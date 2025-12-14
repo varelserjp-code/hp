@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>あなたの名前 / ポートフォリオ</title>
+  <meta name="description" content="画像リンク中心のシンプルなポートフォリオ。" />
+  <meta name="theme-color" content="#ffffff" />
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="/assets/styles.css" />
+</head>
+
+<body>
+  <main class="page">
+    <header class="hero" aria-label="ヘッダー">
+      <!-- ★ここだけ変えればOK（1）表示名 -->
+      <p class="name">VARELSER</p>
+
+      <!-- ★ここだけ変えればOK（2）ロゴ画像：assets/logo.svg を差し替え -->
+      <a class="logo" href="/" aria-label="トップへ">
+        <img src="/assets/logo.svg" alt="ロゴ" width="56" height="56" />
+      </a>
+
+      <!-- ★ここだけ変えればOK（3）SNS/リンク：href を自分のURLに -->
+      <nav class="icons" aria-label="リンク">
+        <a class="icon" href="#" aria-label="サイト">
+          <span aria-hidden="true">◆</span>
+        </a>
+        <a class="icon" href="#" aria-label="Instagram">
+          <span aria-hidden="true">◎</span>
+        </a>
+        <a class="icon" href="#" aria-label="YouTube">
+          <span aria-hidden="true">▶</span>
+        </a>
+        <a class="icon" href="#" aria-label="Behance">
+          <span aria-hidden="true">Be</span>
+        </a>
+      </nav>
+    </header>
+
+    <!-- 画像リンク集（ほとんどここだけ触る） -->
+    <section class="gallery" aria-label="作品リンク">
+      <!-- 使い方：
+        1) assets/ に画像を入れる（例：work-01.jpg）
+        2) 下の <a class="tile"> をコピペして増やす
+        3) href に飛ばしたいURL、img src に画像パスを書く
+      -->
+
+      <!-- ▼ 例：作品1 -->
+      <a class="tile" href="#" target="_blank" rel="noreferrer">
+        <img src="/assets/work-01.svg" alt="作品1" loading="lazy" />
+      </a>
+
+      <!-- ▼ 例：作品2 -->
+      <a class="tile" href="#" target="_blank" rel="noreferrer">
+        <img src="/assets/work-02.svg" alt="作品2" loading="lazy" />
+      </a>
+
+      <!-- ▼ 例：作品3 -->
+      <a class="tile" href="#" target="_blank" rel="noreferrer">
+        <img src="/assets/work-03.svg" alt="作品3" loading="lazy" />
+      </a>
+
+      <!-- ▼ 例：作品4 -->
+      <a class="tile" href="#" target="_blank" rel="noreferrer">
+        <img src="/assets/work-04.svg" alt="作品4" loading="lazy" />
+      </a>
+    </section>
+
+    <footer class="foot">
+      <small>© <span id="y"></span> Your Name</small>
+    </footer>
+  </main>
+
+  <script>
+    document.getElementById("y").textContent = String(new Date().getFullYear());
+  </script>
+</body>
+</html>
