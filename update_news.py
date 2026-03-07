@@ -1,30 +1,17 @@
 import os
 import re
 import feedparser
+import requests
+from bs4 import BeautifulSoup
 import google.generativeai as genai
 
 # 1. 権威ある複数の医療・看護系RSSソースのリスト
 RSS_SOURCES = [
-    {
-        "name": "PubMed (Nursing Research)",
-        "url": "https://pubmed.ncbi.nlm.nih.gov/rss/search/1/?limit=1&term=nursing"
-    },
-    {
-        "name": "WHO (World Health Organization)",
-        "url": "https://www.who.int/rss-feeds/news-english.xml"
-    },
-    {
-        "name": "NIH (National Institutes of Health)",
-        "url": "https://www.nih.gov/news-events/news-releases/rss.xml"
-    },
-    {
-        "name": "ScienceDaily (Nursing News)",
-        "url": "https://www.sciencedaily.com/rss/health_medicine/nursing.xml"
-    },
-    {
-        "name": "MedlinePlus (Health News)",
-        "url": "https://medlineplus.gov/feeds/news_en.xml"
-    }
+    {"name": "PubMed (Nursing Research)", "url": "https://pubmed.ncbi.nlm.nih.gov/rss/search/1/?limit=1&term=nursing"},
+    {"name": "WHO (World Health Organization)", "url": "https://www.who.int/rss-feeds/news-english.xml"},
+    {"name": "NIH (National Institutes of Health)", "url": "https://www.nih.gov/news-events/news-releases/rss.xml"},
+    {"name": "ScienceDaily (Nursing News)", "url": "https://www.sciencedaily.com/rss/health_medicine/nursing.xml"},
+    {"name": "MedlinePlus (Health News)", "url": "https://medlineplus.gov/feeds/news_en.xml"}
 ]
 
 # 2. AIの初期設定
@@ -37,20 +24,39 @@ new_html_content = ""
 for source in RSS_SOURCES:
     try:
         feed = feedparser.parse(source["url"])
-        
         if not feed.entries:
             continue
             
         latest_entry = feed.entries[0]
+        article_url = latest_entry.link
         
-        # AIへのプロンプト（1000文字以内、わかりやすさ、論理的解説を指示）
+        # 【追加ロジック】元記事のURLにアクセスし、ウェブサイトのHTMLからテキスト（段落）を抽出する
+        full_text = ""
+        try:
+            # ブラウザからのアクセスを装い、ブロックを回避するメカニズム
+            headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
+            response = requests.get(article_url, headers=headers, timeout=10)
+            soup = BeautifulSoup(response.text, 'html.parser')
+            
+            # ウェブページ内の <p> (段落) タグのテキストをすべて結合
+            paragraphs = soup.find_all('p')
+            full_text = " ".join([p.get_text(strip=True) for p in paragraphs])
+            
+            # テキストが長すぎる場合を考慮し、最初の10000文字に制限
+            full_text = full_text[:10000]
+        except Exception as scrape_error:
+            print(f"Scraping failed for {article_url}: {scrape_error}")
+            # 万が一スクレイピングに失敗した場合は、RSSの概要をフェイルセーフとして使用
+            full_text = latest_entry.summary if 'summary' in latest_entry else ''
+
+        # AIへのプロンプト（元記事の全文テキストを渡すように変更）
         prompt = f"""
-        以下の英語の医療・看護系ニュースを、日本の現役看護師向けに【1000文字以内】でわかりやすく日本語に翻訳・要約してください。
-        その際、情報のエビデンスやメカニズムが正確に伝わるよう、専門用語を適切に用いて論理的に解説してください。
+        以下の英語の医療・看護系ニュース（元記事の抽出テキスト）を、日本の現役看護師向けに【1000文字以内】でわかりやすく日本語に翻訳・要約してください。
+        情報のエビデンスやメカニズムが正確に伝わるよう、専門用語を適切に用いて論理的に解説してください。
 
         タイトル: {latest_entry.title}
-        リンク: {latest_entry.link}
-        概要: {latest_entry.summary if 'summary' in latest_entry else 'No summary provided.'}
+        元記事テキスト:
+        {full_text}
         """
 
         response = model.generate_content(prompt)
@@ -75,7 +81,6 @@ for source in RSS_SOURCES:
 
 # 5. nurse-news.html の読み込みと物理的な書き換え処理
 file_path = "nurse-news.html"
-
 with open(file_path, "r", encoding="utf-8") as file:
     html_data = file.read()
 
@@ -85,4 +90,4 @@ updated_html = re.sub(pattern, rf"\1\n{new_html_content}\n\3", html_data, flags=
 with open(file_path, "w", encoding="utf-8") as file:
     file.write(updated_html)
 
-print("要約テキストと引用元の更新が完了しました。")
+print("元記事全文に基づくAI要約テキストの更新が完了しました。")
