@@ -30,6 +30,6 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add nurse-news.html seen_urls.json
+          git add nurse-news.html seen_urls.json articles_data.json
           git commit -m "Automated update: AI summarized nursing news" || echo "No changes to commit"
           git push
