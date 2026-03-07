@@ -30,26 +30,21 @@ for source in RSS_SOURCES:
         latest_entry = feed.entries[0]
         article_url = latest_entry.link
         
-        # 【追加ロジック】元記事のURLにアクセスし、ウェブサイトのHTMLからテキスト（段落）を抽出する
+        # 元記事のURLにアクセスし、テキストを抽出するロジック
         full_text = ""
         try:
-            # ブラウザからのアクセスを装い、ブロックを回避するメカニズム
             headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
             response = requests.get(article_url, headers=headers, timeout=10)
             soup = BeautifulSoup(response.text, 'html.parser')
             
-            # ウェブページ内の <p> (段落) タグのテキストをすべて結合
             paragraphs = soup.find_all('p')
             full_text = " ".join([p.get_text(strip=True) for p in paragraphs])
-            
-            # テキストが長すぎる場合を考慮し、最初の10000文字に制限
             full_text = full_text[:10000]
         except Exception as scrape_error:
             print(f"Scraping failed for {article_url}: {scrape_error}")
-            # 万が一スクレイピングに失敗した場合は、RSSの概要をフェイルセーフとして使用
             full_text = latest_entry.summary if 'summary' in latest_entry else ''
 
-        # AIへのプロンプト（元記事の全文テキストを渡すように変更）
+        # AIへのプロンプト
         prompt = f"""
         以下の英語の医療・看護系ニュース（元記事の抽出テキスト）を、日本の現役看護師向けに【1000文字以内】でわかりやすく日本語に翻訳・要約してください。
         情報のエビデンスやメカニズムが正確に伝わるよう、専門用語を適切に用いて論理的に解説してください。
@@ -90,4 +85,4 @@ updated_html = re.sub(pattern, rf"\1\n{new_html_content}\n\3", html_data, flags=
 with open(file_path, "w", encoding="utf-8") as file:
     file.write(updated_html)
 
-print("元記事全文に基づくAI要約テキストの更新が完了しました。")
+print("要約テキストの更新が完了しました。")
