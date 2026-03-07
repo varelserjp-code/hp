@@ -1,0 +1,1791 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MEIKYOSHISUI v25.7 — Ambient/Drone/Psychedelic MIDI Generator</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="Meikyo/styles.css">
+</head>
+
+<body>
+
+<div class="wrap">
+<header>
+  <div class="sys-tag">// MEIKYOSHISUI v25.7 //</div>
+  <h1>MEIKYOSHISUI</h1>
+  <p class="sub">ambient · drone · psychedelic · dark ambient · space</p>
+  <canvas id="osc"></canvas>
+</header>
+
+<!-- ═══ v15.0: ENGINE CONTROL BAR ═══ -->
+<div class="ecb" id="engineControlBar">
+  <div class="ecb-header">
+    <div class="ecb-title">⬡ Engine Control</div>
+    <div class="ecb-presets">
+      <button class="ecb-preset-btn" id="ecbPresetFull">ALL ON</button>
+      <button class="ecb-preset-btn" id="ecbPresetMin">MINIMAL</button>
+      <button class="ecb-preset-btn" id="ecbPresetChaos">CHAOS</button>
+      <button class="ecb-preset-btn" id="ecbPresetOff">ALL OFF</button>
+      <button class="ecb-preset-btn" id="ecbPresetSerial" style="border-color:#aaa;color:#aaa;">SERIAL</button>
+      <button class="ecb-preset-btn" id="ecbPresetXenakis" style="border-color:#aaa;color:#aaa;">XENAKIS</button>
+      <button class="ecb-preset-btn" id="ecbPresetSwarm" style="border-color:#aaa;color:#aaa;">SWARM</button>
+      <button class="ecb-preset-btn" id="ecbPresetOrganic" style="border-color:#c084fc;color:#c084fc;">ORGANIC</button>
+      <button class="ecb-preset-btn" id="ecbPresetSacred" style="border-color:#9b6fff;color:#9b6fff;">SACRED</button>
+    </div>
+  </div>
+  <div class="ecb-grid" id="ecbGrid"><!-- JS で描画 --></div>
+  <div class="ecb-status" id="ecbStatus"><!-- JS で描画 --></div>
+</div>
+
+<div class="g2 mb16">
+  <div class="panel"><div class="panel-top"></div><div class="sec-label">Chord Input</div>
+    <input type="text" class="chord-box" id="chordInput" placeholder="例: Dm9 / F#m11 / Ebmaj13" spellcheck="false" autocomplete="off">
+    <div class="chord-status" id="chordStatus">— コードを入力してください —</div>
+    <div class="chips" id="basicChips"></div>
+    <div style="margin-top:8px;font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--text-dim);letter-spacing:2px;">EXTENDED / EXOTIC</div>
+    <div class="chips" id="extChips"></div>
+    <div class="midi-in-box">
+      <div class="tog-row" style="padding-bottom:10px;">
+        <div class="tog-info">
+          <div class="tog-name" style="color:#7dd3fc;">MIDI INPUT RECEIVE</div>
+          <div class="tog-desc">Web MIDI からノート/CC を受信し、和音認識と主要パラメーター操作へ接続</div>
+        </div>
+        <div class="tog" id="togMidiIn"></div>
+      </div>
+      <div id="midiInControls" style="display:none;">
+        <div class="midi-in-row">
+          <select id="midiInSelect" class="midi-in-select">
+            <option value="">NO INPUT</option>
+          </select>
+          <button class="midi-in-btn" id="midiInRefreshBtn">SCAN</button>
+        </div>
+        <div class="tog-row midi-in-subrow">
+          <div class="tog-info">
+            <div class="tog-name" style="font-size:12px;color:#b0bec5;">CC MAP</div>
+            <div class="tog-desc">CC1→Density / CC7→Velocity / CC71→Dissonance / CC74→Humanize</div>
+          </div>
+          <div class="tog on" id="togMidiCCMap"></div>
+        </div>
+        <div class="midi-in-status" id="midiInStatus">WEB MIDI: OFF</div>
+        <div class="midi-in-status dim" id="midiInNotes">HELD: —</div>
+      </div>
+    </div>
+  </div>
+  <div class="panel"><div class="panel-top purple"></div><div class="sec-label">Genre / Texture</div><div class="genre-grid" id="genreGrid"></div></div>
+</div>
+
+<!-- ═══ v23.0: CC AUTOMATION ═══ -->
+<div class="panel full">
+  <div class="panel-top" style="background:#002030;opacity:.8;"></div>
+  <div class="sec-label">CC Automation <span class="cca-badge">MIDI CC LANES</span> <span class="badge" style="border-color:#00e5ff;color:#00e5ff;">v23.0</span></div>
+  <div class="tog-row" style="margin-bottom:14px;border-bottom:1px solid var(--border);padding-bottom:12px;">
+    <div class="tog-info">
+      <div class="tog-name">CC AUTOMATION</div>
+      <div class="tog-desc">Modulation / Filter / Reverb などを波形・テンションで自動生成</div>
+    </div>
+    <div class="tog" id="togCCA"></div>
+  </div>
+
+  <!-- PRESETS -->
+  <div style="font-family:'Share Tech Mono',monospace;font-size:7px;color:var(--text-dim);letter-spacing:2px;margin-bottom:6px;">PRESETS</div>
+  <div class="cca-preset-row" id="ccaPresets"></div>
+
+  <!-- MINI VISUALIZER -->
+  <canvas id="ccaCanvas"></canvas>
+
+  <!-- LANES -->
+  <div style="font-family:'Share Tech Mono',monospace;font-size:7px;color:var(--text-dim);letter-spacing:2px;margin-bottom:8px;">LANES</div>
+  <div class="cca-lanes" id="ccaLanes"></div>
+
+  <!-- INFO -->
+  <div class="cca-info" id="ccaInfo">CC AUTOMATION — 無効</div>
+</div>
+
+<!-- ═══ v22.0: ATTRACTOR SEQUENCER ═══ -->
+<div class="panel full">
+  <div class="panel-top" style="background:#3d2e00;opacity:.7;"></div>
+  <div class="sec-label">Attractor Sequencer <span class="at-badge">STRANGE ATTRACTOR</span> <span class="badge" style="border-color:#ffcc00;color:#ffcc00;">v22.0</span></div>
+  <div class="tog-row" style="margin-bottom:14px;border-bottom:1px solid var(--border);padding-bottom:12px;">
+    <div class="tog-info">
+      <div class="tog-name" style="color:#ffcc00;">Enable Attractor Sequencer</div>
+      <div class="tog-desc">Lorenz · Rössler · Thomas のストレンジアトラクターを x/y/z → Pitch / Velocity / Duration / Gate / Density に自由マッピング</div>
+    </div>
+    <div class="tog" id="togAttractor"></div>
+  </div>
+  <div id="attractorControls" style="display:none;">
+
+    <!-- TYPE TABS -->
+    <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:#ffcc0088;letter-spacing:3px;margin-bottom:8px;">ATTRACTOR TYPE</div>
+    <div class="at-type-row" id="atTypeRow">
+      <div class="at-type-btn on" data-type="lorenz">LORENZ</div>
+      <div class="at-type-btn" data-type="rossler">RÖSSLER</div>
+      <div class="at-type-btn" data-type="thomas">THOMAS</div>
+    </div>
+
+    <!-- PRESETS -->
+    <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:#ffcc0088;letter-spacing:3px;margin-bottom:6px;">PRESETS</div>
+    <div class="at-preset-row" id="atPresets"></div>
+
+    <!-- CANVAS -->
+    <canvas id="atCanvas"></canvas>
+
+    <!-- PARAMS a / b / c -->
+    <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:#ffcc0088;letter-spacing:3px;margin-bottom:8px;">PARAMETERS</div>
+    <div class="at-param-grid">
+      <div class="at-param-col">
+        <div class="at-param-label" id="atLabelA">A (σ)</div>
+        <input type="range" class="slider" id="atParamA" min="1" max="30" step="0.1" value="10">
+        <span class="pval" id="atParamAV">10.0</span>
+      </div>
+      <div class="at-param-col">
+        <div class="at-param-label" id="atLabelB">B (ρ)</div>
+        <input type="range" class="slider" id="atParamB" min="1" max="60" step="0.1" value="28">
+        <span class="pval" id="atParamBV">28.0</span>
+      </div>
+      <div class="at-param-col">
+        <div class="at-param-label" id="atLabelC">C (β)</div>
+        <input type="range" class="slider" id="atParamC" min="0.1" max="15" step="0.01" value="2.667">
+        <span class="pval" id="atParamCV">2.67</span>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+      <div class="param-row">
+        <span class="param-label">dt</span>
+        <input type="range" class="slider" id="atDt" min="5" max="100" value="20">
+        <span class="pval" id="atDtV">0.020</span>
+      </div>
+      <div class="param-row">
+        <span class="param-label">Warmup</span>
+        <input type="range" class="slider" id="atWarmup" min="100" max="5000" step="100" value="1000">
+        <span class="pval" id="atWarmupV">1000</span>
+      </div>
+    </div>
+
+    <!-- X/Y/Z MAPPING -->
+    <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:#ffcc0088;letter-spacing:3px;margin-bottom:8px;">X / Y / Z MAPPING</div>
+    <div class="at-map-grid">
+      <div class="at-map-col">
+        <div class="at-map-label">X →</div>
+        <select class="at-map-select" id="atMapX">
+          <option value="velocity" selected>Velocity</option>
+          <option value="pitch">Pitch</option>
+          <option value="duration">Duration</option>
+          <option value="gate">Gate</option>
+          <option value="density">Density</option>
+          <option value="none">None</option>
+        </select>
+        <div class="at-scale-row">
+          <span style="font-family:'Share Tech Mono',monospace;font-size:7px;color:var(--text-dim);">Scale</span>
+          <input type="range" class="slider" id="atScaleX" min="0" max="100" value="50">
+          <span class="pval" id="atScaleXV">50%</span>
+        </div>
+      </div>
+      <div class="at-map-col">
+        <div class="at-map-label">Y →</div>
+        <select class="at-map-select" id="atMapY">
+          <option value="velocity">Velocity</option>
+          <option value="pitch" selected>Pitch</option>
+          <option value="duration">Duration</option>
+          <option value="gate">Gate</option>
+          <option value="density">Density</option>
+          <option value="none">None</option>
+        </select>
+        <div class="at-scale-row">
+          <span style="font-family:'Share Tech Mono',monospace;font-size:7px;color:var(--text-dim);">Scale</span>
+          <input type="range" class="slider" id="atScaleY" min="0" max="100" value="50">
+          <span class="pval" id="atScaleYV">50%</span>
+        </div>
+      </div>
+      <div class="at-map-col">
+        <div class="at-map-label">Z →</div>
+        <select class="at-map-select" id="atMapZ">
+          <option value="velocity">Velocity</option>
+          <option value="pitch">Pitch</option>
+          <option value="duration">Duration</option>
+          <option value="gate" selected>Gate</option>
+          <option value="density">Density</option>
+          <option value="none">None</option>
+        </select>
+        <div class="at-scale-row">
+          <span style="font-family:'Share Tech Mono',monospace;font-size:7px;color:var(--text-dim);">Scale</span>
+          <input type="range" class="slider" id="atScaleZ" min="0" max="100" value="50">
+          <span class="pval" id="atScaleZV">50%</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="at-info">
+      アトラクターは RK4 で数値積分。x/y/z を 0-127 に正規化してマッピング先に適用します<br>
+      Velocity = 速度シフト ±N &nbsp;|&nbsp; Pitch = ノートインデックスオフセット &nbsp;|&nbsp; Duration = 音価倍率<br>
+      Gate = ゲート長変調 &nbsp;|&nbsp; Density = 発音確率変調 &nbsp;|&nbsp; Scale = 変調幅 (大きいほど効果が強い)
+    </div>
+  </div>
+</div>
+
+<!-- ═══ v21.0: SCALE MUTATION ENGINE ═══ -->
+<div class="panel full">
+  <div class="panel-top" style="background:#2a0066;opacity:.7;"></div>
+  <div class="sec-label">Scale Mutation <span class="sm-badge">MODAL INTERCHANGE</span> <span class="badge" style="border-color:#8c3fff;color:#8c3fff;">v21.0</span></div>
+  <div class="tog-row" style="margin-bottom:14px;border-bottom:1px solid var(--border);padding-bottom:12px;">
+    <div class="tog-info">
+      <div class="tog-name" style="color:#8c3fff;">Enable Scale Mutation Mode</div>
+      <div class="tog-desc">Dorian → Phrygian → Lydian など バー単位でスケールが変化 — Modal Interchange / Modulation をアンビエント的に表現</div>
+    </div>
+    <div class="tog" id="togScaleMut"></div>
+  </div>
+  <div id="scaleMutControls" style="display:none;">
+
+    <!-- PRESETS -->
+    <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:#8c3fff88;letter-spacing:3px;margin-bottom:6px;">PRESETS</div>
+    <div class="sm-preset-row" id="smPresets"></div>
+
+    <!-- ADD ROW -->
+    <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:#8c3fff88;letter-spacing:3px;margin-bottom:6px;">ADD SCALE</div>
+    <div class="sm-add-row">
+      <select class="sm-add-select" id="smAddSelect"></select>
+      <input class="sm-add-bars" id="smAddBars" type="number" min="1" max="32" value="4" title="このスケールのバー数">
+      <button class="sm-add-btn" id="smAddBtn">＋ ADD</button>
+    </div>
+
+    <!-- SLOT LIST -->
+    <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:#8c3fff88;letter-spacing:3px;margin-bottom:6px;">MUTATION SEQUENCE</div>
+    <div class="sm-slots" id="smSlots">
+      <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--text-dim);padding:8px 0;">— スケールを追加してください —</div>
+    </div>
+
+    <!-- SEQUENCE VISUALIZER -->
+    <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:#8c3fff88;letter-spacing:3px;margin-bottom:4px;">SEQUENCE</div>
+    <div class="sm-seq-bar" id="smSeqBar"></div>
+
+    <!-- SCALE DIFF VISUALIZER -->
+    <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:#8c3fff88;letter-spacing:3px;margin-bottom:4px;margin-top:10px;">SCALE DIFF MAP</div>
+    <canvas class="sm-diff-canvas" id="smDiffCanvas" height="72"></canvas>
+    <div class="sm-diff-legend" id="smDiffLegend"></div>
+
+    <!-- SMOOTHNESS BAR -->
+    <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:#8c3fff88;letter-spacing:3px;margin-bottom:4px;margin-top:10px;">VOICE LEADING SMOOTHNESS</div>
+    <div class="sm-smooth-bar" id="smSmoothBar">
+      <span class="sm-smooth-label">—</span>
+    </div>
+    <div class="sm-info-line" id="smInfoLine">— スケールを追加すると詳細を表示します —</div>
+
+    <!-- PARAMS -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:12px;">
+      <div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:#8c3fff88;letter-spacing:3px;margin-bottom:8px;">TRANSITION MODE</div>
+        <div class="sm-mode-row" id="smTransModeRow">
+          <div class="sm-mode-btn on" data-mode="hard">HARD CUT</div>
+          <div class="sm-mode-btn" data-mode="pivot">PIVOT</div>
+          <div class="sm-mode-btn" data-mode="crossfade">CROSSFADE</div>
+        </div>
+        <div class="sm-trans-len-row">
+          <span style="font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--text-dim);letter-spacing:1px;">Trans Bars</span>
+          <input type="range" class="slider" id="smTransLen" min="0" max="4" value="1" style="flex:1;">
+          <span class="pval" id="smTransLenV">1</span>
+        </div>
+      </div>
+      <div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:#8c3fff88;letter-spacing:3px;margin-bottom:8px;">OPTIONS</div>
+        <div class="param-row" style="margin-bottom:8px;">
+          <span class="param-label" style="flex:1;color:#8c3fff88;">Loop Sequence</span>
+          <div class="tog on" id="smLoopTog" style="width:22px;height:22px;"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sm-info">
+      Scale Mutation はバー単位でスケールを切り替え、全レイヤーの音程プールをリアルタイム変化させます<br>
+      HARD CUT = 即時切替 &nbsp;|&nbsp; PIVOT = 共通音を保持しながら段階的移行 &nbsp;|&nbsp; CROSSFADE = 確率的音程ブレンド<br>
+      Trans Bars = 切替境界付近で前後スケールを補間するバー数 &nbsp;|&nbsp; Chord Progression と併用可能
+    </div>
+  </div>
+</div>
+
+<!-- ═══ v20.0: CHORD PROGRESSION ENGINE ═══ -->
+<div class="panel full">
+  <div class="panel-top" style="background:#004d20;opacity:.7;"></div>
+  <div class="sec-label">Chord Progression <span class="cp-badge">MULTI-CHORD</span> <span class="badge" style="border-color:#00e676;color:#00e676;">v20.0</span></div>
+  <div class="tog-row" style="margin-bottom:14px;border-bottom:1px solid var(--border);padding-bottom:12px;">
+    <div class="tog-info">
+      <div class="tog-name" style="color:#00e676;">Enable Chord Progression Mode</div>
+      <div class="tog-desc">II-V-I · Am-G-F-E など複数コードを時系列に配置 — テンションカーブと連動してコード変化ごとに表情を生成</div>
+    </div>
+    <div class="tog" id="togProgression"></div>
+  </div>
+  <div id="progressionControls" style="display:none;">
+
+    <!-- PRESETS -->
+    <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:#00e67688;letter-spacing:3px;margin-bottom:6px;">PRESETS</div>
+    <div class="cp-preset-row" id="cpPresets"></div>
+
+    <!-- CHORD ADD ROW -->
+    <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:#00e67688;letter-spacing:3px;margin-bottom:6px;">ADD CHORD</div>
+    <div class="cp-add-row">
+      <input class="cp-add-input" id="cpAddInput" placeholder="Cmaj7 · Am · F#m7b5 …" spellcheck="false" autocomplete="off">
+      <input class="cp-add-bars" id="cpAddBars" type="number" min="1" max="32" value="4" title="このコードのバー数">
+      <button class="cp-add-btn" id="cpAddBtn">＋ ADD</button>
+    </div>
+
+    <!-- BORROWED CHORDS (Modal Mixture) -->
+    <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:#00e67688;letter-spacing:3px;margin-bottom:6px;margin-top:14px;">
+      BORROWED CHORDS
+      <span style="color:var(--text-dim);letter-spacing:1px;font-size:7px;"> — MODAL MIXTURE</span>
+    </div>
+    <div class="cp-borrowed-wrap" id="cpBorrowedWrap">
+      <div class="cp-borrowed-groups" id="cpBorrowedGroups">
+        <span style="font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--text-dim);">— コードを生成してスケールを選択すると借用候補が表示されます —</span>
+      </div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:7px;color:var(--text-dim);margin-top:4px;line-height:1.6;">
+        クリックで進行に追加 &nbsp;·&nbsp; <span id="cpBorrowedRoot" style="color:#00e676aa;"></span>
+      </div>
+    </div>
+
+    <!-- SLOT LIST -->
+    <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:#00e67688;letter-spacing:3px;margin-bottom:6px;">PROGRESSION</div>
+    <div class="cp-slots" id="cpSlots">
+      <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--text-dim);padding:8px 0;">— コードを追加してください —</div>
+    </div>
+
+    <!-- SMOOTHNESS BAR -->
+    <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:#00e67688;letter-spacing:3px;margin-bottom:4px;">VOICE LEADING SMOOTHNESS</div>
+    <div class="cp-smooth-bar" id="cpSmoothBar">
+      <span class="cp-smooth-label">—</span>
+    </div>
+    <div class="cp-info-line" id="cpInfoLine">— 進行が設定されると詳細を表示します —</div>
+
+    <!-- PARAMS -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:12px;">
+      <div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:#00e67688;letter-spacing:3px;margin-bottom:8px;">VEL SHAPE</div>
+        <div class="cp-mode-row" id="cpVelShapeRow">
+          <div class="cp-mode-btn on" data-mode="flat">FLAT</div>
+          <div class="cp-mode-btn" data-mode="swell">SWELL</div>
+          <div class="cp-mode-btn" data-mode="fade">FADE</div>
+          <div class="cp-mode-btn" data-mode="accent-in">ACC IN</div>
+          <div class="cp-mode-btn" data-mode="accent-out">ACC OUT</div>
+        </div>
+        <div class="param-row"><span class="param-label">Shape Amount</span><input type="range" class="slider" id="cpVelShapeAmt" min="0" max="100" value="50"><span class="pval" id="cpVelShapeAmtV">0.50</span></div>
+      </div>
+      <div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:#00e67688;letter-spacing:3px;margin-bottom:8px;">TRANSITION</div>
+        <div class="cp-mode-row" id="cpTransRow">
+          <div class="cp-mode-btn on" data-mode="hard">HARD CUT</div>
+          <div class="cp-mode-btn" data-mode="smooth">SMOOTH</div>
+          <div class="cp-mode-btn" data-mode="voice-lead" title="VLEngine: Pad の初期ボイシングを声部進行コスト最小で決定">VOICE LEAD</div>
+        </div>
+        <div style="margin-top:8px;">
+          <div class="param-row">
+            <span class="param-label" style="flex:1;">Loop Prog</span>
+            <div class="tog on" id="cpLoopTog" style="width:22px;height:22px;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cp-info">
+      コード進行モードでは各コードをバー単位で配置し、全レイヤーをコードごとに独立生成して結合します<br>
+      Vel Shape = コード内フェーズでのベロシティ包絡 &nbsp;|&nbsp; Smooth = 前コードとの共通音を優先的に保持<br>
+      進行が空の場合は Chord Input パネルの単一コードで通常生成されます
+    </div>
+  </div>
+</div>
+
+<!-- ═══ v25.7: CONDUCTOR TRACK 可視化・編集 ═══ -->
+<div class="panel full" id="cvPanel">
+  <div class="panel-top" style="background:#001420;opacity:.85;"></div>
+  <div class="sec-label">Conductor Track <span class="badge" style="border-color:#00e5ff;color:#00e5ff;">TIMELINE</span> <span class="badge" style="border-color:#0288d1;color:#0288d1;">v25.7</span></div>
+
+  <!-- ENABLE TOGGLE -->
+  <div class="tog-row" style="margin-bottom:14px;border-bottom:1px solid var(--border);padding-bottom:12px;">
+    <div class="tog-info">
+      <div class="tog-name">CONDUCTOR VIZ</div>
+      <div class="tog-desc">テンポ / テンションカーブをタイムラインで可視化。EDIT モードでクリック&ドラッグして手動編集</div>
+    </div>
+    <div class="tog" id="togCV"></div>
+  </div>
+
+  <!-- CANVAS -->
+  <canvas id="conductorVizCanvas" class="cv-canvas"></canvas>
+
+  <!-- CONTROLS -->
+  <div class="cv-ctrl-row">
+    <div class="cv-edit-btn" id="cvEditBtn" title="クリック&ドラッグでテンションカーブを手動編集">EDIT MODE</div>
+    <div class="cv-reset-btn" id="cvResetBtn" title="手動編集をリセットして自動生成カーブに戻す">RESET</div>
+    <div class="cv-info" id="cvInfo">CONDUCTOR VIZ — 無効</div>
+  </div>
+</div>
+
+<!-- ═══ v25.6: RHYTHMIC CANONS ENGINE ═══ -->
+<div class="panel full" id="rcPanel">
+  <div class="panel-top" style="background:#200a00;opacity:.85;"></div>
+  <div class="sec-label">Rhythmic Canons <span class="badge" style="border-color:#ff6d00;color:#ff6d00;">TILING</span> <span class="badge" style="border-color:#ff9100;color:#ff9100;">v25.6</span></div>
+
+  <!-- ENABLE TOGGLE -->
+  <div class="tog-row" style="margin-bottom:14px;border-bottom:1px solid var(--border);padding-bottom:12px;">
+    <div class="tog-info">
+      <div class="tog-name">RHYTHMIC CANONS</div>
+      <div class="tog-desc">Vuza / Tiling Canon — A⊕B=Zn の完全タイリングリズム。Euclidean の代替ゲートとして Pad / Arp に適用</div>
+    </div>
+    <div class="tog" id="togRC"></div>
+  </div>
+
+  <!-- MODE SELECT -->
+  <div style="font-family:'Share Tech Mono',monospace;font-size:7px;color:var(--text-dim);letter-spacing:2px;margin-bottom:6px;">MODE</div>
+  <div class="rc-mode-row" id="rcModeRow">
+    <div class="rc-mode-btn on"  data-mode="vuza"      title="Vuzaカノン: 完全タイリング・非周期条件を満たすA/Bペア">VUZA</div>
+    <div class="rc-mode-btn"     data-mode="tiling"    title="一般タイリング: 周期的補集合も許容">TILING</div>
+    <div class="rc-mode-btn"     data-mode="messiaen"  title="Messiaen付加値: 不均等音価配列によるリズム">MESSIAEN</div>
+    <div class="rc-mode-btn"     data-mode="polymeter" title="ポリミクシャ: 複数声部が独立した周期で回る">POLYMETER</div>
+  </div>
+
+  <!-- PRESET ROW (vuza/tiling モード時) -->
+  <div id="rcPresetWrap">
+    <div style="font-family:'Share Tech Mono',monospace;font-size:7px;color:var(--text-dim);letter-spacing:2px;margin-bottom:4px;margin-top:8px;">PRESETS (n=<span id="rcPresetN">24</span>)</div>
+    <div class="rc-preset-row" id="rcPresets"></div>
+  </div>
+
+  <!-- N / VOICES -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;">
+    <div style="display:flex;align-items:center;gap:8px;">
+      <div style="font-family:'Share Tech Mono',monospace;font-size:7px;color:var(--text-dim);letter-spacing:2px;white-space:nowrap;">STEPS (n)</div>
+      <input type="range" id="rcN" min="8" max="48" value="24" step="4" style="flex:1;">
+      <div id="rcNV" style="font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--cyan);min-width:24px;">24</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <div style="font-family:'Share Tech Mono',monospace;font-size:7px;color:var(--text-dim);letter-spacing:2px;white-space:nowrap;">VOICES</div>
+      <input type="range" id="rcVoices" min="1" max="4" value="2" step="1" style="flex:1;">
+      <div id="rcVoicesV" style="font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--cyan);min-width:16px;">2</div>
+    </div>
+  </div>
+
+  <!-- MESSIAEN PATTERN (messiaen モード時のみ) -->
+  <div id="rcMessiaenRow" style="display:none;margin-top:10px;">
+    <div style="font-family:'Share Tech Mono',monospace;font-size:7px;color:var(--text-dim);letter-spacing:2px;margin-bottom:4px;">DURATION PATTERN (カンマ区切り)</div>
+    <input type="text" id="rcMessiaenPattern" value="3,3,2,3,3,3,2"
+           style="width:100%;background:var(--s2);border:1px solid var(--border);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:9px;padding:4px 6px;box-sizing:border-box;">
+  </div>
+
+  <!-- POLYMETER CYCLES (polymeter モード時のみ) -->
+  <div id="rcPolymeterRow" style="display:none;margin-top:10px;">
+    <div style="font-family:'Share Tech Mono',monospace;font-size:7px;color:var(--text-dim);letter-spacing:2px;margin-bottom:4px;">CYCLES (カンマ区切り)</div>
+    <input type="text" id="rcPolymeterCycles" value="3,4"
+           style="width:100%;background:var(--s2);border:1px solid var(--border);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:9px;padding:4px 6px;box-sizing:border-box;">
+  </div>
+
+  <!-- PATTERN CANVAS -->
+  <div style="font-family:'Share Tech Mono',monospace;font-size:7px;color:var(--text-dim);letter-spacing:2px;margin-top:10px;margin-bottom:6px;">GATE PATTERN</div>
+  <canvas id="rcPatternCanvas" class="rc-pattern-canvas"></canvas>
+
+  <!-- TILING VALID -->
+  <div class="rc-info" id="rcInfo">RHYTHMIC CANONS — 無効</div>
+</div>
+
+<!-- ═══ v25.5: JUST INTONATION ENGINE ═══ -->
+<div class="panel full" id="jiPanel">
+  <div class="panel-top" style="background:#002818;opacity:.85;"></div>
+  <div class="sec-label">Just Intonation <span class="badge" style="border-color:#00e676;color:#00e676;">JI TUNING</span> <span class="badge" style="border-color:#00bfa5;color:#00bfa5;">v25.5</span></div>
+
+  <!-- ENABLE TOGGLE -->
+  <div class="tog-row" style="margin-bottom:14px;border-bottom:1px solid var(--border);padding-bottom:12px;">
+    <div class="tog-info">
+      <div class="tog-name">JUST INTONATION</div>
+      <div class="tog-desc">純正律チューニング — MPE モード有効時に各音に PitchBend を適用 (5-limit / 7-limit / 11-limit / Harmonic / Utonal)</div>
+    </div>
+    <div class="tog" id="togJI"></div>
+  </div>
+
+  <!-- MODE SELECT -->
+  <div style="font-family:'Share Tech Mono',monospace;font-size:7px;color:var(--text-dim);letter-spacing:2px;margin-bottom:6px;">MODE</div>
+  <div class="ji-mode-row" id="jiModeRow">
+    <div class="ji-mode-btn on"  data-mode="limit5"   title="5-limit: Ptolemy's intense diatonic">5-LIMIT</div>
+    <div class="ji-mode-btn"     data-mode="limit7"   title="7-limit: Partch / Johnston — ブルーノート含む">7-LIMIT</div>
+    <div class="ji-mode-btn"     data-mode="limit11"  title="11-limit: クォータートーン的音程を含む">11-LIMIT</div>
+    <div class="ji-mode-btn"     data-mode="harmonic" title="倍音列直接マッピング — harmonicLimit 倍音まで">HARMONIC</div>
+    <div class="ji-mode-btn"     data-mode="utonal"   title="倍音列の鏡像反転 — Negative Harmony 的">UTONAL</div>
+  </div>
+
+  <!-- BLEND SLIDER -->
+  <div style="display:flex;align-items:center;gap:10px;margin-top:10px;margin-bottom:10px;">
+    <div style="font-family:'Share Tech Mono',monospace;font-size:7px;color:var(--text-dim);letter-spacing:2px;white-space:nowrap;">BLEND</div>
+    <input type="range" id="jiBlend" min="0" max="100" value="100" step="1" style="flex:1;">
+    <div id="jiBlendV" style="font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--cyan);min-width:36px;">100%</div>
+  </div>
+
+  <!-- HARMONIC LIMIT (harmonic/utonal モード時のみ表示) -->
+  <div id="jiHarmonicRow" style="display:none;align-items:center;gap:10px;margin-bottom:10px;">
+    <div style="font-family:'Share Tech Mono',monospace;font-size:7px;color:var(--text-dim);letter-spacing:2px;white-space:nowrap;">HARMONIC LIMIT</div>
+    <input type="range" id="jiHarmonicLimit" min="2" max="32" value="16" step="1" style="flex:1;">
+    <div id="jiHarmonicLimitV" style="font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--cyan);min-width:24px;">16</div>
+  </div>
+
+  <!-- DEVIATION CANVAS -->
+  <div style="font-family:'Share Tech Mono',monospace;font-size:7px;color:var(--text-dim);letter-spacing:2px;margin-bottom:6px;">DEVIATION FROM 12-TET (¢)</div>
+  <canvas id="jiDeviationCanvas" class="ji-deviation-canvas"></canvas>
+
+  <!-- INFO -->
+  <div class="ji-info" id="jiInfo">JUST INTONATION — 無効 (MPE モードで有効になります)</div>
+</div>
+
+<!-- ═══ v25.3: NEO-RIEMANNIAN ENGINE ═══ -->
+<div class="panel full">
+  <div class="panel-top" style="background:#1a004d;opacity:.85;"></div>
+  <div class="sec-label">Neo-Riemannian <span class="badge" style="border-color:#a855f7;color:#a855f7;">TONNETZ</span> <span class="badge" style="border-color:#8c3fff;color:#8c3fff;">v25.3</span></div>
+  <div class="tog-row" style="margin-bottom:14px;border-bottom:1px solid var(--border);padding-bottom:12px;">
+    <div class="tog-info">
+      <div class="tog-name" style="color:#a855f7;">P / R / L 変換 — Tonnetz 格子</div>
+      <div class="tog-desc">Parallel · Relative · Leading-tone 変換でコードを進行に追加 — BFS で最短パス探索 — Tonnetz Canvas でリアルタイム可視化</div>
+    </div>
+  </div>
+
+  <!-- PRESET ROW -->
+  <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:#a855f788;letter-spacing:3px;margin-bottom:6px;">NR PRESETS</div>
+  <div class="nr-preset-row" id="nrPresets"></div>
+
+  <!-- TRANSFORM BUTTONS -->
+  <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:#a855f788;letter-spacing:3px;margin-bottom:6px;margin-top:12px;">TRANSFORM (現在コード)</div>
+  <div class="nr-ops-row" id="nrOpsRow">
+    <button class="nr-op-btn" data-op="P" title="Parallel: 同ルートで長短反転 (C ↔ Cm)">P</button>
+    <button class="nr-op-btn" data-op="R" title="Relative: 平行調 (C → Am)">R</button>
+    <button class="nr-op-btn" data-op="L" title="Leading-tone: 導音変換 (C → Em)">L</button>
+    <button class="nr-op-btn nr-op-btn--combo" data-op="PL" title="PL複合">PL</button>
+    <button class="nr-op-btn nr-op-btn--combo" data-op="LR" title="LR複合">LR</button>
+    <button class="nr-op-btn nr-op-btn--combo" data-op="RL" title="RL複合">RL</button>
+    <button class="nr-op-btn nr-op-btn--combo" data-op="PLP" title="PLP複合">PLP</button>
+    <button class="nr-op-btn nr-op-btn--reset" id="nrResetBtn" title="起点コードをリセット">RESET</button>
+  </div>
+  <!-- 現在変換コード表示 -->
+  <div class="nr-cur-chord" id="nrCurChord">— コードを入力してください —</div>
+
+  <!-- TONNETZ CANVAS -->
+  <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:#a855f788;letter-spacing:3px;margin-bottom:6px;margin-top:12px;">TONNETZ</div>
+  <canvas class="nr-canvas" id="nrCanvas" height="160"></canvas>
+
+  <!-- PATH FINDER -->
+  <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:#a855f788;letter-spacing:3px;margin-bottom:6px;margin-top:12px;">PATH FINDER (BFS)</div>
+  <div class="nr-path-row">
+    <input class="nr-path-input" id="nrPathFrom" placeholder="起点: C, Am, F#m …" spellcheck="false" autocomplete="off">
+    <span class="nr-path-arrow">→</span>
+    <input class="nr-path-input" id="nrPathTo" placeholder="終点: Em, Bb …" spellcheck="false" autocomplete="off">
+    <button class="nr-path-btn" id="nrPathFind">FIND PATH</button>
+  </div>
+  <div class="nr-path-result" id="nrPathResult">— 起点と終点を入力して FIND PATH —</div>
+
+  <!-- PATH → PROGRESSION に追加 -->
+  <div id="nrPathAddRow" style="display:none;margin-top:8px;">
+    <button class="nr-add-prog-btn" id="nrAddToProg">＋ PROGRESSION に追加</button>
+  </div>
+
+  <!-- PROGRESSION ADD FROM NR -->
+  <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:#a855f788;letter-spacing:3px;margin-bottom:6px;margin-top:12px;">現在変換コードを進行に追加</div>
+  <div class="nr-add-row">
+    <input class="nr-add-bars" id="nrAddBars" type="number" min="1" max="32" value="4" title="バー数">
+    <button class="nr-add-chord-btn" id="nrAddCurBtn">＋ ADD CHORD</button>
+  </div>
+</div>
+
+<!-- ═══ v12.2: NEGATIVE HARMONY ═══ -->
+<div class="panel full">
+  <div class="panel-top gold"></div>
+  <div class="sec-label">Negative Harmony <span class="badge gold">ERNST LEVY</span></div>
+  <div class="nh-controls">
+    <div class="nh-field"><label>Key (調性)</label><select id="nh-key"></select></div>
+  </div>
+  <div class="nh-prog-label">Chord Progression — コード進行</div>
+  <div class="nh-slots" id="nh-slots"></div>
+  <button class="nh-add-btn" id="nh-add">＋ コードを追加</button>
+  <div class="nh-section-label orig-label">▲ Original Progression</div>
+  <div class="nh-row" id="nh-orig-row"><div class="nh-empty">コードを追加してください</div></div>
+  <div class="nh-axis-bar"><div class="axis-line"></div><div class="axis-label">対称軸 · Axis = <span id="nh-axis-label">E♭/E</span></div><div class="axis-line"></div></div>
+  <div class="nh-row" id="nh-shad-row"></div>
+  <div class="nh-section-label shad-label">▼ Shadow (Negative Harmony)</div>
+  <div class="nh-info-box">
+    <strong style="color:#aaa">Algorithm:</strong>
+    調性の主音 <em>R</em> に対し、対称軸 <span class="formula">axis = R + 3.5 (半音)</span> を設定。
+    各構成音 <em>n</em> を <span class="formula">n' = (2 × axis − n) mod 12</span> で反転。
+    例：C Major の G7 [G,B,D,F] → [C, A♭, F, D] = Fm6。
+  </div>
+</div>
+
+
+
+<!-- ═══ v18.0: BOIDS / SWARM INTELLIGENCE ENGINE ═══ -->
+<div class="panel full">
+  <div class="panel-top" style="background:#333;opacity:.4;"></div>
+  <div class="sec-label">Swarm Intelligence — Boids <span class="boids-badge">REYNOLDS</span> <span class="badge" style="border-color:#aaa;color:#aaa;">v18.0</span></div>
+  <div class="tog-row" style="margin-bottom:14px;border-bottom:1px solid var(--border);padding-bottom:12px;">
+    <div class="tog-info">
+      <div class="tog-name" style="color:#aaa;">Enable Boids Swarm</div>
+      <div class="tog-desc">Craig Reynolds 1986 — Separation · Alignment · Cohesion — レイヤー間の相互干渉アンサンブルをシミュレート</div>
+    </div>
+    <div class="tog" id="togBoids"></div>
+  </div>
+  <div id="boidsControls" style="display:none;">
+
+    <!-- PRESETS -->
+    <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--text-dim);letter-spacing:3px;margin-bottom:6px;">BEHAVIOR PRESETS</div>
+    <div class="boids-preset-row" id="boidsPresets"></div>
+
+    <!-- SIMULATION MODE -->
+    <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--text-dim);letter-spacing:3px;margin-bottom:6px;">OUTPUT MODE</div>
+    <div class="boids-mode-row" id="boidsModeRow">
+      <div class="boids-mode-btn on" data-mode="register">REGISTER<br><span style="font-size:7px;opacity:.5;">音域の住み分け</span></div>
+      <div class="boids-mode-btn" data-mode="velocity">VELOCITY<br><span style="font-size:7px;opacity:.5;">強弱の相互干渉</span></div>
+      <div class="boids-mode-btn" data-mode="gate">GATE<br><span style="font-size:7px;opacity:.5;">アーティキュレーション同期</span></div>
+      <div class="boids-mode-btn" data-mode="all">ALL<br><span style="font-size:7px;opacity:.5;">全パラメータ</span></div>
+    </div>
+
+    <!-- 3 RULES -->
+    <div class="boids-rule-grid">
+      <div class="boids-rule-card">
+        <div class="rc-sym">↔</div>
+        <div class="rc-title">SEPARATION</div>
+        <div class="rc-desc">近い音域のレイヤーが互いに離れる。Arpが高音域に移動するとTextureが低音域へ退避。</div>
+        <div class="param-row" style="margin-bottom:0;">
+          <span class="param-label" style="font-size:8px;min-width:60px;">Weight</span>
+          <input type="range" class="slider" style="accent-color:#fff;" id="boidsSep" min="0" max="100" value="60">
+          <span class="pval" style="color:#aaa;" id="boidsSepV">60</span>
+        </div>
+        <div class="param-row" style="margin-bottom:0;">
+          <span class="param-label" style="font-size:8px;min-width:60px;">Radius</span>
+          <input type="range" class="slider" style="accent-color:#fff;" id="boidsSepR" min="1" max="24" value="8">
+          <span class="pval" style="color:#aaa;" id="boidsSepRV">8</span>
+        </div>
+      </div>
+      <div class="boids-rule-card">
+        <div class="rc-sym">→</div>
+        <div class="rc-title">ALIGNMENT</div>
+        <div class="rc-desc">同じ方向に動くレイヤーが速度を揃える。クレッシェンドが伝播し、全体でダイナミクスが変化。</div>
+        <div class="param-row" style="margin-bottom:0;">
+          <span class="param-label" style="font-size:8px;min-width:60px;">Weight</span>
+          <input type="range" class="slider" style="accent-color:#fff;" id="boidsAli" min="0" max="100" value="40">
+          <span class="pval" style="color:#aaa;" id="boidsAliV">40</span>
+        </div>
+        <div class="param-row" style="margin-bottom:0;">
+          <span class="param-label" style="font-size:8px;min-width:60px;">Radius</span>
+          <input type="range" class="slider" style="accent-color:#fff;" id="boidsAliR" min="1" max="24" value="12">
+          <span class="pval" style="color:#aaa;" id="boidsAliRV">12</span>
+        </div>
+      </div>
+      <div class="boids-rule-card">
+        <div class="rc-sym">●</div>
+        <div class="rc-title">COHESION</div>
+        <div class="rc-desc">群れの中心へ向かう力。アンサンブルが崩壊せずに全体が引力で結びつく。</div>
+        <div class="param-row" style="margin-bottom:0;">
+          <span class="param-label" style="font-size:8px;min-width:60px;">Weight</span>
+          <input type="range" class="slider" style="accent-color:#fff;" id="boidsCoh" min="0" max="100" value="25">
+          <span class="pval" style="color:#aaa;" id="boidsCohV">25</span>
+        </div>
+        <div class="param-row" style="margin-bottom:0;">
+          <span class="param-label" style="font-size:8px;min-width:60px;">Radius</span>
+          <input type="range" class="slider" style="accent-color:#fff;" id="boidsCohR" min="1" max="48" value="24">
+          <span class="pval" style="color:#aaa;" id="boidsCohRV">24</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- GLOBAL PARAMS -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+      <div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--text-dim);letter-spacing:2px;margin-bottom:6px;">SIMULATION</div>
+        <div class="param-row"><span class="param-label" style="font-size:8px;min-width:70px;">Steps/Bar</span><input type="range" class="slider" style="accent-color:#fff;" id="boidsSteps" min="1" max="32" value="8"><span class="pval" style="color:#aaa;" id="boidsStepsV">8</span></div>
+        <div class="param-row"><span class="param-label" style="font-size:8px;min-width:70px;">Max Speed</span><input type="range" class="slider" style="accent-color:#fff;" id="boidsMaxV" min="1" max="20" value="5"><span class="pval" style="color:#aaa;" id="boidsMaxVV">5</span></div>
+        <div class="param-row"><span class="param-label" style="font-size:8px;min-width:70px;">Inertia</span><input type="range" class="slider" style="accent-color:#fff;" id="boidsInertia" min="0" max="100" value="70"><span class="pval" style="color:#aaa;" id="boidsInertiaV">70%</span></div>
+      </div>
+      <div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--text-dim);letter-spacing:2px;margin-bottom:6px;">OUTPUT INFLUENCE</div>
+        <div class="param-row"><span class="param-label" style="font-size:8px;min-width:70px;">Reg.Depth</span><input type="range" class="slider" style="accent-color:#fff;" id="boidsRegDepth" min="0" max="100" value="50"><span class="pval" style="color:#aaa;" id="boidsRegDepthV">50%</span></div>
+        <div class="param-row"><span class="param-label" style="font-size:8px;min-width:70px;">Vel.Depth</span><input type="range" class="slider" style="accent-color:#fff;" id="boidsVelDepth" min="0" max="100" value="40"><span class="pval" style="color:#aaa;" id="boidsVelDepthV">40%</span></div>
+        <div class="param-row"><span class="param-label" style="font-size:8px;min-width:70px;">Gate.Depth</span><input type="range" class="slider" style="accent-color:#fff;" id="boidsGateDepth" min="0" max="100" value="30"><span class="pval" style="color:#aaa;" id="boidsGateDepthV">30%</span></div>
+      </div>
+    </div>
+
+    <!-- AGENT MONITOR -->
+    <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--text-dim);letter-spacing:3px;margin-bottom:6px;">FLOCK AGENTS — Live Positions</div>
+    <div class="boids-flock-grid" id="boidsAgentGrid"></div>
+
+    <!-- VISUALIZER: 2D Flock Space -->
+    <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--text-dim);letter-spacing:3px;margin-bottom:6px;">FLOCK SPACE — Register(X) × Velocity(Y)</div>
+    <canvas id="boidsViz" height="200"></canvas>
+
+    <!-- OUTPUT TABLE -->
+    <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--text-dim);letter-spacing:3px;margin-bottom:6px;">BOIDS OUTPUT — Per-layer influence at bar 0</div>
+    <div class="boids-output-grid" id="boidsOutputGrid"></div>
+
+    <div class="boids-info-box" id="boidsInfoBox">
+      Boids を有効にして GENERATE — 各レイヤーが相互干渉しながら音域・強弱・アーティキュレーションを調整します。<br>
+      フロック空間: X軸 = 音域位置(低←→高) / Y軸 = ダイナミクス(弱←→強)
+    </div>
+  </div>
+</div>
+
+<!-- ═══ LORENZ ATTRACTOR PARAMS PANEL (legacy — Attractor Sequencer OFF 時のみ表示) ═══ -->
+<div class="panel full" id="lorenzLegacyPanel">
+  <div class="panel-top" style="background:#00e5ff;opacity:.18;"></div>
+  <div class="sec-label">Lorenz Attractor <span class="lz-badge">STRANGE ATTRACTOR</span> <span class="badge" style="border-color:#00e5ff44;color:#00e5ff88;">RK4</span> <span class="badge" style="border-color:#ff444488;color:#ff8888;font-size:7px;">LEGACY</span></div>
+  <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:#ff888888;letter-spacing:2px;margin-bottom:10px;padding:4px 8px;border:1px solid #ff444444;border-radius:2px;background:rgba(255,68,68,.05);">
+    ▸ Attractor Sequencer (v22.0) が有効な場合、このパネルは無効です。以下のパラメータは Attractor Sequencer OFF 時のフォールバックとして機能します。
+  </div>
+  <div class="tog-row" style="margin-bottom:14px;border-bottom:1px solid var(--border);padding-bottom:12px;">
+    <div class="tog-info">
+      <div class="tog-name" style="color:#00e5ff;">Lorenz Attractor Parameters</div>
+      <div class="tog-desc">σ(sigma) · ρ(rho) · β(beta) · dt · Warmup — velocity / gate / note-index を混沌軌道で変調 (Drone · Pad · Arp · Melody · Texture · Lead)</div>
+    </div>
+    <div class="tog on" id="togLorenz"></div>
+  </div>
+  <div id="lorenzControls">
+
+    <!-- PRESETS -->
+    <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--text-dim);letter-spacing:3px;margin-bottom:6px;">PRESETS</div>
+    <div class="lz-preset-row" id="lzPresetRow"></div>
+
+    <!-- PARAMS GRID -->
+    <div class="lz-param-grid">
+      <div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:#00e5ff88;letter-spacing:3px;margin-bottom:8px;">LORENZ EQUATION</div>
+        <div class="param-row"><span class="param-label">σ (sigma)</span><input type="range" class="slider teal" id="lzSigma" min="1" max="30" step="0.5" value="10"><span class="pval" id="lzSigmaV">10.0</span></div>
+        <div class="param-row"><span class="param-label">ρ (rho)</span><input type="range" class="slider teal" id="lzRho" min="1" max="60" step="0.5" value="28"><span class="pval" id="lzRhoV">28.0</span></div>
+        <div class="param-row"><span class="param-label">β (beta)</span><input type="range" class="slider teal" id="lzBeta" min="0.5" max="6" step="0.1" value="2.7"><span class="pval" id="lzBetaV">2.67</span></div>
+      </div>
+      <div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:#00e5ff88;letter-spacing:3px;margin-bottom:8px;">INTEGRATION</div>
+        <div class="param-row"><span class="param-label">dt (step)</span><input type="range" class="slider" id="lzDt" min="1" max="50" value="20"><span class="pval" id="lzDtV">0.020</span></div>
+        <div class="param-row"><span class="param-label">Warmup</span><input type="range" class="slider" id="lzWarmup" min="100" max="5000" step="100" value="1000"><span class="pval" id="lzWarmupV">1000</span></div>
+      </div>
+    </div>
+
+    <!-- LIVE STATE DISPLAY -->
+    <div class="lz-state" id="lzStateDisplay">x: — · y: — · z: —</div>
+
+    <!-- VIZ CANVAS -->
+    <canvas class="lz-viz" id="lzViz"></canvas>
+
+    <div class="lz-info">
+      x → velocity 変調 (±15) &nbsp;|&nbsp; y → note index オフセット (±2) &nbsp;|&nbsp; z → gate長変調 (0.85〜1.15)<br>
+      ρ &lt; 24.06: 安定螺旋 &nbsp;|&nbsp; ρ ≈ 28: 典型カオス &nbsp;|&nbsp; ρ &gt; 36: 完全カオス
+    </div>
+  </div>
+</div>
+
+<!-- ═══ CELLULAR AUTOMATON PARAMS PANEL ═══ -->
+<div class="panel full">
+  <div class="panel-top" style="background:#00e5ff;opacity:.18;"></div>
+  <div class="sec-label">Cellular Automaton <span class="ca-badge">WOLFRAM</span> <span class="badge" style="border-color:#00e5ff44;color:#00e5ff88;">1D ECA</span></div>
+  <div class="tog-row" style="margin-bottom:14px;border-bottom:1px solid var(--border);padding-bottom:12px;">
+    <div class="tog-info">
+      <div class="tog-name" style="color:#00e5ff;">Cellular Automaton Parameters</div>
+      <div class="tog-desc">Rule 0–255 · Seed · Override — ゲートマトリクスでノートの発音をセル状態で制御 (Drone · Pad · Arp · Melody · Texture · Lead)</div>
+    </div>
+    <div class="tog on" id="togCA"></div>
+  </div>
+  <div id="caControls">
+
+    <!-- OVERRIDE TOGGLE -->
+    <div class="ca-override-row">
+      <span class="ca-override-label">RULE SELECT MODE</span>
+      <span style="font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text-dim);letter-spacing:1px;" id="caOverrideLabel">AUTO (ジャンル連動)</span>
+      <div class="tog" id="caOverrideTog"></div>
+    </div>
+
+    <!-- RULE SLIDER -->
+    <div id="caManualControls" style="display:none;">
+      <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:#00e5ff88;letter-spacing:3px;margin-bottom:8px;">RULE NUMBER (Wolfram 0–255)</div>
+      <div class="param-row">
+        <span class="param-label">Rule</span>
+        <input type="range" class="slider teal" id="caRule" min="0" max="255" value="30">
+        <span class="pval" id="caRuleV">30</span>
+      </div>
+      <div class="ca-rule-name" id="caRuleName">Chaotic (Class III)</div>
+
+      <!-- QUICK PRESETS -->
+      <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:#00e5ff88;letter-spacing:3px;margin-bottom:6px;margin-top:12px;">QUICK RULES</div>
+      <div class="ca-rule-presets" id="caRulePresets"></div>
+    </div>
+
+    <!-- SEED BUTTONS (always visible) -->
+    <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:#00e5ff88;letter-spacing:3px;margin-bottom:6px;margin-top:4px;">INITIAL SEED</div>
+    <div class="ca-seed-row" id="caSeedRow"></div>
+
+    <!-- VIZ CANVAS -->
+    <canvas class="ca-viz" id="caViz"></canvas>
+
+    <!-- INFO -->
+    <div class="ca-info">
+      Rule = Wolfram Elementary CA ルール番号 (0–255) &nbsp;|&nbsp; Auto = ジャンルに応じて自動選択 (Ambient→30 / Drone→90 / Psychedelic→54 …)<br>
+      Gate Matrix: CA の各行をサンプリングし、ノートの発音可否をビット列で制御
+    </div>
+  </div>
+</div>
+
+<!-- ═══ v17.0: XENAKIS SIEVE THEORY ENGINE ═══ -->
+<div class="panel full">
+  <div class="panel-top" style="background:#333;opacity:.35;"></div>
+  <div class="sec-label">Xenakis Sieve Theory <span class="sv-badge">XENAKIS</span> <span class="badge green">v17.0</span></div>
+  <div class="tog-row" style="margin-bottom:14px;border-bottom:1px solid var(--border);padding-bottom:12px;">
+    <div class="tog-info">
+      <div class="tog-name" style="color:#aaa;">Enable Sieve Theory</div>
+      <div class="tog-desc">モジュロ演算 × 集合論 — 複数の篩（残差類）を AND · OR · NOT で結合し、非対称スケールとポリリズムを生成</div>
+    </div>
+    <div class="tog" id="togSieve"></div>
+  </div>
+  <div id="sieveControls" style="display:none;">
+
+    <!-- PRESETS -->
+    <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--text-dim);letter-spacing:3px;margin-bottom:6px;">XENAKIS PRESETS</div>
+    <div class="sv-presets" id="svPresets"></div>
+
+    <!-- APPLICATION MODE -->
+    <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--text-dim);letter-spacing:3px;margin-bottom:6px;">APPLICATION MODE</div>
+    <div class="sv-mode-group" id="svModeGroup">
+      <div class="sv-mode-btn on" data-mode="scale">SCALE<br><span style="font-size:7px;opacity:.5;">新しい音階を生成</span></div>
+      <div class="sv-mode-btn" data-mode="rhythm">RHYTHM<br><span style="font-size:7px;opacity:.5;">リズムゲートに適用</span></div>
+      <div class="sv-mode-btn" data-mode="both">SCALE + RHYTHM<br><span style="font-size:7px;opacity:.5;">両方に適用</span></div>
+    </div>
+
+    <!-- SIEVES -->
+    <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--text-dim);letter-spacing:3px;margin-bottom:8px;">SIEVES — 残差類 (modulo, residue)</div>
+    <div class="sv-sieves" id="svSieves"></div>
+    <button class="sv-add-btn" id="svAdd">＋ 篩を追加</button>
+
+    <!-- RANGE & OFFSET -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:10px;">
+      <div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--text-dim);letter-spacing:2px;margin-bottom:4px;">SCALE RANGE (半音数)</div>
+        <div class="param-row"><span class="param-label">Range</span><input type="range" class="slider" style="accent-color:#fff;" id="svRange" min="12" max="48" value="24"><span class="pval" id="svRangeV">24</span></div>
+        <div class="param-row"><span class="param-label">Offset</span><input type="range" class="slider" style="accent-color:#fff;" id="svOffset" min="0" max="11" value="0"><span class="pval" id="svOffsetV">0</span></div>
+      </div>
+      <div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--text-dim);letter-spacing:2px;margin-bottom:4px;">RHYTHM PERIOD (ステップ数)</div>
+        <div class="param-row"><span class="param-label">Period</span><input type="range" class="slider" style="accent-color:#fff;" id="svPeriod" min="8" max="64" value="24"><span class="pval" id="svPeriodV">24</span></div>
+        <div class="param-row"><span class="param-label">Rotation</span><input type="range" class="slider" style="accent-color:#fff;" id="svRhyRot" min="0" max="63" value="0"><span class="pval" id="svRhyRotV">0</span></div>
+      </div>
+    </div>
+
+    <!-- RESULT DISPLAY -->
+    <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:rgba(127,255,0,.4);letter-spacing:2px;margin-bottom:3px;">SIEVE RESULT</div>
+    <div class="sv-result-bar" id="svResultBar">—</div>
+    <div class="sv-density-bar" id="svDensityBar">—</div>
+
+    <!-- VISUALIZERS -->
+    <div class="sv-canvas-wrap">
+      <div>
+        <div class="sv-viz-label">Scale Lattice — 音高分布</div>
+        <canvas class="sv-cv" id="svScaleCv" height="120"></canvas>
+      </div>
+      <div>
+        <div class="sv-viz-label">Rhythm Grid — リズム格子</div>
+        <canvas class="sv-cv" id="svRhythmCv" height="120"></canvas>
+      </div>
+    </div>
+
+    <div class="sv-info-box" id="svInfoBox">
+      篩を追加してGENERATEしてください。<br>
+      Sieve = { n ∈ ℤ | n ≡ r₁ (mod m₁) ∨ n ≡ r₂ (mod m₂) … } — モジュロ演算による残差類の結合
+    </div>
+  </div>
+</div>
+
+<!-- ═══ EUCLIDEAN RHYTHM ═══ -->
+<div class="panel full">
+  <div class="panel-top pink"></div>
+  <div class="sec-label">Euclidean Rhythm <span class="badge pink">BJÖRKLUND</span></div>
+  <div class="tog-row" style="margin-bottom:14px;border-bottom:1px solid var(--border);padding-bottom:12px;">
+    <div class="tog-info"><div class="tog-name" style="color:#aaa;">Enable Euclidean Rhythm</div><div class="tog-desc">ARP · MELODY · TEXTURE · LEAD に適用 — 数理的パルス配置 E(k,n)</div></div>
+    <div class="tog" id="togEuc"></div>
+  </div>
+  <div id="eucControls" style="display:none;">
+    <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--text-dim);letter-spacing:3px;margin-bottom:8px;">PRESETS</div>
+    <div class="euc-preset-grid" id="eucPresets"></div>
+    <div class="param-row"><span class="param-label">Pulses (k)</span><input type="range" class="slider pink" id="eucPulses" min="1" max="16" value="5"><span class="pval" id="eucPulsesV">5</span></div>
+    <div class="param-row"><span class="param-label">Steps (n)</span><input type="range" class="slider pink" id="eucSteps" min="2" max="32" value="8"><span class="pval" id="eucStepsV">8</span></div>
+    <div class="param-row"><span class="param-label">Rotation</span><input type="range" class="slider pink" id="eucRotation" min="0" max="7" value="0"><span class="pval" id="eucRotationV">0</span></div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:9px;color:#aaa;letter-spacing:2px;margin-top:4px;min-height:16px;" id="eucPatternDisplay">—</div>
+    <canvas id="euc-viz"></canvas>
+  </div>
+</div>
+
+<!-- ═══ v14.0: HUMANIZER-NOISE ENGINE ═══ -->
+<div class="panel full">
+  <div class="panel-top purple"></div>
+  <div class="sec-label">Humanizer Noise <span class="badge">1/f + PERLIN</span> <span class="badge green">v14.0</span></div>
+  <div class="tog-row" style="margin-bottom:14px;border-bottom:1px solid var(--border);padding-bottom:12px;">
+    <div class="tog-info">
+      <div class="tog-name" style="color:#aaa;">Enable Humanizer-Noise</div>
+      <div class="tog-desc">velocity / micro-timing / CC modulation を 1/f ピンクノイズ + Perlin FBM で置き換え — 既存の Math.random() ホワイトノイズを廃止</div>
+    </div>
+    <div class="tog" id="togHum"></div>
+  </div>
+  <div id="humControls" style="display:none;">
+    <!-- ノイズモード選択 -->
+    <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--text-dim);letter-spacing:3px;margin-bottom:6px;">NOISE MODE</div>
+    <div class="hum-mode-group" id="humModeGroup"></div>
+    <!-- Pink Noise params -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:4px;" id="humParamGrid">
+      <div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:#aaa;letter-spacing:3px;margin-bottom:8px;">1/f PINK NOISE</div>
+        <div class="param-row"><span class="param-label">Octaves</span><input type="range" class="slider purple" id="humPinkOct" min="4" max="16" value="8"><span class="pval" id="humPinkOctV">8</span></div>
+        <div class="param-row"><span class="param-label">Vel Scale</span><input type="range" class="slider purple" id="humVelScale" min="0" max="30" value="10"><span class="pval" id="humVelScaleV">10</span></div>
+        <div class="param-row"><span class="param-label">Timing (ticks)</span><input type="range" class="slider purple" id="humTimScale" min="0" max="60" value="12"><span class="pval" id="humTimScaleV">12</span></div>
+      </div>
+      <div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:#aaa;letter-spacing:3px;margin-bottom:8px;">PERLIN FBM — CC / PITCH</div>
+        <div class="param-row"><span class="param-label">Speed</span><input type="range" class="slider" id="humPnSpeed" min="1" max="50" value="8"><span class="pval" id="humPnSpeedV">0.008</span></div>
+        <div class="param-row"><span class="param-label">Amplitude</span><input type="range" class="slider" id="humPnAmp" min="5" max="100" value="50"><span class="pval" id="humPnAmpV">0.50</span></div>
+        <div class="param-row"><span class="param-label">FBM Octaves</span><input type="range" class="slider" id="humPnOct" min="1" max="6" value="3"><span class="pval" id="humPnOctV">3</span></div>
+      </div>
+    </div>
+
+    <!-- Velocity Curve params -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;margin-bottom:8px;padding:8px;border:1px solid var(--border);background:var(--s2);border-radius:2px;">
+      <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--text-dim);letter-spacing:2px;">VELOCITY HUMANIZATION CURVE</div>
+      <div class="tog on" id="humCurveTog"></div>
+    </div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--text-dim);letter-spacing:3px;margin-bottom:6px;">CURVE SHAPE</div>
+    <div class="hum-mode-group" id="humCurveShapes"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:6px;">
+      <div>
+        <div class="param-row"><span class="param-label">Curve Amount</span><input type="range" class="slider purple" id="humCurveAmount" min="0" max="100" value="45"><span class="pval" id="humCurveAmountV">45%</span></div>
+        <div class="param-row"><span class="param-label">Bar Head Accent</span><input type="range" class="slider purple" id="humCurveBarHead" min="-100" max="100" value="70"><span class="pval" id="humCurveBarHeadV">70%</span></div>
+        <div class="param-row"><span class="param-label">Phrase Tail</span><input type="range" class="slider purple" id="humCurvePhraseTail" min="-100" max="100" value="55"><span class="pval" id="humCurvePhraseTailV">55%</span></div>
+      </div>
+      <div>
+        <div class="param-row"><span class="param-label">Phrase Bars</span><input type="range" class="slider purple" id="humCurveBars" min="1" max="16" value="4"><span class="pval" id="humCurveBarsV">4</span></div>
+        <div class="param-row"><span class="param-label">Curve Power</span><input type="range" class="slider purple" id="humCurvePower" min="25" max="400" value="120"><span class="pval" id="humCurvePowerV">1.20</span></div>
+      </div>
+    </div>
+
+    <!-- CC対象チェック -->
+    <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--text-dim);letter-spacing:3px;margin:10px 0 6px;">CC TARGETS — Perlin変調を挿入するトラック</div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;" id="humCCTargets"></div>
+    <!-- ライブビジュアライザー -->
+    <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--text-dim);letter-spacing:3px;margin:10px 0 4px;">LIVE PREVIEW — ノイズ波形</div>
+    <canvas class="hum-viz" id="humViz"></canvas>
+    <div class="hum-meter-row">
+      <div class="hum-meter"><div class="hum-meter-fill vel" id="humMeterVel"></div><div class="hum-meter-label" id="humMeterVelV">Δv —</div></div>
+      <div class="hum-meter"><div class="hum-meter-fill tim" id="humMeterTim"></div><div class="hum-meter-label" id="humMeterTimV">Δt —</div></div>
+      <div class="hum-meter"><div class="hum-meter-fill cc" id="humMeterCC"></div><div class="hum-meter-label" id="humMeterCCV">CC —</div></div>
+    </div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--text-dim);letter-spacing:1px;margin-top:4px;">
+      1/f ピンクノイズ — 低周波優勢のスペクトル特性が人間の演奏ゆらぎを模倣。Perlin FBM — 連続した滑らかな変化でドローン・パッドのCC変調に最適。
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══ v16.0: INTEGRAL SERIALISM ENGINE ═══ -->
+<div class="panel full">
+  <div class="panel-top" style="background:#333;"></div>
+  <div class="sec-label">Integral Serialism <span class="badge" style="border-color:#aaa;color:#aaa;">BOULEZ · STOCKHAUSEN</span> <span class="badge green">v16.0</span></div>
+  <div class="tog-row" style="margin-bottom:14px;border-bottom:1px solid var(--border);padding-bottom:12px;">
+    <div class="tog-info">
+      <div class="tog-name" style="color:#aaa;">Enable Integral Serialism</div>
+      <div class="tog-desc">Duration · Velocity · Gate を12音マトリクスで完全決定論的制御 — Lorenz/Humanizer の確率的揺らぎを数学的支配で上書き (Arp · Melody · Lead)</div>
+    </div>
+    <div class="tog" id="togIS"></div>
+  </div>
+  <div id="isControls" style="display:none;">
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px;">
+      <div style="padding:10px;background:rgba(255,109,0,.06);border:1px solid rgba(255,109,0,.2);border-radius:3px;">
+        <div style="font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:3px;color:#aaa;margin-bottom:6px;">DURATION SERIES</div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--text-dim);line-height:1.6;" id="isDurDisplay">P形式 → 音価</div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:7px;color:rgba(255,109,0,.5);margin-top:4px;">32分〜2分 · 12段階</div>
+      </div>
+      <div style="padding:10px;background:rgba(255,109,0,.06);border:1px solid rgba(255,109,0,.2);border-radius:3px;">
+        <div style="font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:3px;color:#aaa;margin-bottom:6px;">VELOCITY SERIES</div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--text-dim);line-height:1.6;" id="isVelDisplay">I形式 → 強度</div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:7px;color:rgba(255,109,0,.5);margin-top:4px;">pppp(8)〜ffff(127)</div>
+      </div>
+      <div style="padding:10px;background:rgba(255,109,0,.06);border:1px solid rgba(255,109,0,.2);border-radius:3px;">
+        <div style="font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:3px;color:#aaa;margin-bottom:6px;">GATE SERIES</div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--text-dim);line-height:1.6;" id="isGateDisplay">RI形式 → 発音</div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:7px;color:rgba(255,109,0,.5);margin-top:4px;">staccatissimo〜legato</div>
+      </div>
+    </div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--text-dim);letter-spacing:3px;margin-bottom:6px;">SERIAL INTENSITY</div>
+    <div class="param-row"><span class="param-label">Duration Scale</span><input type="range" class="slider" style="accent-color:#fff;" id="isDurScale" min="25" max="200" value="100"><span class="pval" id="isDurScaleV">1.00×</span></div>
+    <div class="param-row"><span class="param-label">Vel Override</span><input type="range" class="slider" style="accent-color:#fff;" id="isVelBlend" min="0" max="100" value="100"><span class="pval" id="isVelBlendV">100%</span></div>
+    <div class="param-row"><span class="param-label">Gate Override</span><input type="range" class="slider" style="accent-color:#fff;" id="isGateBlend" min="0" max="100" value="100"><span class="pval" id="isGateBlendV">100%</span></div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:rgba(255,109,0,.6);letter-spacing:2px;margin-top:10px;line-height:1.6;padding:8px;background:rgba(255,109,0,.04);border:1px solid rgba(255,109,0,.12);border-radius:2px;">
+      IS ACTIVE — コードを入力してGENERATEすると音列が確定し、上記の数値が更新されます。<br>
+      Vel/Gate Override 0% = カオス/ノイズ優先 · 100% = 完全決定論
+    </div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--text-dim);letter-spacing:2px;margin-top:8px;" id="isFormStatus">FORM: — / INDEX: —</div>
+  </div>
+</div>
+
+<!-- ═══ v13.0: MARKOV CHAIN ENGINE ═══ -->
+<div class="panel full">
+  <div class="panel-top teal"></div>
+  <div class="sec-label">Markov Chain Melody <span class="badge green">v13.0</span></div>
+  <div class="tog-row" style="margin-bottom:14px;border-bottom:1px solid var(--border);padding-bottom:12px;">
+    <div class="tog-info"><div class="tog-name" style="color:#aaa;">Enable Markov Layer</div><div class="tog-desc">確率的遷移行列によるメロディ生成 — MELODY / ARP に重ねる独立MIDI ch8トラック</div></div>
+    <div class="tog" id="togMarkov"></div>
+  </div>
+  <div id="markovControls" style="display:none;">
+    <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--text-dim);letter-spacing:3px;margin-bottom:8px;">MARKOV SCALE</div>
+    <div class="mkv-scale-grid" id="mkvScaleGrid"></div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--text-dim);letter-spacing:3px;margin-bottom:6px;">TRANSITION BIAS</div>
+    <div class="mkv-bias-group" id="mkvBiasGroup"></div>
+    <div class="param-row"><span class="param-label">Tension</span><input type="range" class="slider teal" id="mkvTension" min="0" max="100" value="50"><span class="pval" id="mkvTensionV">0.50</span></div>
+    <div class="param-row"><span class="param-label">Temperature</span><input type="range" class="slider teal" id="mkvTemp" min="5" max="300" value="80"><span class="pval" id="mkvTempV">0.80</span></div>
+    <div class="param-row"><span class="param-label">Seq Length</span><input type="range" class="slider teal" id="mkvSeqLen" min="4" max="64" step="4" value="16"><span class="pval" id="mkvSeqLenV">16</span></div>
+    <div class="param-row"><span class="param-label">Octave</span><input type="range" class="slider teal" id="mkvOctave" min="1" max="7" value="4"><span class="pval" id="mkvOctaveV">Oct 4</span></div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:#aaa;letter-spacing:3px;margin-top:12px;margin-bottom:4px;">TRANSITION MATRIX <span style="color:var(--text-dim)">— 色濃度 = 遷移確率</span></div>
+    <div class="mkv-matrix-wrap"><div class="mkv-matrix" id="mkvMatrix"></div></div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--text-dim);letter-spacing:3px;margin-top:10px;margin-bottom:4px;">GENERATED SEQUENCE PREVIEW</div>
+    <div class="mkv-seq-display" id="mkvSeqDisplay"></div>
+    <div class="mkv-info" id="mkvInfo">—</div>
+    <button class="ep-btn" style="margin-top:10px;border-color:#aaa;color:#aaa;" id="mkvRegen">↺ Regenerate Sequence</button>
+  </div>
+</div>
+
+<!-- ═══ v19.0: L-SYSTEM (LINDENMAYER) ENGINE ═══ -->
+<div class="panel full">
+  <div class="panel-top ls-top"></div>
+  <div class="sec-label">L-System <span class="badge" style="border-color:#aaa;color:#aaa;">LINDENMAYER</span> <span class="badge green">v19.0</span></div>
+  <div class="tog-row" style="margin-bottom:14px;border-bottom:1px solid var(--border);padding-bottom:12px;">
+    <div class="tog-info">
+      <div class="tog-name" style="color:#aaa;">Enable L-System Phrase Growth</div>
+      <div class="tog-desc">フラクタル文法でフレーズを自己増殖 — 短いモチーフが世代を経て有機的に成長し回帰する。独立MIDI ch10トラック</div>
+    </div>
+    <div class="tog" id="togLS"></div>
+  </div>
+  <div id="lsControls" style="display:none;">
+
+    <!-- PRESETS -->
+    <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:rgba(192,132,252,.5);letter-spacing:3px;margin-bottom:6px;">AXIOM PRESETS</div>
+    <div class="ls-preset-grid" id="lsPresets"></div>
+
+    <!-- AXIOM + GEN -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+      <div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:rgba(192,132,252,.5);letter-spacing:2px;margin-bottom:5px;">AXIOM (初期文字列)</div>
+        <input id="lsAxiom" type="text" value="A" maxlength="12"
+          style="width:100%;background:var(--bg);border:1px solid rgba(192,132,252,.3);border-radius:2px;padding:7px 12px;
+                 font-family:'Share Tech Mono',monospace;font-size:14px;color:#aaa;outline:none;letter-spacing:4px;
+                 box-sizing:border-box;">
+      </div>
+      <div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:rgba(192,132,252,.5);letter-spacing:2px;margin-bottom:5px;">GENERATIONS / 展開長</div>
+        <div class="param-row" style="margin-bottom:3px;">
+          <input type="range" class="slider" style="accent-color:#fff;" id="lsGen" min="1" max="7" value="4">
+          <span class="pval" style="color:#aaa;" id="lsGenV">4 gen</span>
+        </div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:rgba(192,132,252,.3);letter-spacing:1px;" id="lsSeqLen">— symbols</div>
+      </div>
+    </div>
+
+    <!-- RULES -->
+    <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:rgba(192,132,252,.5);letter-spacing:3px;margin-bottom:8px;">PRODUCTION RULES <span style="color:var(--text-dim);font-size:7px;"> — シンボル書換え規則</span></div>
+    <div id="lsRules"></div>
+    <button class="ls-add-btn" id="lsAddRule">＋ ADD RULE</button>
+
+    <!-- SYMBOL LEGEND -->
+    <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:rgba(192,132,252,.5);letter-spacing:3px;margin-bottom:8px;">SYMBOL MAP <span style="color:var(--text-dim);font-size:7px;"> — 音楽マッピング</span></div>
+    <div class="ls-sym-legend" id="lsSymLegend"></div>
+
+    <!-- PARAMETERS -->
+    <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:rgba(192,132,252,.5);letter-spacing:3px;margin-bottom:8px;">PARAMETERS</div>
+    <div class="param-row"><span class="param-label">Root Oct</span>
+      <input type="range" class="slider" style="accent-color:#fff;" id="lsOctave" min="2" max="6" value="4">
+      <span class="pval" style="color:#aaa;" id="lsOctaveV">Oct 4</span>
+    </div>
+    <div class="param-row"><span class="param-label">Step Size</span>
+      <input type="range" class="slider" style="accent-color:#fff;" id="lsStep" min="1" max="6" value="2">
+      <span class="pval" style="color:#aaa;" id="lsStepV">2 st</span>
+    </div>
+    <div class="param-row"><span class="param-label">Gate Ratio</span>
+      <input type="range" class="slider" style="accent-color:#fff;" id="lsGateR" min="20" max="130" value="80">
+      <span class="pval" style="color:#aaa;" id="lsGateRV">0.80</span>
+    </div>
+    <div class="param-row"><span class="param-label">Velocity</span>
+      <input type="range" class="slider" style="accent-color:#fff;" id="lsVelBase" min="30" max="120" value="72">
+      <span class="pval" style="color:#aaa;" id="lsVelBaseV">72</span>
+    </div>
+    <div class="param-row"><span class="param-label">Growth Mode</span>
+      <div class="ls-grow-group" id="lsGrowthGroup">
+        <button class="ls-grow-btn on" data-mode="linear">Linear</button>
+        <button class="ls-grow-btn" data-mode="fractal">Fractal</button>
+        <button class="ls-grow-btn" data-mode="bloom">Bloom</button>
+      </div>
+    </div>
+
+    <!-- L-STRING PREVIEW -->
+    <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:rgba(192,132,252,.4);letter-spacing:2px;margin-top:12px;margin-bottom:4px;">
+      L-STRING PREVIEW <span style="color:var(--text-dim)"> — 展開結果（最大200文字表示）</span>
+    </div>
+    <div class="ls-lstr" id="lsLstring">—</div>
+
+    <!-- VIZ -->
+    <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:rgba(192,132,252,.4);letter-spacing:2px;margin-bottom:4px;">PHRASE TREE VISUALIZER</div>
+    <canvas id="lsViz" style="width:100%;height:150px;display:block;border-radius:2px;background:var(--s1);border:1px solid rgba(192,132,252,.12);"></canvas>
+
+    <!-- INFO -->
+    <div class="ls-info" id="lsInfo">—</div>
+    <button class="ep-btn" style="margin-top:10px;border-color:#aaa;color:#aaa;" id="lsRegen">↺ Regenerate</button>
+  </div>
+</div>
+
+<!-- ═══ RUBATO ENGINE PANEL ═══ -->
+<div class="panel full">
+  <div class="panel-top" style="background:#00e5ff;opacity:.18;"></div>
+  <div class="sec-label">Rubato Engine <span class="rb-badge">BOUNCING BALL</span> <span class="badge" style="border-color:#00e5ff44;color:#00e5ff88;">TEMPORAL</span></div>
+  <div class="tog-row" style="margin-bottom:14px;border-bottom:1px solid var(--border);padding-bottom:12px;">
+    <div class="tog-info">
+      <div class="tog-name" style="color:#00e5ff;">Temporal Distortion — Rubato</div>
+      <div class="tog-desc">物理バウンスモデルによる非線形タイミング変調 — e · t₀ · Notes · Direction — Arp · Melody · Lead のステップ長を変調</div>
+    </div>
+    <div class="tog on" id="togRubato"></div>
+  </div>
+  <div id="rubatoControls">
+
+    <!-- PRESETS -->
+    <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:#00e5ff88;letter-spacing:3px;margin-bottom:6px;">PRESETS</div>
+    <div class="rb-preset-grid" id="rbPresets"></div>
+
+    <!-- PARAMS -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:12px;">
+      <div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:#00e5ff88;letter-spacing:3px;margin-bottom:8px;">PHYSICS</div>
+        <div class="param-row"><span class="param-label">e (elasticity)</span><input type="range" class="slider teal" id="rbE" min="1" max="99" value="80"><span class="pval" id="rbEV">0.80</span></div>
+        <div class="param-row"><span class="param-label">t₀ (init interval)</span><input type="range" class="slider teal" id="rbT0" min="10" max="200" value="100"><span class="pval" id="rbT0V">1.00</span></div>
+      </div>
+      <div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:#00e5ff88;letter-spacing:3px;margin-bottom:8px;">SEQUENCE</div>
+        <div class="param-row"><span class="param-label">Notes</span><input type="range" class="slider" id="rbNotes" min="4" max="48" value="16"><span class="pval" id="rbNotesV">16</span></div>
+      </div>
+    </div>
+
+    <!-- DIRECTION -->
+    <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:#00e5ff88;letter-spacing:3px;margin-bottom:6px;">DIRECTION</div>
+    <div class="rb-dir-row" id="rbDirRow">
+      <div class="rb-dir-btn" data-dir="forward">FORWARD<br><span style="font-size:7px;opacity:.5;">加速→収束</span></div>
+      <div class="rb-dir-btn" data-dir="reverse">REVERSE<br><span style="font-size:7px;opacity:.5;">収束→加速</span></div>
+      <div class="rb-dir-btn on" data-dir="bounce">BOUNCE<br><span style="font-size:7px;opacity:.5;">加速⇄減速</span></div>
+    </div>
+
+    <!-- RATIO DISPLAY -->
+    <div class="rb-ratio" id="rbRatioDisplay">ratio: — · range: —</div>
+
+    <!-- TIMING CHART -->
+    <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:#00e5ff88;letter-spacing:3px;margin-bottom:4px;">TIMING CURVE</div>
+    <canvas class="rb-chart" id="rbChart"></canvas>
+
+    <div class="rb-info">
+      tₙ = t₀ × eⁿ — バウンスボール物理モデル &nbsp;|&nbsp; e 大 = 緩やかな変化 &nbsp;|&nbsp; e 小 = 急速な収束<br>
+      Arp 35% · Melody 45% · Lead 40% のブレンドでステップ長を変調
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SPECTRAL ANALYSIS ENGINE ═══ -->
+<div class="panel full">
+  <div class="panel-top" style="background:#7a3a00;opacity:.6;"></div>
+  <div class="sec-label">Spectral Analysis <span class="sp-badge">HARMONIC SERIES</span> <span class="badge" style="border-color:#ff9100;color:#ff9100;">v1.0</span></div>
+  <div class="tog-row" style="margin-bottom:14px;border-bottom:1px solid var(--border);padding-bottom:12px;">
+    <div class="tog-info">
+      <div class="tog-name" style="color:#ff9100;">Harmonic Spectrum Shaping</div>
+      <div class="tog-desc">倍音列をFFT風に可視化 — 音色プロファイルでオーバートーン速度・テクスチャ密度・協和度ゲートをリアルタイム整形</div>
+    </div>
+    <div class="tog on" id="togSpectral"></div>
+  </div>
+  <div id="spectralControls">
+
+    <!-- TIMBRE PRESETS -->
+    <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:#ff910088;letter-spacing:3px;margin-bottom:6px;">TIMBRE PRESET</div>
+    <div class="sp-timbre-row" id="spTimbreRow">
+      <div class="sp-timbre-btn on" data-timbre="sawtooth">SAW</div>
+      <div class="sp-timbre-btn" data-timbre="square">SQUARE</div>
+      <div class="sp-timbre-btn" data-timbre="triangle">TRIANGLE</div>
+      <div class="sp-timbre-btn" data-timbre="sine">SINE</div>
+      <div class="sp-timbre-btn" data-timbre="clarinet">CLARINET</div>
+      <div class="sp-timbre-btn" data-timbre="brass">BRASS</div>
+      <div class="sp-timbre-btn" data-timbre="strings">STRINGS</div>
+      <div class="sp-timbre-btn" data-timbre="organ">ORGAN</div>
+      <div class="sp-timbre-btn" data-timbre="bell">BELL</div>
+      <div class="sp-timbre-btn" data-timbre="flute">FLUTE</div>
+    </div>
+
+    <!-- PARAMS -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:12px;">
+      <div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:#ff910088;letter-spacing:3px;margin-bottom:8px;">SPECTRUM</div>
+        <div class="param-row"><span class="param-label">Harmonics</span><input type="range" class="slider" id="spHarmonics" min="1" max="16" value="12"><span class="pval" id="spHarmonicsV">12</span></div>
+        <div class="param-row"><span class="param-label">Rolloff</span><input type="range" class="slider" id="spRolloff" min="5" max="30" value="10"><span class="pval" id="spRolloffV">1.0</span></div>
+        <div class="param-row"><span class="param-label">Threshold</span><input type="range" class="slider" id="spThreshold" min="1" max="30" value="5"><span class="pval" id="spThresholdV">0.05</span></div>
+      </div>
+      <div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:#ff910088;letter-spacing:3px;margin-bottom:8px;">SHAPING</div>
+        <div class="param-row"><span class="param-label">Brightness Boost</span><input type="range" class="slider" id="spBrightness" min="0" max="200" value="0"><span class="pval" id="spBrightnessV">0.0</span></div>
+        <div class="param-row"><span class="param-label">Consonance Gate</span><input type="range" class="slider" id="spConsGate" min="0" max="100" value="50"><span class="pval" id="spConsGateV">0.50</span></div>
+        <div class="param-row">
+          <span class="param-label" style="flex:1;">Vel Shape</span>
+          <div class="tog on" id="spVelShape" style="width:22px;height:22px;"></div>
+          <span class="param-label" style="flex:1;margin-left:12px;">Tex Filter</span>
+          <div class="tog on" id="spTexFilter" style="width:22px;height:22px;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SPECTRUM CANVAS -->
+    <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:#ff910088;letter-spacing:3px;margin-bottom:4px;">HARMONIC SPECTRUM</div>
+    <canvas class="sp-canvas" id="spCanvas"></canvas>
+
+    <!-- SCORES -->
+    <div class="sp-score-row">
+      <div class="sp-score-cell">
+        <span class="sp-score-label">CONSONANCE</span>
+        <span class="sp-score-value" id="spScoreConsonance">—</span>
+      </div>
+      <div class="sp-score-cell">
+        <span class="sp-score-label">BRIGHTNESS</span>
+        <span class="sp-score-value" id="spScoreBrightness">—</span>
+      </div>
+      <div class="sp-score-cell">
+        <span class="sp-score-label">DENSITY</span>
+        <span class="sp-score-value" id="spScoreDensity">—</span>
+      </div>
+    </div>
+
+    <!-- RESONANT PCS -->
+    <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:#ff910088;letter-spacing:3px;margin-bottom:4px;">RESONANT PITCH CLASSES</div>
+    <div class="sp-resonant" id="spResonantPCs">— chord not yet analyzed —</div>
+
+    <div class="sp-info">
+      倍音列: 音根 × 整数比 1–N → ピッチクラス投影 &nbsp;|&nbsp; Vel Shape = オーバートーン層の速度を音色プロファイルで整形<br>
+      Tex Filter = 非共鳴PCをテクスチャから抑制 &nbsp;|&nbsp; Consonance Gate = 協和度閾値以下の音程を抑制
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SOLFEGGIO FREQUENCY ENGINE ═══ -->
+<div class="panel full">
+  <div class="panel-top" style="background:#5a3a6a;opacity:.6;"></div>
+  <div class="sec-label">Solfeggio Frequencies <span class="sf-badge">SACRED TONES</span> <span class="badge" style="border-color:#9b6fff;color:#9b6fff;">v1.0</span></div>
+  <div class="tog-row" style="margin-bottom:14px;border-bottom:1px solid var(--border);padding-bottom:12px;">
+    <div class="tog-info">
+      <div class="tog-name" style="color:#c084fc;">Enable Solfeggio Layer</div>
+      <div class="tog-desc">古代ソルフェジオ周波数・バイノーラルビート・シューマン共鳴 — 独立MIDI ch12トラックとして生成</div>
+    </div>
+    <div class="tog" id="togSolfeggio"></div>
+  </div>
+  <div id="solfeggioControls" style="display:none;">
+
+    <!-- PRESETS -->
+    <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:#444;letter-spacing:3px;margin-bottom:6px;">FREQUENCY PRESETS</div>
+    <div class="sf-preset-row" id="sfPresets"></div>
+
+    <!-- MODE -->
+    <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:#444;letter-spacing:3px;margin-bottom:6px;">OUTPUT MODE</div>
+    <div class="sf-mode-row" id="sfModeRow">
+      <div class="sf-mode-btn on" data-mode="sustain">SUSTAIN<br><span style="font-size:7px;opacity:.5;">持続ロングトーン</span></div>
+      <div class="sf-mode-btn" data-mode="pulse">PULSE<br><span style="font-size:7px;opacity:.5;">規則的パルス</span></div>
+      <div class="sf-mode-btn" data-mode="breath">BREATH<br><span style="font-size:7px;opacity:.5;">呼吸リズム</span></div>
+      <div class="sf-mode-btn" data-mode="shimmer">SHIMMER<br><span style="font-size:7px;opacity:.5;">細かいトレモロ</span></div>
+    </div>
+
+    <!-- FREQUENCY SELECT -->
+    <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:#444;letter-spacing:3px;margin-bottom:6px;">SELECT FREQUENCIES <span style="color:#333;font-size:7px;"> — 複数選択可</span></div>
+    <div class="sf-sel-summary" id="sfSelSummary">—</div>
+    <div id="sfFreqGrid"></div>
+
+    <!-- PARAMETERS -->
+    <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:#444;letter-spacing:3px;margin:12px 0 8px;">PARAMETERS</div>
+    <div class="param-row"><span class="param-label">Velocity</span><input type="range" class="slider" style="accent-color:#9b6fff;" id="sfVelocity" min="8" max="100" value="45"><span class="pval" style="color:#c084fc;" id="sfVelocityV">45</span></div>
+    <div class="param-row"><span class="param-label">Gate</span><input type="range" class="slider" style="accent-color:#9b6fff;" id="sfGate" min="10" max="200" value="95"><span class="pval" style="color:#c084fc;" id="sfGateV">0.95</span></div>
+    <div class="param-row"><span class="param-label">Octave Shift</span><input type="range" class="slider" style="accent-color:#9b6fff;" id="sfOctShift" min="-3" max="3" value="0"><span class="pval" style="color:#c084fc;" id="sfOctShiftV">±0</span></div>
+    <div class="param-row"><span class="param-label">Density</span><input type="range" class="slider" style="accent-color:#9b6fff;" id="sfDensity" min="10" max="100" value="60"><span class="pval" style="color:#c084fc;" id="sfDensityV">60%</span></div>
+    <div class="param-row"><span class="param-label">Stagger</span><input type="range" class="slider" style="accent-color:#9b6fff;" id="sfStagger" min="0" max="100" value="30"><span class="pval" style="color:#c084fc;" id="sfStaggerV">30%</span></div>
+    <div class="param-row"><span class="param-label">Fade Curve</span>
+      <div class="ls-grow-group" id="sfFadeCurveGroup">
+        <button class="ls-grow-btn on" data-mode="flat">Flat</button>
+        <button class="ls-grow-btn" data-mode="fade-in">Fade In</button>
+        <button class="ls-grow-btn" data-mode="fade-out">Fade Out</button>
+        <button class="ls-grow-btn" data-mode="swell">Swell</button>
+      </div>
+    </div>
+
+    <!-- CHORD BLEND -->
+    <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:#444;letter-spacing:3px;margin:12px 0 8px;">CHORD INTERACTION</div>
+    <div class="tog-row" style="padding:7px 0;border-bottom:1px solid #111;">
+      <div class="tog-info"><div class="tog-name" style="font-size:12px;">Chord Root Lock</div><div class="tog-desc">ソルフェジオ音をコードのルート音に最近傍スナップ</div></div>
+      <div class="tog" id="sfRootLock"></div>
+    </div>
+    <div class="tog-row" style="padding:7px 0;border-bottom:none;">
+      <div class="tog-info"><div class="tog-name" style="font-size:12px;">Tension Modulation</div><div class="tog-desc">Tension Curveに従ってベロシティを変調</div></div>
+      <div class="tog" id="sfTensionMod"></div>
+    </div>
+
+    <!-- VISUALIZER -->
+    <canvas id="sfVizCanvas" class="sf-viz-canvas"></canvas>
+
+    <!-- INFO -->
+    <div class="sf-info-box" id="sfInfoBox">ソルフェジオ周波数を選択して GENERATE — 対応するMIDIノートに最近傍マッピングされた独立トラックが生成されます。</div>
+  </div>
+</div>
+
+
+<!-- ═══ BINAURAL BEAT ENGINE ═══ -->
+<div class="panel full">
+  <div class="panel-top bb-top"></div>
+  <div class="sec-label">Binaural Beat Engine</div>
+  <div class="tog-row">
+    <div>
+      <div class="tog-name" style="color:#cccccc;">Enable Binaural Beat Layer</div>
+      <div class="tog-desc">左右チャンネルに異なる周波数を出力し脳波を誘導 — Ch13(L) / Ch14(R) として生成<br>DAWでCh13→Pan L100% / Ch14→Pan R100% に設定してください</div>
+    </div>
+    <div class="tog" id="togBinaural"></div>
+  </div>
+  <div id="binauralControls" style="display:none;">
+
+    <!-- PRESETS -->
+    <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:#555;letter-spacing:3px;margin-bottom:6px;">PRESETS</div>
+    <div class="bb-preset-grid" id="bbPresets"></div>
+
+    <!-- BAND SELECT -->
+    <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:#555;letter-spacing:3px;margin:12px 0 6px;">BRAINWAVE BAND</div>
+    <div class="bb-band-grid" id="bbBandRow"></div>
+
+    <!-- BEAT FREQUENCY LIST -->
+    <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:#555;letter-spacing:3px;margin:12px 0 6px;">BEAT FREQUENCY</div>
+    <div id="bbBeatList"></div>
+
+    <!-- CARRIER NOTE -->
+    <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:#555;letter-spacing:3px;margin:12px 0 6px;">CARRIER NOTE (左耳基音)</div>
+    <div class="bb-carrier-row">
+      <div class="bb-carrier-label">BASE NOTE</div>
+      <input type="range" class="slider" id="bbCarrierSlider" min="36" max="84" value="57" style="flex:1;">
+      <div class="bb-carrier-note" id="bbCarrierVal">A3</div>
+    </div>
+    <div class="bb-carrier-row" style="font-size:9px;padding:6px 14px;">
+      <div id="bbCarrierNote" style="font-family:'Share Tech Mono',monospace;font-size:9px;flex:1;color:#aaa;letter-spacing:1px;"></div>
+    </div>
+
+    <!-- MODE -->
+    <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:#555;letter-spacing:3px;margin:12px 0 6px;">GENERATION MODE</div>
+    <div class="bb-mode-row" id="bbModeRow">
+      <div class="bb-mode-btn on" data-mode="pure">Pure<br><span style="font-size:7px;opacity:.6;">全長サステイン</span></div>
+      <div class="bb-mode-btn" data-mode="layered">Layered<br><span style="font-size:7px;opacity:.6;">帯域全ビート重畳</span></div>
+      <div class="bb-mode-btn" data-mode="ramp">Ramp<br><span style="font-size:7px;opacity:.6;">周波数段階変化</span></div>
+    </div>
+
+    <!-- VELOCITY -->
+    <div class="param-row">
+      <div class="param-label">VELOCITY</div>
+      <input type="range" class="slider" id="bbVelocity" min="1" max="127" value="55">
+      <div class="pval" id="bbVelocityV">55</div>
+    </div>
+    <div class="param-row">
+      <div class="param-label">VOLUME CC7</div>
+      <input type="range" class="slider" id="bbVolume" min="1" max="127" value="80">
+      <div class="pval" id="bbVolumeV">80</div>
+    </div>
+
+    <!-- INFO -->
+    <div class="bb-info" id="bbInfo"></div>
+  </div>
+</div>
+
+
+<!-- ═══ COMPENSATION TUNING ENGINE ═══ -->
+<div class="panel full">
+  <div class="panel-top ct-top"></div>
+  <div class="sec-label">Compensation Tuning <span class="badge" style="border-color:#888;color:#aaa;">MICRO</span></div>
+  <div class="tog-row">
+    <div>
+      <div class="tog-name" style="color:#cccccc;">Enable Compensation Tuning</div>
+      <div class="tog-desc">基準ピッチ補正・音律テンプラメント・インターバルマイクロチューニング — 全トラックにPitch Bend後処理として適用</div>
+    </div>
+    <div class="tog" id="togCompTuning"></div>
+  </div>
+  <div id="compTuningControls" style="display:none;">
+
+    <!-- A4 FREQUENCY -->
+    <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:#555;letter-spacing:3px;margin-bottom:6px;">A4 REFERENCE PITCH</div>
+    <div class="ct-a4-grid" id="ctA4Presets"></div>
+    <div class="param-row">
+      <div class="param-label">A4 FREQ</div>
+      <input type="range" class="slider" id="ctA4Slider" min="415" max="466" step="0.1" value="440">
+      <div class="pval" id="ctA4Val">440.0 Hz</div>
+    </div>
+
+    <!-- GLOBAL OFFSET -->
+    <div class="param-row">
+      <div class="param-label">GLOBAL ¢</div>
+      <input type="range" class="slider" id="ctGlobalCents" min="-100" max="100" step="0.5" value="0">
+      <div class="pval" id="ctGlobalCentsV">0¢</div>
+    </div>
+
+    <!-- PITCH BEND RANGE -->
+    <div class="param-row">
+      <div class="param-label">PB RANGE</div>
+      <input type="range" class="slider" id="ctPbRange" min="1" max="12" step="1" value="2">
+      <div class="pval" id="ctPbRangeV">±2 st</div>
+    </div>
+
+    <!-- TEMPERAMENT -->
+    <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:#555;letter-spacing:3px;margin:12px 0 6px;">TEMPERAMENT</div>
+    <div class="ct-sync-row">
+      <div>
+        <div class="tog-name" style="color:#bdbdbd;">Scale Sync</div>
+        <div class="tog-desc">Spectral / Micro スケール選択時に CompTuning Custom と root を自動同期</div>
+      </div>
+      <div class="ct-sync-btn on" id="ctScaleSyncBtn">AUTO</div>
+    </div>
+    <div class="ct-temp-grid" id="ctTempGrid"></div>
+
+    <!-- TEMPERAMENT ROOT NOTE -->
+    <div class="param-row">
+      <div class="param-label">TEMP ROOT</div>
+      <input type="range" class="slider" id="ctRootPc" min="0" max="11" step="1" value="0">
+      <div class="pval" id="ctRootPcV">C</div>
+    </div>
+
+    <!-- INTERVAL OFFSETS (12-tone) -->
+    <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:#555;letter-spacing:3px;margin:12px 0 6px;">INTERVAL OFFSETS (¢)</div>
+    <div class="ct-interval-grid" id="ctIntervalGrid"></div>
+
+    <!-- CHANNEL SELECT -->
+    <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:#555;letter-spacing:3px;margin:12px 0 6px;">APPLY TO CHANNELS</div>
+    <div class="ct-channel-grid" id="ctChButtons"></div>
+
+    <!-- OUTPUT MODE -->
+    <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:#555;letter-spacing:3px;margin:12px 0 6px;">OUTPUT MODE</div>
+    <div class="bb-mode-row" id="ctOutputModeRow">
+      <div class="bb-mode-btn on" data-mode="pb">PitchBend<br><span style="font-size:7px;opacity:.6;">ノートごとPB</span></div>
+      <div class="bb-mode-btn" data-mode="sysex">SysEx Only<br><span style="font-size:7px;opacity:.6;">Master Tune</span></div>
+      <div class="bb-mode-btn" data-mode="both">Both<br><span style="font-size:7px;opacity:.6;">SysEx + PB</span></div>
+    </div>
+
+    <!-- DISPLAY -->
+    <div class="ct-display" id="ctDisplay"></div>
+
+    <!-- INFO -->
+    <div class="ct-info">
+      PitchBendモード: 各ノートOn直前にPBを挿入し音程を補正。DAW側でPBレンジを合わせること。<br>
+      SysExモード: F0 7F 7F 04 03 [lsb] [msb] F7 — Master Fine Tuningメッセージをconductorに挿入。<br>
+      テンプラメント補正はPBモード時のみ有効。Custom選択時は各音のセントを直接入力。
+    </div>
+  </div>
+</div>
+
+
+
+<!-- ═══ MACRO ═══ -->
+<div class="panel full">
+  <div class="panel-top red"></div>
+  <div class="sec-label">Macro Structure <span class="badge red">SECTIONS + TEMPO MOD + CHAIN</span></div>
+  <div class="tog-row" style="margin-bottom:14px;border-bottom:1px solid var(--border);padding-bottom:12px;">
+    <div class="tog-info"><div class="tog-name" style="color:var(--red);">Enable Macro Structure</div><div class="tog-desc">TENSION → VEL/DENSITY/DISSONANCE + SECTION MARKERS + TEMPO DRIFT</div></div>
+    <div class="tog" id="togMacro"></div>
+  </div>
+  <div id="macroControls" style="display:none;">
+    <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--text-dim);letter-spacing:3px;margin-bottom:8px;">CURVE A (PRIMARY)</div>
+    <div class="curve-grid" id="curveGrid"></div>
+    <div class="tog-row" style="margin-bottom:10px;border-bottom:1px solid var(--border);padding-bottom:10px;">
+      <div class="tog-info"><div class="tog-name" style="font-size:11px;">Chain Mode (A→B)</div><div class="tog-desc">FIRST HALF = CURVE A · SECOND HALF = CURVE B</div></div>
+      <div class="tog" id="togChain"></div>
+    </div>
+    <div id="chainControls" style="display:none;">
+      <div class="chain-row"><span class="chain-label">A</span><span class="chain-arrow" id="chainAName">Arch</span><span class="chain-arrow">→</span><span class="chain-label">B</span><select class="chain-sel" id="chainBSelect"></select></div>
+    </div>
+    <div class="param-row"><span class="param-label">Curve Amp</span><input type="range" class="slider red" id="curveAmp" min="0" max="100" value="70"><span class="pval" id="curveAmpV">70%</span></div>
+    <div class="tog-row" style="margin-bottom:10px;border-bottom:1px solid var(--border);padding-bottom:10px;">
+      <div class="tog-info"><div class="tog-name" style="font-size:11px;">Tempo Modulation</div><div class="tog-desc">BPM DRIFTS ±N BASED ON TENSION CURVE</div></div>
+      <div class="tog" id="togTempoMod"></div>
+    </div>
+    <div id="tempoModControls" style="display:none;">
+      <div class="param-row"><span class="param-label">Tempo Drift</span><input type="range" class="slider amber" id="tempoDrift" min="0" max="30" value="8"><span class="pval" id="tempoDriftV">±8 BPM</span></div>
+    </div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--text-dim);letter-spacing:2px;margin-top:8px;" id="sectionInfo">— SECTIONS —</div>
+    <canvas id="tension-cv"></canvas>
+  </div>
+</div>
+
+<!-- ═══ THEORY ═══ -->
+<div class="panel full"><div class="panel-top purple"></div><div class="sec-label">Theory Framework <span class="badge">EXPANDED</span></div>
+  <div class="theory-tabs" id="theoryTabs">
+    <div class="t-tab on" data-cat="modal">Modal / Diatonic</div><div class="t-tab" data-cat="harmonic">Harmonic / Altered</div><div class="t-tab" data-cat="symmetric">Symmetric / Exotic</div><div class="t-tab" data-cat="world">World / Non-Western</div><div class="t-tab" data-cat="spectral">Spectral / Micro</div>
+  </div>
+  <div class="scale-wrap" id="scaleWrap"></div>
+</div>
+<div class="panel full" id="theoryPanel"><div class="panel-top teal"></div><div class="sec-label">Theory Analysis</div>
+  <div class="theory-info" id="theoryInfo">
+    <div class="ti-block"><h4>Root</h4><div class="v" id="tRoot">—</div></div>
+    <div class="ti-block"><h4>Chord</h4><div class="v" id="tChord">—</div><div class="sub" id="tChordSub">—</div></div>
+    <div class="ti-block"><h4>Chord Tones</h4><div class="v" id="tTones" style="font-size:12px;letter-spacing:2px;">—</div><div class="sub" id="tIntvs">—</div></div>
+    <div class="ti-block"><h4>Scale</h4><div class="v" id="tScale" style="font-size:11px;letter-spacing:1px;">—</div><div class="sub" id="tScaleDesc">—</div></div>
+    <div class="ti-block"><h4>Characteristic</h4><div class="v" id="tChar" style="font-size:11px;">—</div></div>
+    <div class="ti-block"><h4>Tension Notes</h4><div class="v" id="tTension" style="font-size:11px;letter-spacing:1px;color:#aaa;">—</div></div>
+  </div>
+  <canvas id="piano-roll"></canvas>
+</div>
+
+<!-- ═══ v23.1: PC SET SIMILARITY MAP ═══ -->
+<div class="panel full" id="pcSimPanel">
+  <div class="panel-top" style="background:#1a0a3a;opacity:.8;"></div>
+  <div class="sec-label">PC Set Similarity Map <span class="badge" style="border-color:#8c3fff;color:#8c3fff;">FORTE</span> <span class="badge" style="border-color:#00e5ff44;color:#00e5ff88;">v23.1</span></div>
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+    <div class="tog" id="togPCSimMap" style="flex-shrink:0;"></div>
+    <div class="tog-info">
+      <div class="tog-name" style="color:#8c3fff;">Enable PC Set Similarity Map</div>
+      <div class="tog-desc">選択中のコード/スケールのIVベクトルに近いForteセットをCanvas上にプロット。類似度が高いほど中心に配置。</div>
+    </div>
+  </div>
+  <div id="pcSimControls" style="display:none;">
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;">
+      <div style="flex:1;min-width:120px;">
+        <div class="pcs-ctrl-label">SOURCE</div>
+        <div class="pcs-mode-row" id="pcSimSource">
+          <button class="pcs-mode-btn on" data-src="chord">Chord IV</button>
+          <button class="pcs-mode-btn" data-src="composite">Chord + Scale</button>
+        </div>
+      </div>
+      <div style="flex:1;min-width:120px;">
+        <div class="pcs-ctrl-label">DISPLAY</div>
+        <div class="pcs-mode-row" id="pcSimDisplay">
+          <button class="pcs-mode-btn on" data-disp="scatter">Scatter</button>
+          <button class="pcs-mode-btn" data-disp="radial">Radial</button>
+        </div>
+      </div>
+      <div style="flex:1;min-width:100px;">
+        <div class="pcs-ctrl-label">TOP N</div>
+        <div style="display:flex;align-items:center;gap:6px;margin-top:4px;">
+          <input type="range" class="slider" id="pcSimTopN" min="5" max="40" value="20" style="flex:1;">
+          <span class="pval" id="pcSimTopNV" style="width:24px;">20</span>
+        </div>
+      </div>
+    </div>
+    <canvas id="pcSimCanvas" style="width:100%;height:280px;border:1px solid rgba(140,63,255,0.2);border-radius:3px;background:#06060e;display:block;cursor:crosshair;"></canvas>
+    <div class="pcs-info-row" id="pcSimInfo">— コードを入力して有効化すると類似セットをプロットします —</div>
+    <div class="pcs-hover-detail" id="pcSimDetail"></div>
+  </div>
+</div>
+
+<!-- ═══ OCTAVE ═══ -->
+<div class="panel full"><div class="panel-top amber"></div><div class="sec-label">Octave Range Control <span class="badge">MULTI-OCTAVE</span></div>
+  <div style="display:grid;grid-template-columns:repeat(8,1fr);gap:6px;margin-bottom:16px;" class="layer-oct-grid" id="layerOctaves"></div>
+  <div class="octave-range"><span class="oct-label">Playable Range</span><div class="oct-range-display" id="octDisplay"></div></div>
+  <div class="param-row"><span class="param-label">Root Oct</span><input type="range" class="slider" id="rootOct" min="0" max="8" value="3"><span class="pval" id="rootOctVal">C3</span></div>
+  <div class="param-row"><span class="param-label">Oct Spread</span><input type="range" class="slider teal" id="octSpread" min="0" max="4" value="1"><span class="pval" id="octSpreadVal">±1 oct</span></div>
+  <div class="param-row"><span class="param-label">Oct Bias</span><input type="range" class="slider purple" id="octBias" min="-2" max="2" value="0"><span class="pval" id="octBiasVal">Center</span></div>
+</div>
+
+<!-- ═══ PARAMS + LAYERS ═══ -->
+<div class="g2">
+  <div class="panel"><div class="panel-top"></div><div class="sec-label">Synthesis Parameters</div>
+    <div class="param-row"><span class="param-label">BPM</span><input type="range" class="slider" id="bpm" min="18" max="140" value="58"><span class="pval" id="bpmV">58 BPM</span></div>
+    <div class="param-row"><span class="param-label">Bars</span><input type="range" class="slider" id="bars" min="4" max="128" value="16"><span class="pval" id="barsV">16</span></div>
+    <div class="param-row"><span class="param-label">Density</span><input type="range" class="slider teal" id="density" min="0" max="100" value="40"><span class="pval" id="densityV">40%</span></div>
+    <div class="param-row"><span class="param-label">Velocity</span><input type="range" class="slider" id="velocity" min="20" max="127" value="72"><span class="pval" id="velocityV">72</span></div>
+    <div class="param-row"><span class="param-label">Humanize</span><input type="range" class="slider teal" id="humanize" min="0" max="100" value="35"><span class="pval" id="humanizeV">35%</span></div>
+    <div class="param-row"><span class="param-label">Drift</span><input type="range" class="slider purple" id="drift" min="0" max="100" value="30"><span class="pval" id="driftV">30%</span></div>
+    <div class="param-row"><span class="param-label">Dissonance</span><input type="range" class="slider amber" id="dissonance" min="0" max="100" value="20"><span class="pval" id="dissonanceV">20%</span></div>
+    <div class="param-row"><span class="param-label">Polyrhythm</span><input type="range" class="slider purple" id="polyrhythm" min="0" max="100" value="10"><span class="pval" id="polyrhythmV">10%</span></div>
+    <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border);">
+      <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:#aaffaa;letter-spacing:3px;margin-bottom:10px;">GATE TIME / ARTICULATION <span class="badge green">NEW</span></div>
+      <div class="param-row"><span class="param-label">Gate Ratio</span><input type="range" class="slider green" id="gateBase" min="30" max="150" value="85"><span class="pval" id="gateBaseV">0.85</span></div>
+      <div class="param-row"><span class="param-label">Gate Hum</span><input type="range" class="slider green" id="gateHumanize" min="0" max="100" value="20"><span class="pval" id="gateHumanizeV">20%</span></div>
+      <div class="gate-indicator" id="gateIndicator" style="color:#aaffaa;">NEUTRAL — natural phrasing</div>
+    </div>
+    <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border);">
+      <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:#aaa;letter-spacing:3px;margin-bottom:10px;">DISSONANCE RESOLUTION <span class="badge">v12.1</span></div>
+      <div class="param-row"><span class="param-label">Resolve Thr</span><input type="range" class="slider purple" id="resolveThreshold" min="0" max="100" value="65"><span class="pval" id="resolveThresholdV">0.65</span></div>
+      <div class="param-row"><span class="param-label">Resolve Steps</span><input type="range" class="slider purple" id="resolveSteps" min="1" max="8" value="2"><span class="pval" id="resolveStepsV">2</span></div>
+      <div class="resolve-indicator" id="resolveIndicator" style="color:#aaa;">IDLE — waiting</div>
+    </div>
+    <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border);">
+      <div class="tog-row" style="border-bottom:none;"><div class="tog-info"><div class="tog-name" style="color:#aaa;">MPE Microtonal</div><div class="tog-desc">PER-NOTE PITCH BEND · QUARTER-TONE · SPECTRAL</div></div><div class="tog" id="togMPE"></div></div>
+      <div id="mpePbRow" style="display:none;margin-top:10px;"><div class="param-row"><span class="param-label">PB Range</span><input type="range" class="slider amber" id="pbRange" min="1" max="48" value="2"><span class="pval" id="pbRangeV">±2 st</span></div><div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--text-dim);letter-spacing:1px;margin-top:4px;" id="mpeStatus">MPE OFF</div></div>
+    </div>
+  </div>
+  <div class="panel"><div class="panel-top teal"></div><div class="sec-label">Layers</div><div id="layerToggles"></div></div>
+</div>
+
+<!-- ═══ v25.0: STATE PERSIST ═══ -->
+<div class="sp-panel" id="spPanel">
+  <div class="sp-bar">
+    <div class="sp-title">💾 PRESETS <span class="sp-badge">LOCAL STORAGE</span></div>
+    <div class="sp-actions">
+      <input type="text" id="spSlotName" class="sp-input" placeholder="slot name" maxlength="32" spellcheck="false">
+      <button class="sp-btn sp-btn-save" id="spBtnSave" title="Save current state">SAVE</button>
+      <button class="sp-btn sp-btn-auto" id="spBtnAutoSave" title="Quick save to auto slot">AUTO</button>
+      <button class="sp-btn" id="spBtnExport" title="Export all presets to JSON file">EXPORT</button>
+      <button class="sp-btn" id="spBtnImport" title="Import presets from JSON file">IMPORT</button>
+    </div>
+  </div>
+  <div class="sp-list" id="spSlotList">
+    <div class="sp-empty" id="spEmpty">No saved presets</div>
+  </div>
+</div>
+
+<div style="margin:16px 0;">
+  <div class="gen-row"><button class="btn-gen" id="btnGen">⬡ GENERATE MIDI</button><button class="btn-dl" id="btnDl">↓ DOWNLOAD .MID</button></div>
+  <div class="gen-row gen-row-ab" style="margin-top:6px;">
+    <button class="btn-gen-ab" id="btnGenAB" title="同一パラメーターでシードだけ変えた2案を比較生成">⬡ GEN A/B</button>
+    <div id="abPanel" style="display:none;" class="ab-panel">
+      <button class="ab-btn on" id="abBtnA" data-ab="A">A</button>
+      <button class="ab-btn" id="abBtnB" data-ab="B">B</button>
+      <span class="ab-label" id="abLabel">シードが異なる2バリアント — クリックで切替</span>
+    </div>
+  </div>
+  <!-- v25.1: SEED -->
+  <div class="seed-row" id="seedRow">
+    <span class="seed-label">SEED</span>
+    <span class="seed-val" id="seedVal">—</span>
+    <button class="seed-btn" id="seedLockBtn" title="シードをロック: 同じシードで再生成できます">LOCK</button>
+    <input type="number" class="seed-input" id="seedInput" placeholder="seed value" min="1" max="4294967295" style="display:none;">
+    <button class="seed-btn seed-btn-copy" id="seedCopyBtn" title="シード値をコピー">COPY</button>
+  </div>
+
+<!-- ═══ v24.0: MIDI PREVIEW PLAYER ═══ -->
+<div id="midiPreviewPanel" style="display:none;margin:0 0 12px;">
+  <div class="prev-bar">
+    <div class="prev-title">▶ PREVIEW <span class="prev-badge">WEB AUDIO</span></div>
+    <div class="prev-transport">
+      <button class="prev-btn" id="prevPlay"  title="Play">▶</button>
+      <button class="prev-btn" id="prevPause" title="Pause" style="display:none;">⏸</button>
+      <button class="prev-btn" id="prevStop"  title="Stop" disabled>■</button>
+    </div>
+    <div class="prev-seek-wrap">
+      <input type="range" id="prevSeek" class="prev-seek" min="0" max="1000" value="0" step="1">
+    </div>
+    <div class="prev-time" id="prevTime">0:00 / 0:00</div>
+    <button class="prev-mixer-toggle" id="prevMixerToggle" title="Channel mixer">⚙</button>
+  </div>
+  <div class="prev-mixer" id="prevMixer" style="display:none;"></div>
+</div>
+
+<!-- ═══ MULTI-FILE EXPORT ═══ -->
+<div class="panel full" style="margin:12px 0 10px;">
+  <div class="panel-top teal"></div>
+  <div class="sec-label">Multi-File Export <span class="badge">STEM</span></div>
+  <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--text-dim);letter-spacing:1px;margin-bottom:12px;">各レイヤーを個別 MIDI ファイルとして一括出力 &mdash; DAW stem import に最適</div>
+  <div style="display:flex;flex-wrap:wrap;gap:20px;margin-bottom:12px;align-items:flex-start;">
+    <div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--text-dim);letter-spacing:2px;margin-bottom:5px;">FILE PREFIX</div>
+      <input type="text" id="mePfx" value="void" maxlength="32" style="background:var(--s2);border:1px solid var(--border);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:11px;padding:5px 9px;width:150px;border-radius:2px;outline:none;">
+    </div>
+    <div style="display:flex;flex-direction:column;gap:7px;padding-top:20px;">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--text-dim);letter-spacing:1px;width:150px;">番号付加 (01_, 02_...)</span>
+        <div class="tog on" id="meNumPad"></div>
+        <span class="pval" id="meNumPadV">ON</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--text-dim);letter-spacing:1px;width:150px;">Conductor Track 含める</span>
+        <div class="tog on" id="meCond"></div>
+        <span class="pval" id="meCondV">ON</span>
+      </div>
+    </div>
+  </div>
+  <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--text-dim);letter-spacing:2px;margin-bottom:6px;">LAYER SELECT <span style="opacity:.5;font-size:7px;letter-spacing:1px;">&mdash; GENERATE後にレイヤーが表示されます</span></div>
+  <div style="display:flex;gap:6px;margin-bottom:8px;">
+    <button id="meSelAll" style="font-family:'Share Tech Mono',monospace;font-size:8px;padding:3px 10px;background:transparent;border:1px solid var(--teal);color:var(--teal);border-radius:2px;cursor:pointer;letter-spacing:1px;">ALL</button>
+    <button id="meSelNone" style="font-family:'Share Tech Mono',monospace;font-size:8px;padding:3px 10px;background:transparent;border:1px solid var(--border);color:var(--text-dim);border-radius:2px;cursor:pointer;letter-spacing:1px;">NONE</button>
+  </div>
+  <div id="meLayerGrid" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;min-height:30px;"></div>
+  <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+    <button class="btn-dl" id="btnMultiDl" style="font-size:10px;padding:14px 22px;letter-spacing:2px;">⇣ EXPORT STEMS</button>
+    <div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--teal);letter-spacing:1px;" id="meCount"></div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--text-dim);margin-top:2px;letter-spacing:1px;" id="meStatus">GENERATEしてからエクスポートしてください</div>
+    </div>
+  </div>
+  <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border);">
+    <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--text-dim);letter-spacing:2px;margin-bottom:6px;">OSC BRIDGE <span style="opacity:.5;font-size:7px;letter-spacing:1px;">&mdash; WebSocket binary bundle / JSON fallback</span></div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;">
+      <button id="oscModeBinary" style="font-family:'Share Tech Mono',monospace;font-size:8px;padding:3px 10px;background:transparent;border:1px solid var(--teal);color:var(--teal);border-radius:2px;cursor:pointer;letter-spacing:1px;">OSC BINARY</button>
+      <button id="oscModeJson" style="font-family:'Share Tech Mono',monospace;font-size:8px;padding:3px 10px;background:transparent;border:1px solid var(--border);color:var(--text-dim);border-radius:2px;cursor:pointer;letter-spacing:1px;">JSON FALLBACK</button>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+      <input type="text" id="oscWsUrl" value="ws://127.0.0.1:7000" spellcheck="false" style="background:var(--s2);border:1px solid var(--border);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:11px;padding:8px 10px;width:240px;border-radius:2px;outline:none;">
+      <button class="btn-dl show" id="btnOscSend" style="display:block;font-size:10px;padding:12px 18px;letter-spacing:2px;">⇢ SEND OSC</button>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--text-dim);letter-spacing:1px;line-height:1.6;" id="oscSendStatus">GENERATEしてから送信してください</div>
+    </div>
+  </div>
+  <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);">
+    <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--text-dim);letter-spacing:2px;margin-bottom:6px;">MUSICXML <span style="opacity:.5;font-size:7px;letter-spacing:1px;">&mdash; score-partwise export</span></div>
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+      <button class="btn-dl show" id="btnMusicXml" style="display:block;font-size:10px;padding:12px 18px;letter-spacing:2px;">⇣ EXPORT MUSICXML</button>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--text-dim);letter-spacing:1px;line-height:1.6;" id="musicXmlStatus">GENERATEしてからエクスポートしてください</div>
+    </div>
+  </div>
+</div>
+  <div class="log" id="log"><span style="color:var(--text-dim)">// MEIKYOSHISUI v25.7 READY — BROWSER-BASED GENERATIVE MIDI SYSTEM //</span></div>
+  <canvas id="tviz"></canvas>
+</div>
+<footer>MEIKYOSHISUI v25.7 — GENERATIVE MIDI SYSTEM — ALL PROCESSING IN BROWSER</footer>
+</div>
+
+<script src="Meikyo/00-oscilloscope.js"></script>
+<script src="Meikyo/01-euclidean.js"></script>
+<script src="Meikyo/02-pcset.js"></script>
+<script src="Meikyo/03-negative-harmony.js"></script>
+<script src="Meikyo/04-twelve-tone.js"></script>
+<script src="Meikyo/05-integral-serialism.js"></script>
+<script src="Meikyo/06-boids.js"></script>
+<script src="Meikyo/07-sieve.js"></script>
+<script src="Meikyo/08-lorenz.js"></script>
+<script src="Meikyo/09-cellular-automaton.js"></script>
+<script src="Meikyo/10-rubato.js"></script>
+<script src="Meikyo/11-markov.js"></script>
+<script src="Meikyo/12-lsystem.js"></script>
+<script src="Meikyo/13-humanizer.js"></script>
+<script src="Meikyo/14-music-data.js"></script>
+<script src="Meikyo/15-midi-core.js"></script>
+<script src="Meikyo/16-layer-generators.js"></script>
+<script src="Meikyo/17-ui-state.js"></script>
+<script src="Meikyo/18-solfeggio.js"></script>
+<script src="Meikyo/19-binaural.js"></script>
+<script src="Meikyo/20-comp-tuning.js"></script>
+<script src="Meikyo/21-engine-control.js"></script>
+<script src="Meikyo/25-chord-progression.js"></script>
+<script src="Meikyo/26-scale-mutation.js"></script>
+<script src="Meikyo/27-cc-automation.js"></script>
+<script src="Meikyo/28-midi-preview.js"></script>
+<script src="Meikyo/29-state-persist.js"></script>
+<script src="Meikyo/30-neo-riemannian.js"></script>
+<script src="Meikyo/31-voice-leading.js"></script>
+<script src="Meikyo/32-just-intonation.js"></script>
+<script src="Meikyo/33-rhythmic-canons.js"></script>
+<script src="Meikyo/34-conductor-viz.js"></script>
+<script src="Meikyo/35-init-conductor-viz.js"></script>
+<script src="Meikyo/22-ui-functions.js"></script>
+<script src="Meikyo/24-spectral.js"></script>
+<script src="Meikyo/66-spectral-harmony.js"></script>
+<script src="Meikyo/23-init.js"></script>
+<script src="Meikyo/36-init-just-intonation.js"></script>
+<script src="Meikyo/37-init-rhythmic-canons.js"></script>
+<script src="Meikyo/38-init-neo-riemannian.js"></script>
+<script src="Meikyo/39-init-chord-progression.js"></script>
+<script src="Meikyo/40-init-scale-mutation.js"></script>
+<script src="Meikyo/41-init-pc-sim-map.js"></script>
+<script src="Meikyo/42-init-attractor.js"></script>
+<script src="Meikyo/43-init-cc-automation.js"></script>
+<script src="Meikyo/44-init-state-persist.js"></script>
+<script src="Meikyo/45-init-midi-preview.js"></script>
+<script src="Meikyo/46-init-seed-ui.js"></script>
+<script src="Meikyo/47-init-ab-ui.js"></script>
+<script src="Meikyo/48-init-humanizer.js"></script>
+<script src="Meikyo/49-init-lsystem.js"></script>
+<script src="Meikyo/50-init-markov.js"></script>
+<script src="Meikyo/51-init-lorenz-legacy.js"></script>
+<script src="Meikyo/52-init-rubato.js"></script>
+<script src="Meikyo/53-init-cellular-automaton.js"></script>
+<script src="Meikyo/54-init-boids.js"></script>
+<script src="Meikyo/55-init-sieve.js"></script>
+<script src="Meikyo/56-init-integral-serialism.js"></script>
+<script src="Meikyo/57-init-mpe.js"></script>
+<script src="Meikyo/58-init-macro.js"></script>
+<script src="Meikyo/59-init-euclidean.js"></script>
+<script src="Meikyo/60-init-gate-resolution.js"></script>
+<script src="Meikyo/61-init-comp-tuning.js"></script>
+<script src="Meikyo/62-init-binaural.js"></script>
+<script src="Meikyo/63-init-multi-export.js"></script>
+<script src="Meikyo/64-init-spectral.js"></script>
+<script src="Meikyo/65-midi-input.js"></script>
+<script src="Meikyo/67-osc-export.js"></script>
+<script src="Meikyo/68-musicxml-export.js"></script>
+</body>
+</html>
