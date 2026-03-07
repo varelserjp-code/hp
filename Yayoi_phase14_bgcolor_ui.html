@@ -1,0 +1,2319 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Yayoi</title>
+  <meta name="description" content="Yayoi single-file renderer for GitHub Pages with export, pointer controls, and no UI changes." />
+
+  <style>
+    .checkerboard-bg {
+      background-color: #171717;
+      background-image:
+        linear-gradient(45deg, #262626 25%, transparent 25%, transparent 75%, #262626 75%, #262626),
+        linear-gradient(45deg, #262626 25%, transparent 25%, transparent 75%, #262626 75%, #262626);
+      background-position: 0 0, 10px 10px;
+      background-size: 20px 20px;
+    }
+    body { margin: 0; background: #000; overflow: hidden; color: #fff; }
+    #loading-fallback{
+      position: fixed; inset: 0;
+      display:flex; align-items:center; justify-content:center; flex-direction:column;
+      background:#000; z-index: 100;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      text-align:center;
+      transition: opacity .35s ease;
+    }
+    /* Scrollbars for panels */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #171717; }
+    ::-webkit-scrollbar-thumb { background: #444; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #666; }
+
+
+    /* Minimal utility CSS replacing the Tailwind classes used by this file. */
+    *,*::before,*::after{box-sizing:border-box}
+    button,input,select{font:inherit}
+    button{cursor:pointer}
+    h1,h2,h3,h4,p{margin:0}
+    .absolute{position:absolute}.fixed{position:fixed}.relative{position:relative}.sticky{position:sticky}
+    .inset-0{inset:0}.top-0{top:0}.top-6{top:1.5rem}.right-0{right:0}.bottom-4{bottom:1rem}.left-0{left:0}.left-1\/2{left:50%}
+    .z-0{z-index:0}.z-10{z-index:10}.z-30{z-index:30}.z-40{z-index:40}.z-50{z-index:50}
+    .block{display:block}.flex{display:flex}.grid{display:grid}.h-full{height:100%}.h-screen{height:100vh}.w-full{width:100%}.w-screen{width:100vw}
+    .flex-1{flex:1 1 0%}.flex-none{flex:none}.flex-col{flex-direction:column}
+    .items-center{align-items:center}.justify-center{justify-content:center}.justify-between{justify-content:space-between}
+    .gap-1{gap:.25rem}.gap-2{gap:.5rem}.gap-3{gap:.75rem}.gap-6{gap:1.5rem}
+    .space-y-1>*+*{margin-top:.25rem}.space-y-2>*+*{margin-top:.5rem}.space-y-3>*+*{margin-top:.75rem}.space-y-4>*+*{margin-top:1rem}
+    .overflow-hidden{overflow:hidden}.overflow-y-auto{overflow-y:auto}.object-contain{object-fit:contain}.whitespace-pre-wrap{white-space:pre-wrap}
+    .rounded{border-radius:.25rem}.rounded-lg{border-radius:.5rem}.rounded-xl{border-radius:.75rem}.rounded-2xl{border-radius:1rem}
+    .border{border:1px solid #262626}.border-none{border:none}.border-b{border-bottom:1px solid #262626}.border-t{border-top:1px solid #262626}
+    .border-neutral-800{border-color:#262626}.ring-1{box-shadow:0 0 0 1px rgba(255,255,255,.1) inset}.ring-white\/10{box-shadow:0 0 0 1px rgba(255,255,255,.1) inset}
+    .bg-black{background:#000}.bg-black\/50{background:rgba(0,0,0,.5)}.bg-black\/90{background:rgba(0,0,0,.9)}.bg-black\/95{background:rgba(0,0,0,.95)}
+    .bg-white{background:#fff}.bg-transparent{background:transparent}.bg-neutral-700{background:#404040}.bg-neutral-800{background:#262626}.bg-neutral-900{background:#171717}
+    .text-black{color:#000}.text-center{text-align:center}.text-right{text-align:right}.text-white{color:#fff}.text-white\/90{color:rgba(255,255,255,.9)}
+    .text-neutral-100{color:#f5f5f5}.text-neutral-400{color:#a3a3a3}.text-neutral-500{color:#737373}.text-red-500{color:#ef4444}
+    .text-xs{font-size:.75rem;line-height:1rem}.text-sm{font-size:.875rem;line-height:1.25rem}.text-xl{font-size:1.25rem;line-height:1.75rem}.text-\[10px\]{font-size:10px}.text-\[9px\]{font-size:9px}
+    .font-bold{font-weight:700}.font-medium{font-weight:500}.font-mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace}
+    .uppercase{text-transform:uppercase}.tracking-wide{letter-spacing:.025em}.tracking-wider{letter-spacing:.05em}.tracking-widest{letter-spacing:.1em}
+    .accent-white{accent-color:#fff}.appearance-none{-webkit-appearance:none;appearance:none}.select-none{-webkit-user-select:none;user-select:none}.pointer-events-none{pointer-events:none}.cursor-pointer{cursor:pointer}
+    .p-1{padding:.25rem}.p-2{padding:.5rem}.p-2\.5{padding:.625rem}.p-3{padding:.75rem}.p-4{padding:1rem}.p-8{padding:2rem}
+    .pt-2{padding-top:.5rem}.pb-1{padding-bottom:.25rem}.pb-2{padding-bottom:.5rem}.pb-10{padding-bottom:2.5rem}.pb-20{padding-bottom:5rem}.pl-1{padding-left:.25rem}
+    .mb-1{margin-bottom:.25rem}.mb-2{margin-bottom:.5rem}.mb-3{margin-bottom:.75rem}.mb-4{margin-bottom:1rem}.mt-1{margin-top:.25rem}.mt-2{margin-top:.5rem}.mx-2{margin-left:.5rem;margin-right:.5rem}
+    .min-w-\[56px\]{min-width:56px}.max-w-\[95vw\]{max-width:95vw}
+    .w-3{width:.75rem}.w-4{width:1rem}.w-5{width:1.25rem}.w-6{width:1.5rem}.w-8{width:2rem}.w-px{width:1px}
+    .h-1{height:.25rem}.h-3{height:.75rem}.h-4{height:1rem}.h-5{height:1.25rem}.h-6{height:1.5rem}.h-8{height:2rem}
+    .grid-cols-1{grid-template-columns:repeat(1,minmax(0,1fr))}.grid-cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}.grid-cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}.grid-cols-4{grid-template-columns:repeat(4,minmax(0,1fr))}.grid-cols-6{grid-template-columns:repeat(6,minmax(0,1fr))}
+    .col-span-2{grid-column:span 2 / span 2}
+    @media (min-width:640px){.sm\:grid-cols-8{grid-template-columns:repeat(8,minmax(0,1fr))}}
+    @media (min-width:768px){.md\:grid-cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}.md\:grid-cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}.md\:grid-cols-10{grid-template-columns:repeat(10,minmax(0,1fr))}}
+    @media (min-width:1024px){.lg\:grid-cols-12{grid-template-columns:repeat(12,minmax(0,1fr))}}
+    .-translate-x-1\/2{transform:translateX(-50%)}
+    .shadow-2xl{box-shadow:0 25px 50px -12px rgba(0,0,0,.55)}
+    .shadow-\[0_0_20px_rgba\(255\,255\,255\,0\.15\)\]{box-shadow:0 0 20px rgba(255,255,255,.15)}
+    .shadow-\[0_0_20px_rgba\(255\,255\,255\,0\.3\)\]{box-shadow:0 0 20px rgba(255,255,255,.3)}
+    .shadow-\[0_0_50px_rgba\(0\,0\,0\,0\.5\)\]{box-shadow:0 0 50px rgba(0,0,0,.5)}
+    .drop-shadow-md{filter:drop-shadow(0 4px 3px rgba(0,0,0,.35))}
+    .opacity-10{opacity:.1}.opacity-70{opacity:.7}
+    .transition-all{transition:all .2s ease}.transition-colors{transition:color .2s ease,background-color .2s ease,border-color .2s ease}.transition-transform{transition:transform .2s ease}
+    .duration-300{transition-duration:.3s}.duration-700{transition-duration:.7s}.ease-in-out{transition-timing-function:cubic-bezier(.4,0,.2,1)}.ease-\[cubic-bezier\(0\.25\,1\,0\.5\,1\)\]{transition-timing-function:cubic-bezier(.25,1,.5,1)}
+    .backdrop-blur,.backdrop-blur-xl{backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+    .animate-in{animation:fadeIn .28s ease-out both}.fade-in{animation-name:fadeIn}.slide-in-from-bottom-2{animation-name:fadeInUp}
+    @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+    @keyframes fadeInUp{from{opacity:0;transform:translateY(.5rem)}to{opacity:1;transform:translateY(0)}}
+    .hover\:bg-neutral-200:hover{background:#e5e5e5}.hover\:bg-neutral-800:hover{background:#262626}.hover\:bg-neutral-800\/80:hover{background:rgba(38,38,38,.8)}
+    .hover\:text-white:hover{color:#fff}.hover\:scale-105:hover{transform:scale(1.05)}.active\:scale-95:active{transform:scale(.95)}
+    .hover\:border-neutral-500:hover{border-color:#737373}.hover\:border-neutral-600:hover{border-color:#525252}
+    .group:hover .group-hover\:rotate-180{transform:rotate(180deg)}.group:hover .group-hover\:scale-110{transform:scale(1.1)}
+    .stroke-\[2\.5px\]{stroke-width:2.5px}
+    .touch-none{touch-action:none}
+    svg{display:block}
+  </style>
+
+  <link rel="dns-prefetch" href="//unpkg.com">
+  <link rel="dns-prefetch" href="//cdn.jsdelivr.net">
+  <link rel="preconnect" href="https://unpkg.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+
+  <script>
+    window.__yayoiLoadedScripts = Object.create(null);
+    window.__yayoiLoadScript = function(src, timeoutMs){
+      return new Promise(function(resolve,reject){
+        var finished = false;
+        var s=document.createElement('script');
+        var timer=setTimeout(function(){
+          if (finished) return;
+          finished = true;
+          s.remove();
+          reject(new Error('Timeout: ' + src));
+        }, Number.isFinite(timeoutMs) ? timeoutMs : 10000);
+        s.src=src; s.async=false;
+        s.onload=function(){
+          if (finished) return;
+          finished = true;
+          clearTimeout(timer);
+          resolve(src);
+        };
+        s.onerror=function(){
+          if (finished) return;
+          finished = true;
+          clearTimeout(timer);
+          s.remove();
+          reject(new Error('Failed: ' + src));
+        };
+        document.head.appendChild(s);
+      });
+    };
+    window.__yayoiLoadAny = async function(urls, test, label){
+      var lastError = null;
+      for (const url of urls) {
+        try {
+          await window.__yayoiLoadScript(url, 10000);
+          if (!test || test()) {
+            if (label) window.__yayoiLoadedScripts[label] = url;
+            return url;
+          }
+        } catch (err) {
+          lastError = err;
+        }
+      }
+      throw lastError || new Error('All script sources failed');
+    };
+  </script>
+
+</head>
+
+<body>
+  <div id="loading-fallback">
+    <div style="margin-bottom: 0.75rem;">INITIALIZING YAYOI...</div>
+    <div style="font-size: 0.8rem; opacity: 0.6;">Loading React runtime</div>
+  </div>
+
+  <div id="root"></div>
+  <script>
+    // Embedded vendor: htm 3.1.1 UMD
+    !function(n,e){"object"==typeof exports&&"undefined"!=typeof module?module.exports=e():"function"==typeof define&&define.amd?define(e):n.htm=e()}(this,function(){var n=function(e,t,u,s){var r;t[0]=0;for(var p=1;p<t.length;p++){var h=t[p++],o=t[p]?(t[0]|=h?1:2,u[t[p++]]):t[++p];3===h?s[0]=o:4===h?s[1]=Object.assign(s[1]||{},o):5===h?(s[1]=s[1]||{})[t[++p]]=o:6===h?s[1][t[++p]]+=o+"":h?(r=e.apply(o,n(e,o,u,["",null])),s.push(r),o[0]?t[0]|=2:(t[p-2]=0,t[p]=r)):s.push(o)}return s},e=new Map;return function(t){var u=e.get(this);return u||(u=new Map,e.set(this,u)),(u=n(this,u.get(t)||(u.set(t,u=function(n){for(var e,t,u=1,s="",r="",p=[0],h=function(n){1===u&&(n||(s=s.replace(/^\s*\n\s*|\s*\n\s*$/g,"")))?p.push(0,n,s):3===u&&(n||s)?(p.push(3,n,s),u=2):2===u&&"..."===s&&n?p.push(4,n,0):2===u&&s&&!n?p.push(5,0,!0,s):u>=5&&((s||!n&&5===u)&&(p.push(u,0,s,t),u=6),n&&(p.push(u,n,0,t),u=6)),s=""},o=0;o<n.length;o++){o&&(1===u&&h(),h(o));for(var f=0;f<n[o].length;f++)e=n[o][f],1===u?"<"===e?(h(),p=[p],u=3):s+=e:4===u?"--"===s&&">"===e?(u=1,s=""):s=e+s[0]:r?e===r?r="":s+=e:'"'===e||"'"===e?r=e:">"===e?(h(),u=1):u&&("="===e?(u=5,t=s,s=""):"/"===e&&(u<5||">"===n[o][f+1])?(h(),3===u&&(p=p[0]),u=p,(p=p[0]).push(2,0,u),u=0):" "===e||"\t"===e||"\n"===e||"\r"===e?(h(),u=2):s+=e),3===u&&"!--"===s&&(u=4,p=p[0])}return h(),p}(t)),u),arguments,[])).length>1?u:u[0]}});
+  </script>
+
+  <script>
+    (async () => {
+      try {
+        await window.__yayoiLoadAny([
+          'https://unpkg.com/react@18/umd/react.production.min.js',
+          'https://cdn.jsdelivr.net/npm/react@18/umd/react.production.min.js'
+        ], () => !!window.React, 'react');
+        await window.__yayoiLoadAny([
+          'https://unpkg.com/react-dom@18/umd/react-dom.production.min.js',
+          'https://cdn.jsdelivr.net/npm/react-dom@18/umd/react-dom.production.min.js'
+        ], () => !!window.ReactDOM, 'react-dom');
+        const React = window.React;
+        const ReactDOM = window.ReactDOM;
+        const { useState, useEffect, useRef, useCallback, useMemo } = React;
+        const html = window.htm.bind(React.createElement);
+
+        const createIcon = (paths, options = {}) => ({ className = '' }) => html`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill=${options.fill || 'none'} stroke=${options.stroke || 'currentColor'} strokeWidth=${options.strokeWidth || 2} strokeLinecap="round" strokeLinejoin="round" className=${className}>${paths.map((p) => p)}</svg>`;
+        const IconCircle = createIcon([html`<circle cx="12" cy="12" r="9" />`]);
+        const IconSquare = createIcon([html`<rect x="4" y="4" width="16" height="16" rx="1.5" />`]);
+        const IconTriangle = createIcon([html`<path d="M12 5 20 19H4Z" />`]);
+        const IconHexagon = createIcon([html`<path d="M7 4h10l5 8-5 8H7l-5-8z" />`]);
+        const IconOctagon = createIcon([html`<path d="M9 2h6l7 7v6l-7 7H9l-7-7V9z" />`]);
+        const IconStar = createIcon([html`<path d="m12 3 2.9 6 6.6 1-4.8 4.7 1.2 6.8L12 18.6 6.1 21.5l1.2-6.8L2.5 10l6.6-1z" />`]);
+        const IconDiamond = createIcon([html`<path d="M12 3 21 12 12 21 3 12Z" />`]);
+        const IconPlus = createIcon([html`<path d="M12 5v14M5 12h14" />`]);
+        const IconDisc = createIcon([html`<circle cx="12" cy="12" r="9" />`, html`<circle cx="12" cy="12" r="2" />`]);
+        const IconHeart = createIcon([html`<path d="M12 20s-7-4.35-9-8.63C1.24 7.63 3.43 4 7.27 4c2.05 0 3.27 1.3 4.73 3 1.46-1.7 2.68-3 4.73-3 3.84 0 6.03 3.63 4.27 7.37C19 15.65 12 20 12 20Z" />`]);
+        const IconArrow = createIcon([html`<path d="M12 19V5" />`, html`<path d="m5 10 5-5 5 5" />`]);
+        const IconDna = createIcon([html`<path d="M4 5c6 0 10 14 16 14" />`, html`<path d="M20 5C14 5 10 19 4 19" />`, html`<path d="M8 8h.01" />`, html`<path d="M16 16h.01" />`, html`<path d="M16 8h.01" />`, html`<path d="M8 16h.01" />`]);
+        const RefreshCcw = createIcon([html`<path d="M3 12a9 9 0 1 0 3-6.7" />`, html`<path d="M3 3v6h6" />`]);
+        const Palette = createIcon([html`<path d="M12 3a9 9 0 0 0 0 18h1.5a2.5 2.5 0 0 0 0-5H12a2 2 0 1 1 0-4h2.5A4.5 4.5 0 0 0 19 7.5 4.5 4.5 0 0 0 12 3Z" />`, html`<circle cx="7.5" cy="10.5" r="1" />`, html`<circle cx="12" cy="7.5" r="1" />`, html`<circle cx="16.5" cy="10.5" r="1" />`]);
+        const Layers = createIcon([html`<path d="m12 3 9 5-9 5-9-5 9-5Z" />`, html`<path d="m3 12 9 5 9-5" />`, html`<path d="m3 16 9 5 9-5" />`]);
+        const Box = createIcon([html`<path d="m3 7 9-4 9 4-9 4-9-4Z" />`, html`<path d="m3 7 9 4 9-4" />`, html`<path d="M12 11v10" />`, html`<path d="M3 7v10l9 4 9-4V7" />`]);
+        const Maximize = createIcon([html`<path d="M8 3H3v5" />`, html`<path d="M16 3h5v5" />`, html`<path d="M8 21H3v-5" />`, html`<path d="M16 21h5v-5" />`]);
+        const X = createIcon([html`<path d="M18 6 6 18" />`, html`<path d="m6 6 12 12" />`]);
+        const Shapes = createIcon([html`<circle cx="6.5" cy="7.5" r="2.5" />`, html`<path d="M17 5h4v4h-4z" />`, html`<path d="M12 14 9 20h6z" />`]);
+        const Globe = createIcon([html`<circle cx="12" cy="12" r="9" />`, html`<path d="M3 12h18" />`, html`<path d="M12 3a15 15 0 0 1 0 18" />`, html`<path d="M12 3a15 15 0 0 0 0 18" />`]);
+        const RectangleHorizontal = createIcon([html`<rect x="3" y="7" width="18" height="10" rx="2" />`]);
+        const Sun = createIcon([html`<circle cx="12" cy="12" r="4" />`, html`<path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />`]);
+        const Scaling = createIcon([html`<path d="M4 20 20 4" />`, html`<path d="M14 4h6v6" />`, html`<path d="M10 20H4v-6" />`]);
+        const Eye = createIcon([html`<path d="M2 12s4-6 10-6 10 6 10 6-4 6-10 6-10-6-10-6Z" />`, html`<circle cx="12" cy="12" r="2.5" />`]);
+        const Shuffle = createIcon([html`<path d="M16 3h5v5" />`, html`<path d="M4 20 21 3" />`, html`<path d="M21 16v5h-5" />`, html`<path d="m15 15 6 6" />`, html`<path d="M4 4h1" />`]);
+        const Grid3X3 = createIcon([html`<path d="M3 3h5v5H3zM10 3h4v5h-4zM16 3h5v5h-5zM3 10h5v4H3zM10 10h4v4h-4zM16 10h5v4h-5zM3 16h5v5H3zM10 16h4v5h-4zM16 16h5v5h-5z" />`]);
+        const Spline = createIcon([html`<path d="M4 18c3.5-8 6.5-8 10 0s6.5 8 6 0" />`, html`<circle cx="4" cy="18" r="1" />`, html`<circle cx="10" cy="10" r="1" />`, html`<circle cx="16" cy="18" r="1" />`, html`<circle cx="22" cy="10" r="1" />`]);
+        const Stamp = createIcon([html`<path d="M8 6a4 4 0 1 1 8 0c0 2 1 3 2 4v3H6v-3c1-1 2-2 2-4Z" />`, html`<path d="M5 17h14v3H5z" />`]);
+        const Cylinder = createIcon([html`<ellipse cx="12" cy="6" rx="7" ry="3" />`, html`<path d="M5 6v10c0 1.7 3.1 3 7 3s7-1.3 7-3V6" />`, html`<path d="M5 16c0 1.7 3.1 3 7 3s7-1.3 7-3" />`]);
+        const IconCone = createIcon([html`<path d="M12 4 5 19h14L12 4Z" />`, html`<ellipse cx="12" cy="19" rx="7" ry="2" />`]);
+
+    // ----------------------------------------------------------------------
+    // TYPES / CONSTANTS (ported from your TS)
+    // ----------------------------------------------------------------------
+    const LayoutMode = Object.freeze({ Random: 'random', Grid: 'grid', Shape: 'shape', Solid: 'solid' });
+
+    const ShapeType = Object.freeze({
+      Circle: 'circle',
+      Square: 'square',
+      Triangle: 'triangle',
+      Pentagon: 'pentagon',
+      Hexagon: 'hexagon',
+      Octagon: 'octagon',
+      Star: 'star',
+      Diamond: 'diamond',
+      Cross: 'cross',
+      Ring: 'ring',
+      Heart: 'heart',
+      Arrow: 'arrow',
+    });
+
+    const SolidShapeType = Object.freeze({ Sphere: 'sphere', Cube: 'cube', Torus: 'torus', Cone: 'cone' });
+
+    const SHAPE_ORDER = Object.freeze([
+      ShapeType.Circle,
+      ShapeType.Square,
+      ShapeType.Triangle,
+      ShapeType.Pentagon,
+      ShapeType.Hexagon,
+      ShapeType.Octagon,
+      ShapeType.Star,
+      ShapeType.Diamond,
+      ShapeType.Cross,
+      ShapeType.Ring,
+      ShapeType.Heart,
+      ShapeType.Arrow,
+    ]);
+
+    const FOCAL_LENGTH = 1500;
+    const PANEL_HEIGHT = 320;
+    const MAX_CANVAS_DIMENSION = 16384;
+    const YAYOI_BUILD = 'phase10-publish-readiness';
+
+    const GENERATION_CONFIG_KEYS = Object.freeze([
+      'width',
+      'height',
+      'count',
+      'sizeMode',
+      'linearDirection',
+      'linearStyle',
+      'reverseSize',
+      'syncRadius',
+      'minRadius',
+      'maxRadius',
+      'shapeSizes',
+      'depth',
+      'spreadX',
+      'spreadY',
+      'layoutMode',
+      'layoutShape',
+      'layoutScale',
+      'shapeDistribution',
+      'activeShapes',
+      'randomShapes',
+      'solidShape',
+      'solidDistribution',
+      'colorMode',
+      'baseColor',
+      'shapeColors',
+      'useStroke',
+      'gridX',
+      'gridY',
+      'gridZ',
+      'seed',
+    ]);
+
+    const pickConfigSubset = (source, keys) => {
+      const out = {};
+      for (const key of keys) out[key] = source[key];
+      return out;
+    };
+
+    const createDefaultMap = (keys, value) => {
+      const out = {};
+      for (const k of keys) out[k] = value;
+      return out;
+    };
+
+    const clampExportDimensions = (width, height, maxDimension = MAX_CANVAS_DIMENSION) => {
+      const safeWidth = Math.max(1, Math.floor(width || 1));
+      const safeHeight = Math.max(1, Math.floor(height || 1));
+      const longestSide = Math.max(safeWidth, safeHeight);
+      if (longestSide <= maxDimension) {
+        return { width: safeWidth, height: safeHeight, scale: 1 };
+      }
+      const scale = maxDimension / longestSide;
+      return {
+        width: Math.max(1, Math.floor(safeWidth * scale)),
+        height: Math.max(1, Math.floor(safeHeight * scale)),
+        scale,
+      };
+    };
+
+    const formatExportTimestamp = (date = new Date()) => {
+      const pad = (value) => String(value).padStart(2, '0');
+      return `${date.getFullYear()}${pad(date.getMonth() + 1)}${pad(date.getDate())}_${pad(date.getHours())}${pad(date.getMinutes())}${pad(date.getSeconds())}`;
+    };
+
+    const buildExportFilename = (extension, prefix = 'yayoi') => `${prefix}_${formatExportTimestamp()}.${extension}`;
+
+    const downloadBlob = (blob, filename) => {
+      if (!blob) throw new Error('Failed to create export blob.');
+      const objectUrl = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = objectUrl;
+      link.download = filename;
+      link.rel = 'noopener';
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
+    };
+
+    const canvasToBlob = (canvas, type = 'image/png') => new Promise((resolve, reject) => {
+      if (!canvas || typeof canvas.toBlob !== 'function') {
+        reject(new Error('Canvas export is not available in this browser.'));
+        return;
+      }
+      canvas.toBlob((blob) => {
+        if (blob) resolve(blob);
+        else reject(new Error(`Canvas returned an empty ${type} blob.`));
+      }, type);
+    });
+
+    const escapeXML = (value) => String(value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&apos;');
+
+    const fmt = (value) => {
+      if (!Number.isFinite(value)) return '0';
+      const rounded = Math.abs(value) < 0.000001 ? 0 : value;
+      return Number(rounded.toFixed(4)).toString();
+    };
+
+    const getCirclePathData = (radius) => {
+      const r = Math.max(0, radius);
+      return `M ${fmt(-r)} 0 A ${fmt(r)} ${fmt(r)} 0 1 0 ${fmt(r)} 0 A ${fmt(r)} ${fmt(r)} 0 1 0 ${fmt(-r)} 0 Z`;
+    };
+
+    const getRingPathData = (radius) => {
+      const outer = Math.max(0, radius);
+      const inner = outer * 0.6;
+      return `${getCirclePathData(outer)} ${getCirclePathData(inner)}`;
+    };
+
+    const getShapePathData = (type, radius) => {
+      if (type === ShapeType.Circle) return getCirclePathData(radius);
+      if (type === ShapeType.Square) {
+        const pr = Math.max(0, radius);
+        return `M ${fmt(-pr)} ${fmt(-pr)} H ${fmt(pr)} V ${fmt(pr)} H ${fmt(-pr)} Z`;
+      }
+      if (type === ShapeType.Ring) return getRingPathData(radius);
+      return getSVGPathData(type, radius) || getCirclePathData(radius);
+    };
+
+    const getShapeFillRule = (type) => (type === ShapeType.Ring ? 'evenodd' : 'nonzero');
+
+    const getStrokeWidthForScale = (scale) => fmt(Math.max(1, 3 * scale));
+
+    const getShadowStdDeviation = (shadowBlur) => fmt(Math.max(0.01, (shadowBlur || 0) / 2));
+
+    const DEFAULT_CONFIG = {
+      width: 3240,
+      height: 4050,
+      count: 300,
+      useBackground: false,
+      backgroundColor: '#000000',
+      zoom: 1.0,
+      sizeMode: 'random',        // fixed | random | linear
+      linearDirection: 'vertical',// horizontal | vertical
+      linearStyle: 'center',      // full | center
+      reverseSize: false,
+      syncRadius: false,
+      minRadius: 20,
+      maxRadius: 120,
+      shapeSizes: createDefaultMap(SHAPE_ORDER, 60),
+      depth: 2500,
+      spreadX: 100,
+      spreadY: 100,
+
+      // requested defaults
+      layoutMode: LayoutMode.Shape,
+      layoutShape: ShapeType.Circle,
+      layoutScale: 100,
+      shapeDistribution: 'fill-random', // stroke-linear | stroke-random | fill-random | fill-grid
+      activeShapes: [ShapeType.Circle],
+      randomShapes: [ShapeType.Circle],
+
+      solidShape: SolidShapeType.Sphere,
+      solidDistribution: 'surface', // surface | volume
+
+      colorMode: 'single',         // single | random | per-shape
+      baseColor: '#ffffff',
+      shapeColors: createDefaultMap(SHAPE_ORDER, '#ffffff'),
+      opacity: 0.9,
+      blendMode: 'source-over',
+      useStroke: false,
+      strokeColor: '#000000',
+      useShadow: false,
+      shadowBlur: 30,
+      shadowColor: '#000000',
+
+      gridX: 10,
+      gridY: 10,
+      gridZ: 5,
+
+      showAxes: false,
+      seed: Date.now(),
+      rotationX: 0,
+      rotationY: 0,
+    };
+
+    // ----------------------------------------------------------------------
+    // UI HELPERS (ported from ControlPanel.tsx)
+    // ----------------------------------------------------------------------
+    const getShapeIcon = (type, className = 'w-4 h-4') => {
+      switch (type) {
+        case ShapeType.Circle: return html`<${IconCircle} className=${className} />`;
+        case ShapeType.Square: return html`<${IconSquare} className=${className} />`;
+        case ShapeType.Triangle: return html`<${IconTriangle} className=${className} />`;
+        case ShapeType.Pentagon: return html`<${IconDna} className=${className} />`;
+        case ShapeType.Hexagon: return html`<${IconHexagon} className=${className} />`;
+        case ShapeType.Octagon: return html`<${IconOctagon} className=${className} />`;
+        case ShapeType.Star: return html`<${IconStar} className=${className} />`;
+        case ShapeType.Diamond: return html`<${IconDiamond} className=${className} />`;
+        case ShapeType.Cross: return html`<${IconPlus} className=${className} />`;
+        case ShapeType.Ring: return html`<${IconDisc} className=${className} />`;
+        case ShapeType.Heart: return html`<${IconHeart} className=${className} />`;
+        case ShapeType.Arrow: return html`<${IconArrow} className=${className} />`;
+        default: return html`<${IconCircle} className=${className} />`;
+      }
+    };
+
+    const Section = ({ title, icon: Icon, children, className = '' }) => html`
+      <div className=${`space-y-2 ${className}`}>
+        <div className="flex items-center gap-2 text-[10px] font-bold text-neutral-400 uppercase tracking-widest border-b border-neutral-800 pb-1 mb-2">
+          ${Icon ? html`<${Icon} className="w-3 h-3" />` : null} ${title}
+        </div>
+        <div className="space-y-3">
+          ${children}
+        </div>
+      </div>
+    `;
+
+    const PanelHeader = ({ title, icon: Icon, onClose }) => html`
+      <div className="flex justify-between items-center mb-2 pb-2 border-b border-neutral-800 sticky top-0 bg-black/95 z-10 backdrop-blur">
+        <h3 className="text-white font-bold tracking-wide flex items-center gap-2 text-sm">
+          <${Icon} className="w-4 h-4 text-white" />
+          ${title}
+        </h3>
+        <button onClick=${onClose} className="text-neutral-500 hover:text-white transition-colors p-1 rounded hover:bg-neutral-800">
+          <${X} className="w-4 h-4" />
+        </button>
+      </div>
+    `;
+
+    const Dock = ({ activeTab, setActiveTab, onGenerate, onExportPNG, onExportTransparentPNG, onExportSVG }) => {
+      const tabs = [
+        { id: 'shape',  icon: Shapes,   label: 'Shapes' },
+        { id: 'layout', icon: Layers,   label: 'Layout' },
+        { id: 'color',  icon: Palette,  label: 'Style'  },
+        { id: 'size',   icon: Maximize, label: 'Size'   },
+        { id: 'space',  icon: Box,      label: 'Space'  },
+      ];
+      const exportButtons = [
+        { id: 'png', icon: Stamp, label: 'PNG', onClick: onExportPNG },
+        { id: 'tpng', icon: Layers, label: 'TPNG', onClick: onExportTransparentPNG },
+        { id: 'svg', icon: Spline, label: 'SVG', onClick: onExportSVG },
+      ];
+
+      return html`
+        <div className="flex items-center gap-1 p-2 rounded-2xl bg-black/90 backdrop-blur-xl border border-neutral-800 shadow-2xl ring-1 ring-white/10">
+          <div className="flex items-center gap-1">
+            ${tabs.map((tab) => html`
+              <button
+                key=${tab.id}
+                onClick=${() => setActiveTab(activeTab === tab.id ? null : tab.id)}
+                className=${`relative group p-2.5 rounded-xl transition-all duration-300 flex flex-col items-center justify-center gap-1 min-w-[56px] ${
+                  activeTab === tab.id
+                    ? 'bg-white text-black shadow-[0_0_20px_rgba(255,255,255,0.3)] scale-105 z-10'
+                    : 'text-neutral-400 hover:text-white hover:bg-neutral-800/80 hover:scale-105'
+                }`}
+              >
+                <${tab.icon} className=${`w-5 h-5 transition-transform duration-300 ${activeTab === tab.id ? 'scale-110 stroke-[2.5px]' : 'group-hover:scale-110'}`} />
+                <span className="text-[9px] font-bold uppercase tracking-wider">${tab.label}</span>
+              </button>
+            `)}
+          </div>
+
+          <div className="w-px h-8 bg-neutral-800 mx-2" />
+
+          <button
+            onClick=${onGenerate}
+            className="group relative p-2.5 rounded-xl bg-white text-black hover:bg-neutral-200 transition-all duration-300 shadow-[0_0_20px_rgba(255,255,255,0.15)] flex flex-col items-center justify-center gap-1 min-w-[56px] hover:scale-105 active:scale-95"
+          >
+            <${RefreshCcw} className="w-5 h-5 stroke-[2.5px] group-hover:rotate-180 transition-transform duration-700 ease-in-out" />
+            <span className="text-[9px] font-bold uppercase tracking-wider">Gen</span>
+          </button>
+
+          <div className="w-px h-8 bg-neutral-800 mx-2" />
+
+          <div className="flex items-center gap-1">
+            ${exportButtons.map((button) => html`
+              <button
+                key=${button.id}
+                onClick=${button.onClick}
+                className="group relative p-2.5 rounded-xl text-neutral-400 hover:text-white hover:bg-neutral-800/80 transition-all duration-300 flex flex-col items-center justify-center gap-1 min-w-[56px] hover:scale-105 active:scale-95"
+              >
+                <${button.icon} className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" />
+                <span className="text-[9px] font-bold uppercase tracking-wider">${button.label}</span>
+              </button>
+            `)}
+          </div>
+        </div>
+      `;
+    };
+
+    const ControlPanelContent = ({
+      config,
+      setConfig,
+activeTab,
+      setActiveTab,
+    }) => {
+
+      const handleChange = (key, value) => {
+        setConfig((prev) => {
+          const next = { ...prev, [key]: value };
+          if (key === 'layoutMode' && value === LayoutMode.Random) {
+            if (!prev.randomShapes || prev.randomShapes.length === 0) {
+              next.randomShapes = (prev.activeShapes && prev.activeShapes.length > 0) ? [...prev.activeShapes] : [ShapeType.Circle];
+            }
+          }
+          return next;
+        });
+      };
+
+      const toggleShape = (type) => {
+        setConfig((prev) => {
+          const listKey = (prev.layoutMode === LayoutMode.Random) ? 'randomShapes' : 'activeShapes';
+          const current = (prev[listKey] && prev[listKey].length > 0) ? prev[listKey] : (prev.activeShapes || [ShapeType.Circle]);
+          if (current.includes(type) && current.length === 1) return prev;
+          const newShapes = current.includes(type) ? current.filter((t) => t !== type) : [...current, type];
+          return { ...prev, [listKey]: newShapes };
+        });
+      };
+
+      if (!activeTab) return null;
+
+      switch (activeTab) {
+        case 'shape':
+          return html`
+            <div className="h-full flex flex-col">
+              <${PanelHeader} title="SHAPES" icon=${Shapes} onClose=${() => setActiveTab(null)} />
+              <div className="overflow-y-auto pb-10">
+                <div className="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 lg:grid-cols-12 gap-2">
+                  ${SHAPE_ORDER.map((type) => {
+                    const shapeList = (config.layoutMode === LayoutMode.Random ? (config.randomShapes || config.activeShapes) : config.activeShapes) || [];
+                    const isActive = shapeList.includes(type);
+                    const label = type === ShapeType.Pentagon ? 'Penta' : type;
+                    return html`
+                      <button
+                        key=${type}
+                        onClick=${() => toggleShape(type)}
+                        className=${`relative flex flex-col items-center justify-center gap-1 p-2 rounded-lg border transition-all aspect-square ${
+                          isActive
+                            ? 'bg-white border-white text-black shadow-lg'
+                            : 'bg-neutral-900 border-neutral-800 text-neutral-500 hover:border-neutral-600 hover:text-white'
+                        }`}
+                      >
+                        ${getShapeIcon(type)}
+                        <span className="text-[9px] uppercase font-bold mt-1">${label}</span>
+                      </button>
+                    `;
+                  })}
+                </div>
+              </div>
+            </div>
+          `;
+
+        case 'layout':
+          return html`
+            <div className="h-full flex flex-col">
+              <${PanelHeader} title="LAYOUT & CANVAS" icon=${Layers} onClose=${() => setActiveTab(null)} />
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 overflow-y-auto pb-10">
+                <${Section} title="Resolution" icon=${RectangleHorizontal}>
+                  <div className="grid grid-cols-3 gap-1">
+                    ${[
+                      { label: '4K+', w: 4050, h: 4050 },
+                      { label: '4K',  w: 4000, h: 4000 },
+                      { label: '3K',  w: 3240, h: 3240 },
+                      { label: '2K',  w: 2160, h: 2160 },
+                      { label: 'HD',  w: 1920, h: 1920 },
+                      { label: 'A4',  w: 2480, h: 3508 },
+                    ].map((preset) => html`
+                      <button
+                        key=${preset.label}
+                        onClick=${() => setConfig((prev) => ({ ...prev, width: preset.w, height: preset.h }))}
+                        className=${`relative py-2 rounded border text-[9px] transition-all font-bold flex items-center justify-center gap-1 ${
+                          config.width === preset.w && config.height === preset.h
+                            ? 'bg-white text-black border-white'
+                            : 'bg-neutral-900 border-neutral-800 text-neutral-400 hover:text-white hover:border-neutral-600'
+                        }`}
+                      >
+                        ${preset.label}
+                      </button>
+                    `)}
+                  </div>
+                </${Section}>
+
+                <${Section} title="Arrangement" icon=${Layers}>
+                  <div className="grid grid-cols-4 gap-2 mb-3">
+                    ${[
+                      { mode: LayoutMode.Solid,  icon: Globe,  label: 'Solid'  },
+                      { mode: LayoutMode.Random, icon: Shuffle, label: 'Random' },
+                      { mode: LayoutMode.Grid,   icon: Grid3X3, label: 'Grid'   },
+                      { mode: LayoutMode.Shape,  icon: Shapes,  label: 'Shape'  },
+                    ].map((item) => html`
+                      <button
+                        key=${item.mode}
+                        onClick=${() => handleChange('layoutMode', item.mode)}
+                        className=${`flex flex-col items-center justify-center gap-1 py-2 rounded border transition-all text-[10px] font-bold ${
+                          config.layoutMode === item.mode
+                            ? 'bg-white text-black border-white'
+                            : 'bg-neutral-900 text-neutral-500 border-neutral-800 hover:border-neutral-600 hover:text-white'
+                        }`}
+                      >
+                        <${item.icon} className="w-3 h-3" /> ${item.label}
+                      </button>
+                    `)}
+                  </div>
+
+                  ${config.layoutMode === LayoutMode.Solid ? html`
+                    <div className="space-y-3 bg-neutral-900 p-3 rounded border border-neutral-800 animate-in fade-in slide-in-from-bottom-2">
+                      <div>
+                        <span className="text-[10px] text-neutral-400 mb-1 block">3D Base Shape</span>
+                        <div className="grid grid-cols-4 gap-1">
+                          ${[
+                            { id: SolidShapeType.Sphere, icon: Globe,    label: 'Sphere' },
+                            { id: SolidShapeType.Cube,   icon: Box,      label: 'Cube'   },
+                            { id: SolidShapeType.Torus,  icon: Cylinder, label: 'Torus'  },
+                            { id: SolidShapeType.Cone,   icon: IconCone, label: 'Cone'   },
+                          ].map((opt) => html`
+                            <button
+                              key=${opt.id}
+                              onClick=${() => handleChange('solidShape', opt.id)}
+                              className=${`p-2 rounded border flex flex-col items-center justify-center transition-all ${
+                                config.solidShape === opt.id
+                                  ? 'bg-white text-black border-white'
+                                  : 'bg-black text-neutral-500 border-neutral-700 hover:border-neutral-500'
+                              }`}
+                            >
+                              <${opt.icon} className="w-4 h-4 mb-1" />
+                              <span className="text-[9px] font-bold">${opt.label}</span>
+                            </button>
+                          `)}
+                        </div>
+                      </div>
+
+                      <div>
+                        <span className="text-[10px] text-neutral-400 mb-1 block">Placement</span>
+                        <div className="grid grid-cols-2 gap-2">
+                          <button
+                            onClick=${() => handleChange('solidDistribution', 'surface')}
+                            className=${`flex items-center justify-center gap-2 py-1.5 rounded text-[10px] font-bold transition-all border ${
+                              config.solidDistribution === 'surface'
+                                ? 'bg-white text-black border-white'
+                                : 'bg-black text-neutral-500 border-neutral-700 hover:border-neutral-500'
+                            }`}
+                          >
+                            <${Globe} className="w-3 h-3" /> Outside (Surface)
+                          </button>
+                          <button
+                            onClick=${() => handleChange('solidDistribution', 'volume')}
+                            className=${`flex items-center justify-center gap-2 py-1.5 rounded text-[10px] font-bold transition-all border ${
+                              config.solidDistribution === 'volume'
+                                ? 'bg-white text-black border-white'
+                                : 'bg-black text-neutral-500 border-neutral-700 hover:border-neutral-500'
+                            }`}
+                          >
+                            <${Box} className="w-3 h-3" /> Inside (Volume)
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="space-y-1 pt-2 border-t border-neutral-800">
+                        <div className="flex justify-between text-[10px] text-neutral-400">
+                          <span>Base Scale</span>
+                          <span className="font-mono text-white">${config.layoutScale}%</span>
+                        </div>
+                        <input
+                          type="range" min="10" max="150"
+                          value=${config.layoutScale}
+                          onChange=${(e) => handleChange('layoutScale', parseInt(e.target.value, 10))}
+                          className="w-full h-1 bg-neutral-700 rounded appearance-none cursor-pointer accent-white"
+                        />
+                      </div>
+
+                      <div className="space-y-1">
+                        <div className="flex justify-between text-[10px] text-neutral-400">
+                          <span>Item Count</span>
+                          <span className="font-mono text-white">${config.count}</span>
+                        </div>
+                        <input
+                          type="range" min="10" max="2000" step="10"
+                          value=${config.count}
+                          onChange=${(e) => handleChange('count', parseInt(e.target.value, 10))}
+                          className="w-full h-1 bg-neutral-700 rounded appearance-none cursor-pointer accent-white"
+                        />
+                      </div>
+                    </div>
+                  ` : null}
+
+                  ${config.layoutMode === LayoutMode.Grid ? html`
+                    <div className="space-y-2 bg-neutral-900 p-2 rounded border border-neutral-800">
+                      ${['gridX','gridY','gridZ'].map((key) => html`
+                        <div key=${key} className="flex items-center justify-between gap-2">
+                          <span className="text-[10px] text-neutral-400 w-8">${key.replace('grid','')}</span>
+                          <input
+                            type="range" min="1" max="20"
+                            value=${config[key]}
+                            onChange=${(e) => handleChange(key, parseInt(e.target.value, 10))}
+                            className="flex-1 h-1 bg-neutral-700 rounded-lg appearance-none cursor-pointer accent-white"
+                          />
+                          <span className="text-[10px] font-mono text-white w-4 text-right">${config[key]}</span>
+                        </div>
+                      `)}
+                    </div>
+                  ` : null}
+
+                  ${config.layoutMode === LayoutMode.Shape ? html`
+                    <div className="space-y-3 bg-neutral-900 p-3 rounded border border-neutral-800 animate-in fade-in slide-in-from-bottom-2">
+                      <div>
+                        <span className="text-[10px] text-neutral-400 mb-1 block">Guide Shape</span>
+                        <div className="grid grid-cols-6 gap-1">
+                          ${SHAPE_ORDER.map((type) => html`
+                            <button
+                              key=${type}
+                              onClick=${() => handleChange('layoutShape', type)}
+                              className=${`p-1.5 rounded border flex items-center justify-center transition-all ${
+                                config.layoutShape === type
+                                  ? 'bg-white text-black border-white'
+                                  : 'bg-black text-neutral-500 border-neutral-700 hover:border-neutral-500'
+                              }`}
+                              title=${type}
+                            >
+                              ${getShapeIcon(type, 'w-3 h-3')}
+                            </button>
+                          `)}
+                        </div>
+                      </div>
+
+                      <div className="space-y-1">
+                        <div className="flex justify-between text-[10px] text-neutral-400">
+                          <span>Guide Scale</span>
+                          <span className="font-mono text-white">${config.layoutScale}%</span>
+                        </div>
+                        <input
+                          type="range" min="10" max="100"
+                          value=${config.layoutScale}
+                          onChange=${(e) => handleChange('layoutScale', parseInt(e.target.value, 10))}
+                          className="w-full h-1 bg-neutral-700 rounded appearance-none cursor-pointer accent-white"
+                        />
+                      </div>
+
+                      <div>
+                        <span className="text-[10px] text-neutral-400 mb-1 block">Distribution Pattern</span>
+                        <div className="grid grid-cols-2 gap-2 mb-2">
+                          <div className="col-span-2 text-[9px] font-bold text-neutral-500 uppercase tracking-wider pl-1 mt-1">Outline</div>
+                          ${[
+                            { id: 'stroke-linear', label: 'Linear', icon: Spline },
+                            { id: 'stroke-random', label: 'Random', icon: Shuffle },
+                          ].map((m) => html`
+                            <button
+                              key=${m.id}
+                              onClick=${() => handleChange('shapeDistribution', m.id)}
+                              className=${`flex items-center justify-center gap-2 px-2 py-2 rounded border text-[10px] font-bold transition-all ${
+                                config.shapeDistribution === m.id
+                                  ? 'bg-white text-black border-white'
+                                  : 'bg-black text-neutral-500 border-neutral-700 hover:border-neutral-500'
+                              }`}
+                            >
+                              <${m.icon} className="w-3 h-3" />
+                              ${m.label}
+                            </button>
+                          `)}
+
+                          <div className="col-span-2 text-[9px] font-bold text-neutral-500 uppercase tracking-wider pl-1 mt-1">Fill</div>
+                          ${[
+                            { id: 'fill-random', label: 'Random', icon: Stamp },
+                            { id: 'fill-grid', label: 'Grid', icon: Grid3X3 },
+                          ].map((m) => html`
+                            <button
+                              key=${m.id}
+                              onClick=${() => handleChange('shapeDistribution', m.id)}
+                              className=${`flex items-center justify-center gap-2 px-2 py-2 rounded border text-[10px] font-bold transition-all ${
+                                config.shapeDistribution === m.id
+                                  ? 'bg-white text-black border-white'
+                                  : 'bg-black text-neutral-500 border-neutral-700 hover:border-neutral-500'
+                              }`}
+                            >
+                              <${m.icon} className="w-3 h-3" />
+                              ${m.label}
+                            </button>
+                          `)}
+                        </div>
+
+                        ${config.shapeDistribution === 'fill-grid' ? html`
+                          <div className="bg-black/50 p-2 rounded border border-neutral-800 space-y-2 mt-2">
+                            <div className="space-y-1">
+                              <div className="flex justify-between text-[10px] text-neutral-400">
+                                <span>Grid Columns (X)</span>
+                                <span className="font-mono text-white">${config.gridX}</span>
+                              </div>
+                              <input
+                                type="range" min="2" max="60"
+                                value=${config.gridX}
+                                onChange=${(e) => handleChange('gridX', parseInt(e.target.value, 10))}
+                                className="w-full h-1 bg-neutral-700 rounded appearance-none cursor-pointer accent-white"
+                              />
+                            </div>
+                            <div className="space-y-1">
+                              <div className="flex justify-between text-[10px] text-neutral-400">
+                                <span>Grid Rows (Y)</span>
+                                <span className="font-mono text-white">${config.gridY}</span>
+                              </div>
+                              <input
+                                type="range" min="2" max="60"
+                                value=${config.gridY}
+                                onChange=${(e) => handleChange('gridY', parseInt(e.target.value, 10))}
+                                className="w-full h-1 bg-neutral-700 rounded appearance-none cursor-pointer accent-white"
+                              />
+                            </div>
+                          </div>
+                        ` : html`
+                          <div className="space-y-1">
+                            <div className="flex justify-between text-[10px] text-neutral-400">
+                              <span>Count</span>
+                              <span className="font-mono text-white">${config.count}</span>
+                            </div>
+                            <input
+                              type="range" min="10" max="2000" step="10"
+                              value=${config.count}
+                              onChange=${(e) => handleChange('count', parseInt(e.target.value, 10))}
+                              className="w-full h-1 bg-neutral-700 rounded appearance-none cursor-pointer accent-white"
+                            />
+                          </div>
+                        `}
+                      </div>
+                    </div>
+                  ` : null}
+                </${Section}>
+              </div>
+            </div>
+          `;
+
+        case 'color':
+          return html`
+            <div className="h-full flex flex-col">
+              <${PanelHeader} title="STYLE & COLOR" icon=${Palette} onClose=${() => setActiveTab(null)} />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 overflow-y-auto pb-10">
+                <${Section} title="Color Strategy" icon=${Palette}>
+                  <div className="grid grid-cols-3 gap-2 mb-4">
+                    ${[
+                      { mode: 'single',   label: 'Single' },
+                      { mode: 'random',   label: 'Random' },
+                      { mode: 'per-shape',label: 'Per Shape' },
+                    ].map((opt) => html`
+                      <button
+                        key=${opt.mode}
+                        onClick=${() => handleChange('colorMode', opt.mode)}
+                        className=${`py-2 rounded border text-[10px] font-bold uppercase ${
+                          config.colorMode === opt.mode
+                            ? 'bg-white text-black border-white'
+                            : 'bg-neutral-900 text-neutral-500 border-neutral-800'
+                        }`}
+                      >
+                        ${opt.label}
+                      </button>
+                    `)}
+                  </div>
+
+                  ${config.colorMode === 'single' ? html`
+                    <div className="flex items-center gap-3 bg-neutral-900 p-2 rounded border border-neutral-800">
+                      <input
+                        type="color"
+                        value=${config.baseColor}
+                        onChange=${(e) => handleChange('baseColor', e.target.value)}
+                        className="w-8 h-8 rounded cursor-pointer border-none bg-transparent"
+                      />
+                      <span className="text-xs font-mono text-white">${config.baseColor}</span>
+                    </div>
+                  ` : null}
+                </${Section}>
+
+                <${Section} title="Effects" icon=${Sun}>
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <label className="text-[10px] font-bold text-neutral-400 uppercase">Background</label>
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            checked=${config.useBackground}
+                            onChange=${(e) => handleChange('useBackground', e.target.checked)}
+                            className="w-4 h-4 accent-white"
+                          />
+                          <span className="text-[10px] font-mono text-white">${config.useBackground ? 'ON' : 'OFF'}</span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3 bg-neutral-900 p-2 rounded border border-neutral-800">
+                        <input
+                          type="color"
+                          value=${config.backgroundColor}
+                          onChange=${(e) => handleChange('backgroundColor', e.target.value)}
+                          className="w-8 h-8 rounded cursor-pointer border-none bg-transparent"
+                          title="Background color"
+                        />
+                        <span className="text-xs font-mono text-white">${config.backgroundColor}</span>
+                      </div>
+                    </div>
+
+                    <div className="space-y-1">
+                      <div className="flex justify-between text-[10px] text-neutral-400">
+                        <span>Opacity</span>
+                        <span className="font-mono text-white">${Math.round(config.opacity * 100)}%</span>
+                      </div>
+                      <input
+                        type="range" min="10" max="100"
+                        value=${Math.round(config.opacity * 100)}
+                        onChange=${(e) => handleChange('opacity', parseInt(e.target.value, 10) / 100)}
+                        className="w-full h-1 bg-neutral-700 rounded appearance-none cursor-pointer accent-white"
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <label className="text-[10px] font-bold text-neutral-400 uppercase">Stroke</label>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          checked=${config.useStroke}
+                          onChange=${(e) => handleChange('useStroke', e.target.checked)}
+                          className="w-4 h-4 accent-white"
+                        />
+                        ${config.useStroke ? html`
+                          <input
+                            type="color"
+                            value=${config.strokeColor}
+                            onChange=${(e) => handleChange('strokeColor', e.target.value)}
+                            className="w-6 h-6 rounded cursor-pointer border-none"
+                          />
+                        ` : null}
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <label className="text-[10px] font-bold text-neutral-400 uppercase">Shadow</label>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          checked=${config.useShadow}
+                          onChange=${(e) => handleChange('useShadow', e.target.checked)}
+                          className="w-4 h-4 accent-white"
+                        />
+                        ${config.useShadow ? html`
+                          <input
+                            type="color"
+                            value=${config.shadowColor}
+                            onChange=${(e) => handleChange('shadowColor', e.target.value)}
+                            className="w-6 h-6 rounded cursor-pointer border-none"
+                          />
+                        ` : null}
+                      </div>
+                    </div>
+                  </div>
+                </${Section}>
+              </div>
+            </div>
+          `;
+
+        case 'size':
+          return html`
+            <div className="h-full flex flex-col">
+              <${PanelHeader} title="SIZE & SCALE" icon=${Maximize} onClose=${() => setActiveTab(null)} />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 overflow-y-auto pb-10">
+                <${Section} title="Size Strategy" icon=${Scaling}>
+                  <div className="grid grid-cols-3 gap-2 mb-4">
+                    ${[
+                      { mode: 'fixed',  label: 'Fixed'  },
+                      { mode: 'random', label: 'Random' },
+                      { mode: 'linear', label: 'Linear' },
+                    ].map((opt) => html`
+                      <button
+                        key=${opt.mode}
+                        onClick=${() => handleChange('sizeMode', opt.mode)}
+                        className=${`py-2 rounded border text-[10px] font-bold uppercase ${
+                          config.sizeMode === opt.mode
+                            ? 'bg-white text-black border-white'
+                            : 'bg-neutral-900 text-neutral-500 border-neutral-800'
+                        }`}
+                      >
+                        ${opt.label}
+                      </button>
+                    `)}
+                  </div>
+
+                  <div className="space-y-4 bg-neutral-900 p-3 rounded border border-neutral-800">
+                    <div className="space-y-1">
+                      <div className="flex justify-between text-[10px] text-neutral-400">
+                        <span>${config.sizeMode === 'fixed' ? 'Size' : 'Min Size'}</span>
+                        <span className="font-mono text-white">${config.minRadius}px</span>
+                      </div>
+                      <input
+                        type="range" min="1" max="300"
+                        value=${config.minRadius}
+                        onChange=${(e) => handleChange('minRadius', parseInt(e.target.value, 10))}
+                        className="w-full h-1 bg-neutral-700 rounded appearance-none cursor-pointer accent-white"
+                      />
+                    </div>
+
+                    ${config.sizeMode !== 'fixed' ? html`
+                      <div className="space-y-1 animate-in fade-in">
+                        <div className="flex justify-between text-[10px] text-neutral-400">
+                          <span>Max Size</span>
+                          <span className="font-mono text-white">${config.maxRadius}px</span>
+                        </div>
+                        <input
+                          type="range" min="1" max="300"
+                          value=${config.maxRadius}
+                          onChange=${(e) => handleChange('maxRadius', parseInt(e.target.value, 10))}
+                          className="w-full h-1 bg-neutral-700 rounded appearance-none cursor-pointer accent-white"
+                        />
+                      </div>
+                    ` : null}
+                  </div>
+                </${Section}>
+
+                ${config.sizeMode === 'linear' ? html`
+                  <${Section} title="Linear Settings" icon=${Spline}>
+                    <div className="bg-neutral-900 p-3 rounded border border-neutral-800 space-y-3">
+                      <div className="flex justify-between items-center">
+                        <span className="text-[10px] text-neutral-400">Direction</span>
+                        <div className="flex gap-1">
+                          <button onClick=${() => handleChange('linearDirection', 'horizontal')} className=${`p-1 rounded ${config.linearDirection === 'horizontal' ? 'bg-white text-black' : 'bg-black text-neutral-500'}`}>H</button>
+                          <button onClick=${() => handleChange('linearDirection', 'vertical')} className=${`p-1 rounded ${config.linearDirection === 'vertical' ? 'bg-white text-black' : 'bg-black text-neutral-500'}`}>V</button>
+                        </div>
+                      </div>
+
+                      <div className="flex justify-between items-center">
+                        <span className="text-[10px] text-neutral-400">Style</span>
+                        <div className="flex gap-1">
+                          <button onClick=${() => handleChange('linearStyle', 'full')} className=${`px-2 py-1 text-[9px] rounded ${config.linearStyle === 'full' ? 'bg-white text-black' : 'bg-black text-neutral-500'}`}>Full</button>
+                          <button onClick=${() => handleChange('linearStyle', 'center')} className=${`px-2 py-1 text-[9px] rounded ${config.linearStyle === 'center' ? 'bg-white text-black' : 'bg-black text-neutral-500'}`}>Center</button>
+                        </div>
+                      </div>
+
+                      <div className="flex justify-between items-center">
+                        <span className="text-[10px] text-neutral-400">Reverse</span>
+                        <input type="checkbox" checked=${config.reverseSize} onChange=${(e) => handleChange('reverseSize', e.target.checked)} className="accent-white" />
+                      </div>
+                    </div>
+                  </${Section}>
+                ` : null}
+              </div>
+            </div>
+          `;
+
+        case 'space':
+          return html`
+            <div className="h-full flex flex-col">
+              <${PanelHeader} title="SPACE & CAMERA" icon=${Box} onClose=${() => setActiveTab(null)} />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 overflow-y-auto pb-10">
+                <${Section} title="Dimensions" icon=${Box}>
+                  <div className="bg-neutral-900 p-3 rounded border border-neutral-800 space-y-4">
+                    <div className="space-y-1">
+                      <div className="flex justify-between text-[10px] text-neutral-400">
+                        <span>Depth (Z-Axis)</span>
+                        <span className="font-mono text-white">${config.depth}</span>
+                      </div>
+                      <input
+                        type="range" min="100" max="5000"
+                        value=${config.depth}
+                        onChange=${(e) => handleChange('depth', parseInt(e.target.value, 10))}
+                        className="w-full h-1 bg-neutral-700 rounded appearance-none cursor-pointer accent-white"
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <div className="flex justify-between text-[10px] text-neutral-400">
+                        <span>Spread X</span>
+                        <span className="font-mono text-white">${config.spreadX}%</span>
+                      </div>
+                      <input
+                        type="range" min="10" max="200"
+                        value=${config.spreadX}
+                        onChange=${(e) => handleChange('spreadX', parseInt(e.target.value, 10))}
+                        className="w-full h-1 bg-neutral-700 rounded appearance-none cursor-pointer accent-white"
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <div className="flex justify-between text-[10px] text-neutral-400">
+                        <span>Spread Y</span>
+                        <span className="font-mono text-white">${config.spreadY}%</span>
+                      </div>
+                      <input
+                        type="range" min="10" max="200"
+                        value=${config.spreadY}
+                        onChange=${(e) => handleChange('spreadY', parseInt(e.target.value, 10))}
+                        className="w-full h-1 bg-neutral-700 rounded appearance-none cursor-pointer accent-white"
+                      />
+                    </div>
+                  </div>
+                </${Section}>
+
+                <${Section} title="Camera" icon=${Eye}>
+                  <div className="bg-neutral-900 p-3 rounded border border-neutral-800 space-y-4">
+                    <div className="space-y-1">
+                      <div className="flex justify-between text-[10px] text-neutral-400">
+                        <span>Zoom</span>
+                        <span className="font-mono text-white">${config.zoom.toFixed(1)}x</span>
+                      </div>
+                      <input
+                        type="range" min="0.1" max="5" step="0.1"
+                        value=${config.zoom}
+                        onChange=${(e) => handleChange('zoom', parseFloat(e.target.value))}
+                        className="w-full h-1 bg-neutral-700 rounded appearance-none cursor-pointer accent-white"
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <div className="flex justify-between text-[10px] text-neutral-400">
+                        <span>Rotation X</span>
+                        <span className="font-mono text-white">${Math.round(config.rotationX)}°</span>
+                      </div>
+                      <input
+                        type="range" min="-90" max="90"
+                        value=${config.rotationX}
+                        onChange=${(e) => handleChange('rotationX', parseInt(e.target.value, 10))}
+                        className="w-full h-1 bg-neutral-700 rounded appearance-none cursor-pointer accent-white"
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <div className="flex justify-between text-[10px] text-neutral-400">
+                        <span>Rotation Y</span>
+                        <span className="font-mono text-white">${Math.round(config.rotationY)}°</span>
+                      </div>
+                      <input
+                        type="range" min="0" max="360"
+                        value=${config.rotationY}
+                        onChange=${(e) => handleChange('rotationY', parseInt(e.target.value, 10))}
+                        className="w-full h-1 bg-neutral-700 rounded appearance-none cursor-pointer accent-white"
+                      />
+                    </div>
+
+                    <div className="flex justify-between items-center pt-2">
+                      <span className="text-[10px] text-neutral-400">Show Axes</span>
+                      <input type="checkbox" checked=${config.showAxes} onChange=${(e) => handleChange('showAxes', e.target.checked)} className="accent-white" />
+                    </div>
+                  </div>
+                </${Section}>
+              </div>
+            </div>
+          `;
+
+        default:
+          return null;
+      }
+    };
+
+    // ----------------------------------------------------------------------
+    // RENDER / MATH HELPERS (ported from App.tsx + bugfixes)
+    // ----------------------------------------------------------------------
+    const getPolygonVertices = (r, sides, rotationOffset = -Math.PI / 2) => {
+      const points = [];
+      for (let i = 0; i < sides; i++) {
+        const angle = rotationOffset + (i * 2 * Math.PI) / sides;
+        points.push({ x: r * Math.cos(angle), y: r * Math.sin(angle) });
+      }
+      return points;
+    };
+
+    const getStarVertices = (r, points, inset) => {
+      const pts = [];
+      for (let i = 0; i < points * 2; i++) {
+        const rot = (Math.PI / points) * i;
+        const dist = i % 2 === 0 ? r : r * inset;
+        const angle = rot - Math.PI / 2;
+        pts.push({ x: Math.cos(angle) * dist, y: Math.sin(angle) * dist });
+      }
+      return pts;
+    };
+
+    const getShapeVertices = (type, r) => {
+      switch (type) {
+        case ShapeType.Square:   return getPolygonVertices(r, 4, -Math.PI / 4);
+        case ShapeType.Triangle: return getPolygonVertices(r, 3);
+        case ShapeType.Pentagon: return getPolygonVertices(r, 5);
+        case ShapeType.Hexagon:  return getPolygonVertices(r, 6);
+        case ShapeType.Octagon:  return getPolygonVertices(r, 8);
+        case ShapeType.Diamond:  return [{ x: 0, y: -r }, { x: r * 0.7, y: 0 }, { x: 0, y: r }, { x: -r * 0.7, y: 0 }];
+        case ShapeType.Star:     return getStarVertices(r, 5, 0.4);
+        case ShapeType.Cross: {
+          const w = r * 0.35;
+          return [
+            { x: -w, y: -r }, { x: w, y: -r }, { x: w, y: -w }, { x: r, y: -w }, { x: r, y: w },
+            { x: w, y: w }, { x: w, y: r }, { x: -w, y: r }, { x: -w, y: w }, { x: -r, y: w },
+            { x: -r, y: -w }, { x: -w, y: -w }
+          ];
+        }
+        case ShapeType.Arrow: {
+          const w = r * 0.5;
+          return [
+            { x: 0, y: -r }, { x: r, y: 0 }, { x: w, y: 0 }, { x: w, y: r },
+            { x: -w, y: r }, { x: -w, y: 0 }, { x: -r, y: 0 }
+          ];
+        }
+        case ShapeType.Heart: {
+          const pts = [];
+          const res = 60;
+          for (let i = 0; i < res; i++) {
+            const t = (i / res) * Math.PI * 2;
+            const x = 16 * Math.pow(Math.sin(t), 3);
+            const y = -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
+            const scale = r / 16;
+            pts.push({ x: x * scale, y: y * scale });
+          }
+          return pts;
+        }
+        default:
+          return [];
+      }
+    };
+
+    const isPointInPolygon = (p, vertices) => {
+      let inside = false;
+      for (let i = 0, j = vertices.length - 1; i < vertices.length; j = i++) {
+        const xi = vertices[i].x, yi = vertices[i].y;
+        const xj = vertices[j].x, yj = vertices[j].y;
+        const intersect = ((yi > p.y) !== (yj > p.y)) && (p.x < (xj - xi) * (p.y - yi) / (yj - yi) + xi);
+        if (intersect) inside = !inside;
+      }
+      return inside;
+    };
+
+    const getPointOnPolygonPerimeter = (t, vertices) => {
+      if (vertices.length < 2) return { x: 0, y: 0 };
+      const lengths = [];
+      let totalLength = 0;
+      for (let i = 0; i < vertices.length; i++) {
+        const next = vertices[(i + 1) % vertices.length];
+        const dist = Math.hypot(next.x - vertices[i].x, next.y - vertices[i].y);
+        lengths.push(dist);
+        totalLength += dist;
+      }
+      if (totalLength === 0) return vertices[0];
+      const targetDist = t * totalLength;
+      let currentDist = 0;
+      for (let i = 0; i < vertices.length; i++) {
+        const len = lengths[i];
+        if (currentDist + len >= targetDist - 0.001) {
+          const segmentT = len > 0 ? (targetDist - currentDist) / len : 0;
+          const v1 = vertices[i];
+          const v2 = vertices[(i + 1) % vertices.length];
+          return { x: v1.x + (v2.x - v1.x) * segmentT, y: v1.y + (v2.y - v1.y) * segmentT };
+        }
+        currentDist += len;
+      }
+      return vertices[0];
+    };
+
+    const getSVGPathData = (type, r) => {
+      const round = (n) => Math.round(n * 100) / 100;
+      if (type === ShapeType.Circle) return '';
+      if (type === ShapeType.Ring) {
+        const R = r;
+        const r2 = r * 0.6;
+        return `M ${round(R)} 0 A ${round(R)} ${round(R)} 0 1 0 ${round(-R)} 0 A ${round(R)} ${round(R)} 0 1 0 ${round(R)} 0 Z ` +
+               `M ${round(r2)} 0 A ${round(r2)} ${round(r2)} 0 1 1 ${round(-r2)} 0 A ${round(r2)} ${round(r2)} 0 1 1 ${round(r2)} 0 Z`;
+      }
+      if (type === ShapeType.Heart) {
+        const s = r / 1.5;
+        return `M 0 ${-round(s * 0.5)} C ${round(s)} ${-round(s * 1.5)}, ${round(s * 2)} ${-round(s * 0.5)}, 0 ${round(s * 1.5)} ` +
+               `C ${-round(s * 2)} ${-round(s * 0.5)}, ${-round(s)} ${-round(s * 1.5)}, 0 ${-round(s * 0.5)} Z`;
+      }
+      const v = getShapeVertices(type, r);
+      if (v.length > 0) return `M ${v.map((p) => `${round(p.x)} ${round(p.y)}`).join(' L ')} Z`;
+      return '';
+    };
+
+    const createLCG = (seed) => {
+      let state = seed % 2147483647;
+      if (state <= 0) state += 2147483646;
+      return () => {
+        state = (state * 48271) % 2147483647;
+        return state / 2147483647;
+      };
+    };
+
+    const getRandomColor = (rng) => {
+      const h = Math.floor(rng() * 360);
+      const s = 70 + Math.floor(rng() * 30);
+      const l = 50 + Math.floor(rng() * 20);
+      return `hsl(${h}, ${s}%, ${l}%)`;
+    };
+
+    const rotate3D = (x, y, z, angleX, angleY) => {
+      const radX = (angleX * Math.PI) / 180;
+      const radY = (angleY * Math.PI) / 180;
+      const x1 = x * Math.cos(radY) - z * Math.sin(radY);
+      const z1 = x * Math.sin(radY) + z * Math.cos(radY);
+      const y1 = y;
+      const y2 = y1 * Math.cos(radX) - z1 * Math.sin(radX);
+      const z2 = y1 * Math.sin(radX) + z1 * Math.cos(radX);
+      return { x: x1, y: y2, z: z2 };
+    };
+
+    class ErrorBoundary extends React.Component {
+      constructor(props) {
+        super(props);
+        this.state = { hasError: false, error: null };
+      }
+      static getDerivedStateFromError(error) {
+        return { hasError: true, error };
+      }
+      render() {
+        if (this.state.hasError) {
+          return html`
+            <div className="flex items-center justify-center h-screen w-screen bg-black text-red-500 flex-col p-4 text-center">
+              <h2 className="text-xl font-bold mb-2">Renderer Crashed</h2>
+              <pre className="text-xs opacity-70 whitespace-pre-wrap">${String(this.state.error?.message || this.state.error)}</pre>
+            </div>
+          `;
+        }
+        return this.props.children;
+      }
+    }
+
+    // ----------------------------------------------------------------------
+    // MAIN APP
+    // ----------------------------------------------------------------------
+    const AppContent = () => {
+      const canvasRef = useRef(null);
+      const dragStateRef = useRef({ pointerId: null, x: 0, y: 0 });
+      const [shapes, setShapes] = useState([]);
+      const [activeTab, setActiveTab] = useState(null);
+      const [isDragging, setIsDragging] = useState(false);
+      const [config, setConfig] = useState(DEFAULT_CONFIG);
+      const generationConfigDependencies = GENERATION_CONFIG_KEYS.map((key) => config[key]);
+      const generationConfig = useMemo(() => pickConfigSubset(config, GENERATION_CONFIG_KEYS), generationConfigDependencies);
+
+      useEffect(() => {
+        const fallback = document.getElementById('loading-fallback');
+        if (fallback) {
+          fallback.style.opacity = '0';
+          setTimeout(() => fallback.remove(), 350);
+        }
+      }, []);
+
+      const generateShapes = useCallback(() => {
+        const config = generationConfig;
+        const newShapes = [];
+        const rng = createLCG(config.seed);
+        const shapePool = (config.layoutMode === LayoutMode.Random) ? (config.randomShapes || config.activeShapes) : config.activeShapes;
+        const availableShapes = (shapePool && shapePool.length > 0) ? shapePool : [ShapeType.Circle];
+        const pickShapeType = () => availableShapes[Math.floor(rng() * availableShapes.length)];
+
+        const pickColor = (type) => {
+          if (config.colorMode === 'random') return getRandomColor(rng);
+          if (config.colorMode === 'per-shape') return config.shapeColors[type] || '#ffffff';
+          return config.baseColor;
+        };
+
+        const calculateSize = (type, t) => {
+          if (config.sizeMode === 'fixed') return config.minRadius;
+          if (config.sizeMode === 'per-shape') return config.shapeSizes[type] || config.minRadius;
+          if (config.sizeMode === 'linear') {
+            let linearT = t;
+            if (config.linearStyle === 'center') linearT = Math.abs(t - 0.5) * 2;
+            if (config.reverseSize) linearT = 1.0 - linearT;
+            return config.minRadius + (config.maxRadius - config.minRadius) * linearT;
+          }
+          if (config.syncRadius) return config.minRadius;
+          const min = config.minRadius;
+          const max = config.maxRadius;
+          return (min === max) ? min : (min + rng() * (max - min));
+        };
+
+        const spreadXScale = config.spreadX / 100;
+        const spreadYScale = config.spreadY / 100;
+
+        if (config.layoutMode === LayoutMode.Solid) {
+          const baseR = (Math.min(config.width, config.height) / 2) * (config.layoutScale / 100);
+          const maxActiveShapeRadius = (() => {
+            if (config.sizeMode === 'fixed') return config.minRadius;
+            if (config.sizeMode === 'per-shape') {
+              const list = (config.activeShapes && config.activeShapes.length) ? config.activeShapes : [ShapeType.Circle];
+              let r = 0;
+              for (const t of list) r = Math.max(r, (config.shapeSizes && config.shapeSizes[t]) ? config.shapeSizes[t] : 0);
+              return Math.max(r || 0, config.minRadius);
+            }
+            return Math.max(config.minRadius, config.maxRadius);
+          })();
+          const strokePad = config.useStroke ? 3 : 0;
+          const R = Math.max(2, baseR - (maxActiveShapeRadius + strokePad) * 1.1);
+          const isVolume = config.solidDistribution === 'volume';
+
+          let sphereSurfacePoints = null;
+          if (config.solidShape === SolidShapeType.Sphere && !isVolume) {
+            const target = Math.max(1, config.count);
+            const pts = [];
+            // Ring-grid on sphere surface (latitudinal bands with staggered longitudes)
+            const rings = Math.max(2, Math.round(Math.sqrt(target / 4)));
+            for (let r = 0; r < rings && pts.length < target; r++) {
+              const v = (r + 0.5) / rings;
+              const phiR = Math.PI * v;
+              const yR = -Math.cos(phiR) * R;
+              const ringRadius = Math.sin(phiR) * R;
+              let n = Math.max(1, Math.round(2 * Math.PI * rings * Math.sin(phiR)));
+              n = Math.min(n, target - pts.length);
+              const offset = (r % 2) ? (Math.PI / n) : 0;
+              for (let j = 0; j < n && pts.length < target; j++) {
+                const theta = offset + (j / n) * Math.PI * 2;
+                pts.push({ x: Math.cos(theta) * ringRadius, y: yR, z: Math.sin(theta) * ringRadius });
+              }
+            }
+            // Backfill (rare, tiny targets) with Fibonacci
+            if (pts.length < target) {
+              const golden = Math.PI * (3 - Math.sqrt(5));
+              for (let k = pts.length; k < target; k++) {
+                const yPos = 1 - (k / Math.max(1, (target - 1))) * 2;
+                const radiusAtY = Math.sqrt(Math.max(0, 1 - yPos * yPos));
+                const theta = golden * k;
+                pts.push({ x: Math.cos(theta) * radiusAtY * R, y: yPos * R * -1, z: Math.sin(theta) * radiusAtY * R });
+              }
+            }
+            sphereSurfacePoints = pts;
+          }
+
+
+          for (let i = 0; i < config.count; i++) {
+            let x = 0, y = 0, z = 0, t = 0;
+            let rotation = 0;
+
+            if (config.solidShape === SolidShapeType.Sphere) {
+              if (!isVolume) {
+                if (sphereSurfacePoints && sphereSurfacePoints[i]) {
+                  const p = sphereSurfacePoints[i];
+                  x = p.x;
+                  y = p.y;
+                  z = p.z;
+                } else {
+                  const phi = Math.PI * (3 - Math.sqrt(5));
+                  const yPos = 1 - (i / Math.max(1, (config.count - 1))) * 2;
+                  const radiusAtY = Math.sqrt(Math.max(0, 1 - yPos * yPos));
+                  const theta = phi * i;
+                  x = Math.cos(theta) * radiusAtY * R;
+                  y = yPos * R * -1;
+                  z = Math.sin(theta) * radiusAtY * R;
+                }
+                t = (y + R) / (2 * R);
+              } 
+              else {
+                const u = rng();
+                const v = rng();
+                const theta = 2 * Math.PI * u;
+                const phi = Math.acos(2 * v - 1);
+                const radius = R * Math.cbrt(rng());
+                x = radius * Math.sin(phi) * Math.cos(theta);
+                z = radius * Math.sin(phi) * Math.sin(theta);
+                y = radius * Math.cos(phi);
+                t = (y + R) / (2 * R);
+              }
+            } else if (config.solidShape === SolidShapeType.Cube) {
+              const size = R;
+              if (!isVolume) {
+                const face = Math.floor(rng() * 6);
+                const u = (rng() - 0.5) * 2 * size;
+                const v = (rng() - 0.5) * 2 * size;
+                switch (face) {
+                  case 0: x =  size; y = u;    z = v;    break;
+                  case 1: x = -size; y = u;    z = v;    break;
+                  case 2: x = u;    y =  size; z = v;    break;
+                  case 3: x = u;    y = -size; z = v;    break;
+                  case 4: x = u;    y = v;     z =  size;break;
+                  case 5: x = u;    y = v;     z = -size;break;
+                  default: break;
+                }
+              } else {
+                x = (rng() - 0.5) * 2 * size;
+                y = (rng() - 0.5) * 2 * size;
+                z = (rng() - 0.5) * 2 * size;
+              }
+              t = (y + size) / (2 * size);
+            } else if (config.solidShape === SolidShapeType.Torus) {
+              const majorR = R * 0.7;
+              const minorR = R * 0.3;
+              const u = rng() * Math.PI * 2;
+              const v = rng() * Math.PI * 2;
+              let rOffset = minorR;
+              if (isVolume) rOffset = minorR * Math.sqrt(rng());
+              x = (majorR + rOffset * Math.cos(v)) * Math.cos(u);
+              z = (majorR + rOffset * Math.cos(v)) * Math.sin(u);
+              y = rOffset * Math.sin(v);
+              t = (y + minorR) / (2 * minorR);
+            } else if (config.solidShape === SolidShapeType.Cone) {
+              const h = R * 2;
+              const rBase = R;
+              if (!isVolume) {
+                const theta = rng() * Math.PI * 2;
+                const hRatio = Math.sqrt(rng());
+                const curH = h * hRatio;
+                const curR = rBase * (1 - hRatio);
+                y = curH - h / 2;
+                x = curR * Math.cos(theta);
+                z = curR * Math.sin(theta);
+              } else {
+                const hRatio = rng();
+                const curH = h * hRatio;
+                const maxR = rBase * (1 - hRatio);
+                const rPos = maxR * Math.sqrt(rng());
+                const theta = rng() * Math.PI * 2;
+                y = curH - h / 2;
+                x = rPos * Math.cos(theta);
+                z = rPos * Math.sin(theta);
+              }
+              t = (y + h / 2) / h;
+            }
+
+            x *= spreadXScale;
+            y *= spreadYScale;
+            t = Math.max(0, Math.min(1, t));
+
+            if (config.linearDirection === 'horizontal') {
+              const bound = R;
+              t = (x + bound) / (2 * bound);
+              t = Math.max(0, Math.min(1, t));
+            }
+
+            const type = pickShapeType();
+            newShapes.push({
+              id: `solid-${i}`,
+              x, y, z,
+              baseRadius: calculateSize(type, t),
+              type,
+              rotation,
+              color: pickColor(type),
+            });
+          }
+        } else if (config.layoutMode === LayoutMode.Grid) {
+          const { gridX, gridY, gridZ } = config;
+          const w = config.width * spreadXScale;
+          const h = config.height * spreadYScale;
+          const d = config.depth;
+          const safeGridX = Math.min(gridX, 30);
+          const safeGridY = Math.min(gridY, 30);
+
+          for (let iz = 0; iz < gridZ; iz++) {
+            for (let iy = 0; iy < safeGridY; iy++) {
+              for (let ix = 0; ix < safeGridX; ix++) {
+                const nx = safeGridX > 1 ? ix / (safeGridX - 1) : 0.5;
+                const ny = safeGridY > 1 ? iy / (safeGridY - 1) : 0.5;
+                const nz = gridZ > 1 ? iz / (gridZ - 1) : 0.5;
+
+                const x = (nx - 0.5) * w;
+                const y = (ny - 0.5) * h;
+                const z = (nz - 0.5) * d;
+
+                const t = (config.linearDirection === 'horizontal') ? nx : ny;
+                const type = pickShapeType();
+                newShapes.push({
+                  id: `grid-${ix}-${iy}-${iz}`,
+                  x, y, z,
+                  baseRadius: calculateSize(type, t),
+                  type,
+                  rotation: rng() * Math.PI * 2,
+                  color: pickColor(type),
+                });
+              }
+            }
+          }
+        } else if (config.layoutMode === LayoutMode.Shape) {
+          const guideBaseSize = Math.min(config.width, config.height) * 0.45;
+          const guideRadius = guideBaseSize * (config.layoutScale / 100);
+          const guideType = config.layoutShape;
+
+          let guideVertices = [];
+          const isRadial = (guideType === ShapeType.Circle || guideType === ShapeType.Ring);
+          if (!isRadial) guideVertices = getShapeVertices(guideType, guideRadius);
+
+          if (config.shapeDistribution === 'fill-grid') {
+            // Clean, even grid clipped to the guide shape.
+            // Uses existing Grid X/Y controls (columns/rows) but improves aesthetics by:
+            // - keeping shapes fully inside the guide (padding by max radius + stroke)
+            // - staggering every other row for better packing (hex-like)
+            const cols = Math.max(2, (config.gridX | 0));
+            const rows = Math.max(2, (config.gridY | 0));
+
+            const maxActiveShapeRadius = (() => {
+              // Worst-case radius used to keep shapes from crossing the guide boundary.
+              if (config.sizeMode === 'fixed') return config.minRadius;
+              if (config.sizeMode === 'per-shape') {
+                const list = (config.activeShapes && config.activeShapes.length) ? config.activeShapes : [ShapeType.Circle];
+                let r = 0;
+                for (const t of list) r = Math.max(r, (config.shapeSizes && config.shapeSizes[t]) ? config.shapeSizes[t] : 0);
+                return Math.max(r || 0, config.minRadius);
+              }
+              return Math.max(config.minRadius, config.maxRadius);
+            })();
+
+            const strokePad = config.useStroke ? 3 : 0;
+            const pad = (maxActiveShapeRadius + strokePad) * 1.05;
+            const effR = Math.max(2, guideRadius - pad);
+
+            const stepX = (effR * 2) / (cols - 1);
+            const stepY = (effR * 2) / (rows - 1);
+            const startX = -effR;
+            const startY = -effR;
+
+            // Slightly expand for inside test (numerical safety)
+            const checkR = effR * 1.0005;
+            let checkVertices = [];
+            if (!isRadial) checkVertices = getShapeVertices(guideType, checkR);
+
+            let idx = 0;
+            for (let iy = 0; iy < rows; iy++) {
+              const rowOffset = (iy % 2) ? (stepX * 0.5) : 0;
+              const ry = startY + iy * stepY;
+
+              for (let ix = 0; ix < cols; ix++) {
+                const rx = startX + ix * stepX + rowOffset;
+
+                let isInside = false;
+                if (isRadial) {
+                  isInside = (rx * rx + ry * ry) <= (checkR * checkR);
+                } else {
+                  isInside = isPointInPolygon({ x: rx, y: ry }, checkVertices);
+                }
+                if (!isInside) continue;
+
+                const x = rx * spreadXScale;
+                const y = ry * spreadYScale;
+                const z = 0;
+
+                const tx = Math.max(0, Math.min(1, (rx + effR) / (effR * 2)));
+                const ty = Math.max(0, Math.min(1, (ry + effR) / (effR * 2)));
+                const t = (config.linearDirection === 'horizontal') ? tx : ty;
+
+                const type = pickShapeType();
+                newShapes.push({
+                  id: `s-grid-${idx++}`,
+                  x, y, z,
+                  baseRadius: calculateSize(type, t),
+                  type,
+                  rotation: 0,
+                  color: pickColor(type),
+                });
+              }
+            }
+          } else {
+            for (let i = 0; i < config.count; i++) {
+              let x = 0, y = 0, t = 0, z = 0, rotation = 0;
+
+              if (config.shapeDistribution === 'stroke-linear') {
+                t = i / config.count;
+                if (isRadial) {
+                  const angle = t * Math.PI * 2 - Math.PI / 2;
+                  x = guideRadius * Math.cos(angle);
+                  y = guideRadius * Math.sin(angle);
+                } else {
+                  const pt = getPointOnPolygonPerimeter(t, guideVertices);
+                  x = pt.x; y = pt.y;
+                }
+              } else if (config.shapeDistribution === 'stroke-random') {
+                t = rng();
+                if (isRadial) {
+                  const angle = t * Math.PI * 2 - Math.PI / 2;
+                  x = guideRadius * Math.cos(angle);
+                  y = guideRadius * Math.sin(angle);
+                } else {
+                  const pt = getPointOnPolygonPerimeter(t, guideVertices);
+                  x = pt.x; y = pt.y;
+                }
+                z = (rng() - 0.5) * config.depth;
+                rotation = rng() * Math.PI * 2;
+              } else if (config.shapeDistribution === 'fill-random') {
+                // Random fill, but keep shapes fully inside the guide by padding with max radius + stroke.
+                const maxActiveShapeRadius = (() => {
+                  if (config.sizeMode === 'fixed') return config.minRadius;
+                  if (config.sizeMode === 'per-shape') {
+                    const list = (config.activeShapes && config.activeShapes.length) ? config.activeShapes : [ShapeType.Circle];
+                    let r = 0;
+                    for (const t of list) r = Math.max(r, (config.shapeSizes && config.shapeSizes[t]) ? config.shapeSizes[t] : 0);
+                    return Math.max(r || 0, config.minRadius);
+                  }
+                  return Math.max(config.minRadius, config.maxRadius);
+                })();
+                const strokePad = config.useStroke ? 3 : 0;
+                const pad = (maxActiveShapeRadius + strokePad) * 1.05;
+                const effR = Math.max(2, guideRadius - pad);
+                const checkR = effR * 1.0005;
+                const checkVertices = (!isRadial) ? getShapeVertices(guideType, checkR) : null;
+
+                let found = false;
+                let attempts = 0;
+                while (!found && attempts < 400) {
+                  const rx = (rng() - 0.5) * 2 * effR;
+                  const ry = (rng() - 0.5) * 2 * effR;
+                  if (isRadial) {
+                    if (rx * rx + ry * ry <= checkR * checkR) { x = rx; y = ry; found = true; }
+                  } else {
+                    if (isPointInPolygon({ x: rx, y: ry }, checkVertices)) { x = rx; y = ry; found = true; }
+                  }
+                  attempts++;
+                }
+                if (!found) { x = 0; y = 0; }
+
+                t = (y + effR) / (effR * 2);
+                if (config.linearDirection === 'horizontal') t = (x + effR) / (effR * 2);
+                z = (rng() - 0.5) * config.depth;
+                rotation = rng() * Math.PI * 2;
+              }
+
+              t = Math.max(0, Math.min(1, t));
+              const finalX = x * spreadXScale;
+              const finalY = y * spreadYScale;
+
+              const type = pickShapeType();
+              newShapes.push({
+                id: `s-${i}`,
+                x: finalX,
+                y: finalY,
+                z,
+                baseRadius: calculateSize(type, t),
+                type,
+                rotation,
+                color: pickColor(type),
+              });
+            }
+          }
+        } else {
+          // Random
+          for (let i = 0; i < config.count; i++) {
+            const x = (rng() - 0.5) * config.width * spreadXScale;
+            const y = (rng() - 0.5) * config.height * spreadYScale;
+            const z = (rng() - 0.5) * config.depth;
+
+            let t = 0;
+            if (config.linearDirection === 'horizontal') {
+              const limit = (config.width * spreadXScale) / 2;
+              t = limit > 0 ? (x + limit) / (limit * 2) : 0.5;
+            } else {
+              const limit = (config.height * spreadYScale) / 2;
+              t = limit > 0 ? (y + limit) / (limit * 2) : 0.5;
+            }
+            t = Math.max(0, Math.min(1, t));
+
+            const type = pickShapeType();
+            newShapes.push({
+              id: `rnd-${i}`,
+              x, y, z,
+              baseRadius: calculateSize(type, t),
+              type,
+              rotation: rng() * Math.PI * 2,
+              color: pickColor(type),
+            });
+          }
+        }
+
+        setShapes(newShapes);
+      }, [generationConfig]);
+
+      useEffect(() => { generateShapes(); }, [generateShapes]);
+
+      const handleRegenerate = () => setConfig((prev) => ({ ...prev, seed: Date.now() }));
+
+      const project = useCallback((x, y, z, cx, cy, rotX, rotY) => {
+        const rotated = rotate3D(x, y, z, rotX, rotY);
+        const viewDistance = Math.max(config.depth, 2500);
+        const cameraZ = rotated.z + viewDistance;
+        const scale = (1500 / (1500 + cameraZ)) * config.zoom;
+        return { x: rotated.x * scale + cx, y: rotated.y * scale + cy, z: cameraZ, scale };
+      }, [config.depth, config.zoom]);
+
+      const renderToContext = (ctx, width, height, renderList, renderConfig = config) => {
+        ctx.clearRect(0, 0, width, height);
+        if (renderConfig.useBackground) {
+          ctx.fillStyle = renderConfig.backgroundColor;
+          ctx.fillRect(0, 0, width, height);
+        }
+        ctx.lineJoin = 'round';
+        ctx.lineCap = 'round';
+        ctx.globalAlpha = renderConfig.opacity;
+        ctx.globalCompositeOperation = renderConfig.blendMode;
+
+        if (renderConfig.useShadow) {
+          ctx.shadowBlur = renderConfig.shadowBlur;
+          ctx.shadowColor = renderConfig.shadowColor;
+          ctx.shadowOffsetX = 0;
+          ctx.shadowOffsetY = 0;
+        } else {
+          ctx.shadowBlur = 0;
+          ctx.shadowColor = 'transparent';
+        }
+
+        for (const shape of renderList) {
+          const pr = shape.baseRadius * shape.scale;
+          if (shape.pz < 0 || pr < 0.5) continue;
+
+          ctx.save();
+          ctx.translate(shape.px, shape.py);
+          ctx.rotate(shape.rotation);
+
+          const pathData = getShapePathData(shape.type, pr);
+          const path = new Path2D(pathData);
+          const fillRule = getShapeFillRule(shape.type);
+          const strokeWidth = Number(getStrokeWidthForScale(shape.scale));
+
+          ctx.fillStyle = shape.color;
+          ctx.fill(path, fillRule);
+          if (renderConfig.useStroke) {
+            ctx.strokeStyle = renderConfig.strokeColor;
+            ctx.lineWidth = strokeWidth;
+            ctx.stroke(path);
+          }
+
+          ctx.restore();
+        }
+
+        ctx.globalCompositeOperation = 'source-over';
+        ctx.globalAlpha = 1.0;
+        ctx.shadowBlur = 0;
+
+        if (renderConfig.showAxes) {
+          const spreadXScale2 = renderConfig.spreadX / 100;
+          const spreadYScale2 = renderConfig.spreadY / 100;
+          const w = renderConfig.width * spreadXScale2;
+          const h = renderConfig.height * spreadYScale2;
+          const d = renderConfig.depth;
+          const cx = renderConfig.width / 2;
+          const cy = renderConfig.height / 2;
+          const rotX = renderConfig.rotationX;
+          const rotY = renderConfig.rotationY;
+
+          ctx.lineWidth = 2;
+          ctx.font = `bold ${Math.max(14, renderConfig.width / 80)}px monospace`;
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+
+          const drawAxis = (x1, y1, z1, x2, y2, z2, color, label) => {
+            const p1 = project(x1, y1, z1, cx, cy, rotX, rotY);
+            const p2 = project(x2, y2, z2, cx, cy, rotX, rotY);
+            if (p1.z <= 10 || p2.z <= 10) return;
+
+            ctx.beginPath();
+            ctx.strokeStyle = color;
+            ctx.moveTo(p1.x, p1.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.stroke();
+
+            ctx.fillStyle = color;
+            ctx.fillText(label, p2.x, p2.y);
+          };
+
+          drawAxis(-w / 2, 0, 0, w / 2, 0, 0, '#ff4444', 'X');
+          drawAxis(0, -h / 2, 0, 0, h / 2, 0, '#44ff44', 'Y');
+          drawAxis(0, 0, -d / 2, 0, 0, d / 2, '#4444ff', 'Z');
+        }
+      };
+
+      const createRenderList = useCallback(() => {
+        const cx = config.width / 2;
+        const cy = config.height / 2;
+        return shapes
+          .map((s) => {
+            const p = project(s.x, s.y, s.z, cx, cy, config.rotationX, config.rotationY);
+            return { ...s, px: p.x, py: p.y, pz: p.z, scale: p.scale };
+          })
+          .sort((a, b) => b.pz - a.pz);
+      }, [shapes, project, config.width, config.height, config.rotationX, config.rotationY]);
+
+      useEffect(() => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+        renderToContext(ctx, config.width, config.height, createRenderList());
+      }, [config, createRenderList]);
+
+      const exportPNG = useCallback(async ({ filename, forceTransparent = false } = {}) => {
+        const renderList = createRenderList();
+        const exportCanvas = document.createElement('canvas');
+        const exportSize = clampExportDimensions(config.width, config.height);
+        exportCanvas.width = exportSize.width;
+        exportCanvas.height = exportSize.height;
+        const exportContext = exportCanvas.getContext('2d');
+        if (!exportContext) throw new Error('Failed to acquire export canvas context.');
+
+        exportContext.setTransform(1, 0, 0, 1, 0, 0);
+        exportContext.clearRect(0, 0, exportCanvas.width, exportCanvas.height);
+        if (exportSize.scale !== 1) {
+          exportContext.setTransform(exportSize.scale, 0, 0, exportSize.scale, 0, 0);
+        }
+
+        const exportConfig = forceTransparent && config.useBackground
+          ? { ...config, useBackground: false }
+          : config;
+
+        renderToContext(exportContext, config.width, config.height, renderList, exportConfig);
+        exportContext.setTransform(1, 0, 0, 1, 0, 0);
+
+        const blob = await canvasToBlob(exportCanvas, 'image/png');
+        const resolvedFilename = filename || (forceTransparent ? buildExportFilename('png', 'yayoi_transparent') : buildExportFilename('png'));
+        downloadBlob(blob, resolvedFilename);
+        return { filename: resolvedFilename, width: exportCanvas.width, height: exportCanvas.height, clamped: exportSize.scale !== 1 };
+      }, [config, createRenderList]);
+
+      const buildSVGMarkup = useCallback(() => {
+        const renderList = createRenderList();
+        const shadowId = 'yayoi-shadow-filter';
+        const parts = [];
+        parts.push(`<?xml version="1.0" encoding="UTF-8"?>`);
+        parts.push(`<svg xmlns="http://www.w3.org/2000/svg" width="${config.width}" height="${config.height}" viewBox="0 0 ${config.width} ${config.height}" shape-rendering="geometricPrecision">`);
+
+        if (config.useShadow && config.shadowBlur > 0) {
+          const stdDeviation = getShadowStdDeviation(config.shadowBlur);
+          parts.push(`<defs><filter id="${shadowId}" x="-50%" y="-50%" width="200%" height="200%"><feDropShadow dx="0" dy="0" stdDeviation="${fmt(stdDeviation)}" flood-color="${escapeXML(config.shadowColor)}" flood-opacity="1"/></filter></defs>`);
+        }
+
+        if (config.useBackground) {
+          parts.push(`<rect width="100%" height="100%" fill="${escapeXML(config.backgroundColor)}"/>`);
+        }
+
+        const groupStyles = [];
+        if (config.blendMode && config.blendMode !== 'source-over') groupStyles.push(`mix-blend-mode:${config.blendMode}`);
+        groupStyles.push('isolation:isolate');
+        const groupAttrs = [`opacity="${fmt(config.opacity)}"`];
+        if (groupStyles.length > 0) groupAttrs.push(`style="${groupStyles.join(';')}"`);
+        if (config.useShadow && config.shadowBlur > 0) groupAttrs.push(`filter="url(#${shadowId})"`);
+        parts.push(`<g ${groupAttrs.join(' ')}>`);
+
+        for (const shape of renderList) {
+          const pr = shape.baseRadius * shape.scale;
+          if (shape.pz < 0 || pr < 0.5) continue;
+
+          const d = getShapePathData(shape.type, pr);
+          const fillRule = getShapeFillRule(shape.type);
+          const attrs = [
+            `d="${d}"`,
+            `fill="${escapeXML(shape.color)}"`,
+            `fill-rule="${fillRule}"`,
+            `transform="translate(${fmt(shape.px)} ${fmt(shape.py)}) rotate(${fmt((shape.rotation * 180) / Math.PI)})"`,
+          ];
+
+          if (config.useStroke) {
+            attrs.push(`stroke="${escapeXML(config.strokeColor)}"`);
+            attrs.push(`stroke-width="${getStrokeWidthForScale(shape.scale)}"`);
+            attrs.push('stroke-linejoin="round"');
+            attrs.push('stroke-linecap="round"');
+          }
+
+          parts.push(`<path ${attrs.join(' ')}/>`);
+        }
+
+        parts.push(`</g>`);
+
+        if (config.showAxes) {
+          const spreadXScale = config.spreadX / 100;
+          const spreadYScale = config.spreadY / 100;
+          const w = config.width * spreadXScale;
+          const h = config.height * spreadYScale;
+          const d = config.depth;
+          const cx = config.width / 2;
+          const cy = config.height / 2;
+          const fontSize = Math.max(14, config.width / 80);
+          const axes = [
+            { from: [-w / 2, 0, 0], to: [w / 2, 0, 0], color: '#ff4444', label: 'X' },
+            { from: [0, -h / 2, 0], to: [0, h / 2, 0], color: '#44ff44', label: 'Y' },
+            { from: [0, 0, -d / 2], to: [0, 0, d / 2], color: '#4444ff', label: 'Z' },
+          ];
+          parts.push('<g stroke-linecap="round" stroke-linejoin="round">');
+          for (const axis of axes) {
+            const p1 = project(axis.from[0], axis.from[1], axis.from[2], cx, cy, config.rotationX, config.rotationY);
+            const p2 = project(axis.to[0], axis.to[1], axis.to[2], cx, cy, config.rotationX, config.rotationY);
+            if (p1.z <= 10 || p2.z <= 10) continue;
+            parts.push(`<line x1="${fmt(p1.x)}" y1="${fmt(p1.y)}" x2="${fmt(p2.x)}" y2="${fmt(p2.y)}" stroke="${axis.color}" stroke-width="2"/>`);
+            parts.push(`<text x="${fmt(p2.x)}" y="${fmt(p2.y)}" fill="${axis.color}" font-family="monospace" font-size="${fmt(fontSize)}" font-weight="700" text-anchor="middle" dominant-baseline="middle">${axis.label}</text>`);
+          }
+          parts.push('</g>');
+        }
+
+        parts.push('</svg>');
+        return parts.join('');
+      }, [config, createRenderList, project]);
+
+      const exportSVG = useCallback(({ filename } = {}) => {
+        const svgMarkup = buildSVGMarkup();
+        const blob = new Blob([svgMarkup], { type: 'image/svg+xml;charset=utf-8' });
+        const resolvedFilename = filename || buildExportFilename('svg');
+        downloadBlob(blob, resolvedFilename);
+        return { filename: resolvedFilename, width: config.width, height: config.height };
+      }, [buildSVGMarkup, config.width, config.height]);
+
+      const handleExportPNG = useCallback(() => {
+        exportPNG().catch((error) => console.error('[YAYOI export]', error));
+      }, [exportPNG]);
+
+      const handleExportTransparentPNG = useCallback(() => {
+        exportPNG({ forceTransparent: true }).catch((error) => console.error('[YAYOI export]', error));
+      }, [exportPNG]);
+
+      const handleExportSVG = useCallback(() => {
+        try {
+          exportSVG();
+        } catch (error) {
+          console.error('[YAYOI export]', error);
+        }
+      }, [exportSVG]);
+
+      useEffect(() => {
+        const selfTest = () => {
+          const rootNode = document.getElementById('root');
+          const canvasNode = canvasRef.current;
+          const checks = {
+            rootPresent: !!rootNode,
+            canvasPresent: !!canvasNode,
+            canvasContext2D: !!canvasNode?.getContext?.('2d'),
+            reactLoaded: !!window.React,
+            reactDomLoaded: !!window.ReactDOM,
+            htmEmbedded: !!window.htm,
+            exportApiPresent: true,
+            exportPngPresent: true,
+            exportTransparentPngPresent: true,
+            exportSvgPresent: true,
+            widthPositive: Number.isFinite(config.width) && config.width > 0,
+            heightPositive: Number.isFinite(config.height) && config.height > 0,
+            shapesArrayValid: Array.isArray(shapes),
+            shapesCountMatchesSnapshot: Array.isArray(shapes) && shapes.length >= 0,
+          };
+          const failed = Object.entries(checks).filter(([, ok]) => !ok).map(([name]) => name);
+          return {
+            ok: failed.length === 0,
+            failed,
+            checks,
+            snapshot: {
+              width: config.width,
+              height: config.height,
+              count: shapes.length,
+              layoutMode: config.layoutMode,
+              seed: config.seed,
+            },
+          };
+        };
+
+        const publishReadiness = () => {
+          const runtime = selfTest();
+          const warnings = [];
+          if (!window.__yayoiLoadedScripts.react) warnings.push('React CDN source was not recorded');
+          if (!window.__yayoiLoadedScripts['react-dom']) warnings.push('ReactDOM CDN source was not recorded');
+          warnings.push('Online access is required for React / ReactDOM at startup');
+          return {
+            ok: runtime.ok,
+            build: YAYOI_BUILD,
+            mode: 'online-publish',
+            runtime,
+            loadedScripts: { ...window.__yayoiLoadedScripts },
+            exports: {
+              png: true,
+              pngTransparent: true,
+              svg: true,
+            },
+            warnings,
+          };
+        };
+
+        const api = {
+          png: (options) => exportPNG(options),
+          pngTransparent: (options) => exportPNG({ ...(options || {}), forceTransparent: true }),
+          svg: (options) => exportSVG(options),
+          snapshot: () => ({
+            width: config.width,
+            height: config.height,
+            count: shapes.length,
+            layoutMode: config.layoutMode,
+            seed: config.seed,
+          }),
+          selfTest,
+          publishReadiness,
+          diagnostics: () => ({
+            build: YAYOI_BUILD,
+            hiddenConfig: {
+              sizeModePerShapeImplemented: true,
+              sizeModePerShapeExposedInUI: false,
+              colorModePerShapeImplemented: true,
+              colorModePerShapeExposedInUI: true,
+              perShapeColorEditorExposedInUI: false,
+              blendModeImplemented: true,
+              blendModeExposedInUI: false,
+              syncRadiusImplemented: true,
+              syncRadiusExposedInUI: false,
+              shadowBlurImplemented: true,
+              shadowBlurExposedInUI: false,
+            },
+            config: {
+              colorMode: config.colorMode,
+              sizeMode: config.sizeMode,
+              blendMode: config.blendMode,
+              syncRadius: config.syncRadius,
+              shadowBlur: config.shadowBlur,
+              useShadow: config.useShadow,
+            },
+            exports: {
+              png: true,
+              pngTransparent: true,
+              svg: true,
+            },
+            runtimeSources: { ...window.__yayoiLoadedScripts },
+            selfTest: selfTest(),
+          }),
+        };
+        window.YAYOI_EXPORT = api;
+        if (!window.__yayoiBootLogged) {
+          window.__yayoiBootLogged = true;
+          setTimeout(() => {
+            try {
+              console.info('[YAYOI] publishReadiness', api.publishReadiness());
+            } catch (error) {
+              console.warn('[YAYOI] publishReadiness failed', error);
+            }
+          }, 0);
+        }
+        return () => {
+          if (window.YAYOI_EXPORT === api) delete window.YAYOI_EXPORT;
+        };
+      }, [config.width, config.height, config.layoutMode, config.seed, shapes.length, config.colorMode, config.sizeMode, config.blendMode, config.syncRadius, config.shadowBlur, config.useShadow, exportPNG, exportSVG]);
+
+      const endDrag = useCallback((event) => {
+        const state = dragStateRef.current;
+        if (event && state.pointerId !== null && event.pointerId !== state.pointerId) return;
+        if (event?.currentTarget?.releasePointerCapture && state.pointerId !== null) {
+          try {
+            event.currentTarget.releasePointerCapture(state.pointerId);
+          } catch (error) {
+            // ignore invalid release during teardown
+          }
+        }
+        dragStateRef.current = { pointerId: null, x: 0, y: 0 };
+        setIsDragging(false);
+      }, []);
+
+      const handlePointerDown = useCallback((event) => {
+        if (!event.isPrimary) return;
+        if (event.pointerType === 'mouse' && event.button !== 0) return;
+        event.preventDefault();
+        dragStateRef.current = { pointerId: event.pointerId, x: event.clientX, y: event.clientY };
+        setIsDragging(true);
+        if (event.currentTarget?.setPointerCapture) {
+          try {
+            event.currentTarget.setPointerCapture(event.pointerId);
+          } catch (error) {
+            // ignore capture failures on unsupported browsers
+          }
+        }
+      }, []);
+
+      const handlePointerMove = useCallback((event) => {
+        const state = dragStateRef.current;
+        if (!isDragging || state.pointerId === null || event.pointerId !== state.pointerId) return;
+        event.preventDefault();
+        const deltaX = event.clientX - state.x;
+        const deltaY = event.clientY - state.y;
+        dragStateRef.current = { pointerId: state.pointerId, x: event.clientX, y: event.clientY };
+        const sensitivity = 0.5;
+        setConfig((prev) => ({
+          ...prev,
+          rotationY: (prev.rotationY + deltaX * sensitivity) % 360,
+          rotationX: Math.max(-90, Math.min(90, prev.rotationX + deltaY * sensitivity)),
+        }));
+      }, [isDragging]);
+
+      const handlePointerUp = useCallback((event) => {
+        endDrag(event);
+      }, [endDrag]);
+
+      const handlePointerCancel = useCallback((event) => {
+        endDrag(event);
+      }, [endDrag]);
+
+      useEffect(() => {
+        const isEditableTarget = (target) => {
+          if (!(target instanceof HTMLElement)) return false;
+          const tag = target.tagName;
+          return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || target.isContentEditable;
+        };
+
+        const handleKeyDown = (event) => {
+          if (!(event.altKey && event.shiftKey) || event.ctrlKey || event.metaKey) return;
+          if (isEditableTarget(event.target)) return;
+
+          const key = event.key.toLowerCase();
+          if (key === 'p') {
+            event.preventDefault();
+            exportPNG().catch((error) => console.error('[YAYOI export]', error));
+          } else if (key === 't') {
+            event.preventDefault();
+            exportPNG({ forceTransparent: true }).catch((error) => console.error('[YAYOI export]', error));
+          } else if (key === 's') {
+            event.preventDefault();
+            try {
+              exportSVG();
+            } catch (error) {
+              console.error('[YAYOI export]', error);
+            }
+          }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+      }, [exportPNG, exportSVG]);
+
+      return html`
+        <div className="flex flex-col h-screen w-full bg-black text-neutral-100 overflow-hidden">
+          <div className="absolute top-6 left-0 right-0 z-30 pointer-events-none flex justify-center">
+            <h1 className="text-xl font-medium text-white/90 drop-shadow-md">Yayoi</h1>
+          </div>
+
+          <div className="flex-1 relative w-full overflow-hidden flex items-center justify-center">
+            <div
+              className="relative flex items-center justify-center p-8 w-full h-full"
+              onPointerDown=${handlePointerDown}
+              onPointerMove=${handlePointerMove}
+              onPointerUp=${handlePointerUp}
+              onPointerCancel=${handlePointerCancel}
+              onPointerLeave=${handlePointerUp}
+              style=${{ cursor: isDragging ? 'grabbing' : 'grab', touchAction: 'none' }}
+            >
+              <div
+                className="relative shadow-[0_0_50px_rgba(0,0,0,0.5)] border border-neutral-800 rounded-lg overflow-hidden pointer-events-none select-none transition-all duration-300"
+                style=${{
+                  aspectRatio: `${config.width}/${config.height}`,
+                  maxHeight: '90%',
+                  maxWidth: '90%',
+                }}
+              >
+                ${!config.useBackground ? html`<div className="absolute inset-0 checkerboard-bg z-0 opacity-10"></div>` : null}
+                <canvas
+                  ref=${canvasRef}
+                  width=${config.width}
+                  height=${config.height}
+                  className="w-full h-full object-contain relative z-10 block"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 max-w-[95vw]">
+            <${Dock}
+              activeTab=${activeTab}
+              setActiveTab=${setActiveTab}
+              onGenerate=${handleRegenerate}
+              onExportPNG=${handleExportPNG}
+              onExportTransparentPNG=${handleExportTransparentPNG}
+              onExportSVG=${handleExportSVG}
+            />
+          </div>
+
+          <div
+            className="w-full bg-black/95 border-t border-neutral-800 transition-all duration-300 ease-[cubic-bezier(0.25,1,0.5,1)] overflow-hidden flex-none z-40"
+            style=${{ height: activeTab ? `${320}px` : '0px' }}
+          >
+            <div className="h-full p-4 pb-20 overflow-hidden relative">
+              <${ControlPanelContent}
+                config=${config}
+                setConfig=${setConfig}
+activeTab=${activeTab}
+                setActiveTab=${setActiveTab}
+              />
+            </div>
+          </div>
+        </div>
+      `;
+    };
+
+    const App = () => html`
+      <${ErrorBoundary}>
+        <${AppContent} />
+      </${ErrorBoundary}>
+    `;
+
+    const rootElement = document.getElementById('root');
+    if (rootElement) ReactDOM.createRoot(rootElement).render(html`<${App} />`);
+      } catch (error) {
+        console.error(error);
+        const fallback = document.getElementById('loading-fallback');
+        if (fallback) {
+          fallback.style.opacity = '1';
+          fallback.innerHTML = '<div style="margin-bottom:0.75rem">INITIALIZATION FAILED</div><div style="font-size:0.8rem;opacity:0.75;max-width:36rem;padding:0 1rem;line-height:1.5">React runtime could not be loaded from the configured CDNs. This file now avoids esm.sh and Tailwind CDN, but still needs internet access for React / ReactDOM. Open the browser console for details.</div>';
+        }
+      }
+    })();
+  </script>
+</body>
+</html>
