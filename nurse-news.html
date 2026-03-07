@@ -5,325 +5,147 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Nursing News | VARELSER</title>
   <style>
-    :root{
-      --bg: #fff;
-      --fg: #111;
-      --muted: rgba(0,0,0,.55);
-      --border: #e8e8e8;
-      --accent: #0056b3;
-      --card-bg: #fafafa;
+    :root {
+      --bg:#fff; --fg:#111; --muted:rgba(0,0,0,.5);
+      --border:#e8e8e8; --accent:#0056b3;
+      --sidebar-bg:#fafafa; --hover:rgba(0,0,0,.04);
     }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      background: var(--bg);
-      color: var(--fg);
-      font-family: ui-sans-serif, system-ui, -apple-system,
-        "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Segoe UI", sans-serif;
-      line-height: 1.8;
-      font-size: 16px;
-    }
-    .container {
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 48px 24px;
-    }
-    .back-link {
-      display: inline-block;
-      margin-bottom: 32px;
-      color: var(--muted);
-      text-decoration: none;
-      font-size: 14px;
-    }
-    .back-link:hover { color: var(--fg); }
-    .page-title {
-      font-size: 22px;
-      font-weight: 700;
-      margin: 0 0 8px;
-      letter-spacing: .02em;
-    }
-    .page-desc {
-      color: var(--muted);
-      font-size: 13px;
-      margin: 0 0 48px;
-    }
-    article {
-      margin-bottom: 56px;
-      padding-bottom: 48px;
-      border-bottom: 1px solid var(--border);
-    }
-    article:last-child {
-      border-bottom: none;
-    }
-    .meta {
-      font-size: 12px;
-      color: var(--muted);
-      margin: 0 0 10px;
-      letter-spacing: .02em;
-    }
-    .article-title {
-      font-size: 19px;
-      font-weight: 700;
-      margin: 0 0 20px;
-      line-height: 1.5;
-      letter-spacing: .01em;
-    }
-    .summary {
-      font-size: 15px;
-      color: #222;
-      line-height: 1.9;
-      margin-bottom: 24px;
-    }
-    .source-box {
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 14px 16px;
-      font-size: 13px;
-      color: #555;
-      line-height: 1.7;
-    }
-    .source-box strong {
-      color: var(--fg);
-      display: block;
-      margin-bottom: 4px;
-    }
-    .source-box a {
-      color: var(--accent);
-      word-break: break-all;
-    }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{background:var(--bg);color:var(--fg);font-family:ui-sans-serif,system-ui,-apple-system,"Hiragino Kaku Gothic ProN","Noto Sans JP","Segoe UI",sans-serif;line-height:1.8;font-size:16px;}
+    .layout{display:flex;min-height:100vh;max-width:1100px;margin:0 auto;}
+    .sidebar{width:210px;flex-shrink:0;background:var(--sidebar-bg);border-right:1px solid var(--border);padding:40px 0;position:sticky;top:0;height:100vh;overflow-y:auto;}
+    .sidebar-section{margin-bottom:24px;}
+    .sidebar-title{font-size:11px;font-weight:700;letter-spacing:.1em;color:var(--muted);padding:0 20px 10px;text-transform:uppercase;}
+    .sidebar-divider{border:none;border-top:1px solid var(--border);margin:20px 20px;}
+    .date-group{margin-bottom:2px;}
+    .date-btn{width:100%;display:flex;justify-content:space-between;align-items:center;padding:9px 20px;background:none;border:none;border-left:2px solid transparent;cursor:pointer;color:var(--fg);font-size:13px;font-family:inherit;text-align:left;transition:background .15s,border-color .15s;}
+    .date-btn:hover{background:var(--hover);border-left-color:var(--fg);}
+    .date-btn.open{border-left-color:var(--fg);font-weight:600;}
+    .genre-list{display:none;padding:2px 0 6px;background:#f0f0f0;}
+    .genre-list.open{display:block;}
+    .genre-sublink{display:flex;justify-content:space-between;align-items:center;padding:7px 20px 7px 32px;text-decoration:none;color:#444;font-size:12px;transition:background .15s;}
+    .genre-sublink:hover{background:var(--hover);color:var(--fg);}
+    .genre-link{display:flex;justify-content:space-between;align-items:center;padding:9px 20px;text-decoration:none;color:var(--fg);font-size:13px;border-left:2px solid transparent;transition:background .15s,border-color .15s;}
+    .genre-link:hover{background:var(--hover);border-left-color:var(--fg);}
+    .genre-link.active{border-left-color:var(--fg);font-weight:600;}
+    .count{font-size:11px;color:var(--muted);background:var(--border);border-radius:999px;padding:1px 7px;flex-shrink:0;}
+    .main{flex:1;padding:48px 48px 80px;min-width:0;}
+    .back-link{display:inline-block;margin-bottom:32px;color:var(--muted);text-decoration:none;font-size:14px;}
+    .back-link:hover{color:var(--fg);}
+    .page-title{font-size:22px;font-weight:700;margin-bottom:6px;}
+    .page-desc{color:var(--muted);font-size:13px;margin-bottom:56px;}
+    .view{display:none;}
+    .view.active{display:block;}
+    .date-section{margin-bottom:64px;}
+    .date-heading{font-size:15px;font-weight:700;letter-spacing:.05em;color:var(--muted);border-bottom:1px solid var(--border);padding-bottom:10px;margin-bottom:28px;}
+    .genre-section{margin-bottom:40px;}
+    .genre-heading{font-size:13px;font-weight:700;letter-spacing:.08em;color:#fff;background:var(--fg);display:inline-block;padding:3px 12px;border-radius:4px;margin-bottom:20px;}
+    .genre-view-title{font-size:18px;font-weight:700;margin-bottom:32px;padding-bottom:12px;border-bottom:1px solid var(--border);}
+    .genre-view-title span{display:inline-block;background:var(--fg);color:#fff;padding:2px 12px;border-radius:4px;font-size:15px;margin-left:8px;}
+    article{margin-bottom:40px;padding-bottom:36px;border-bottom:1px solid var(--border);}
+    article:last-child{border-bottom:none;}
+    .meta{font-size:12px;color:var(--muted);margin-bottom:8px;}
+    .article-title{font-size:17px;font-weight:700;line-height:1.5;margin-bottom:16px;}
+    .summary{font-size:15px;color:#222;line-height:1.9;margin-bottom:18px;}
+    .source-box{background:var(--sidebar-bg);border:1px solid var(--border);border-radius:8px;padding:12px 16px;font-size:13px;color:#555;line-height:1.7;}
+    .source-box strong{color:var(--fg);display:block;margin-bottom:4px;}
+    .source-box a{color:var(--accent);word-break:break-all;}
+    @media(max-width:640px){.sidebar{display:none;}.main{padding:32px 20px 60px;}}
   </style>
 </head>
 <body>
-  <div class="container">
-    <a href="/" class="back-link">← ホームに戻る</a>
-    <p class="page-title">最新の医療・看護ニュース</p>
-    <p class="page-desc">海外の最新医療ニュースをAIで要約し、定期配信しています。</p>
-<!-- ARTICLES_START -->
-
-
-          <article>
-            <p class="meta">WHO (World Health Organization)　Wed, 04 Mar 2026 14:57:17 Z</p>
-            <h2 class="article-title">Chile becomes the first country in the Americas to be verified by WHO for the elimination of leprosy</h2>
-            <div class="summary">【チリ、アメリカ大陸初のハンセン病撲滅を達成：公衆衛生の成功事例に学ぶ】<br><br>世界保健機関（WHO）と汎米保健機構（PAHO）は、チリがアメリカ大陸で初めて、そして世界で二番目の国として、ハンセン病（らい病）の撲滅を公式に認定したことを発表しました。この公衆衛生上の画期的な偉業は、チリの長年にわたる揺るぎないコミットメントと、強固な医療システムの証しと言えます。<br><br>チリにおけるハンセン病は、19世紀後半にイースター島で初めて記録され、本土では散発的に発生していました。しかし、イースター島での厳格な隔離と治療措置により管理され、1990年代後半には最後の二次感染症例が管理されました。驚くべきことに、チリは1993年以降30年以上にわたり、国内で感染したハンセン病の症例を報告していません。<br><br>国内感染がない状況でも、チリはハンセン病を公衆衛生上の議題から外すことはありませんでした。届出義務のある疾患として、強制的な報告制度、統合的なサーベイランス（監視）、そして医療システム全体での継続的な臨床準備体制を維持し続けてきました。WHO事務局長テドロス・アダノム・ゲブレイェス博士は、この成果が「リーダーシップ、科学、連帯によって何が達成できるかを示す強力な証拠」であると強調しています。<br><br>チリの撲滅は、数十年にわたる持続的な公衆衛生努力、予防戦略、早期診断、効果的な治療、継続的な追跡調査、そして全国の医療チームの献身によって支えられてきました。プライマリケアセンターが疑い例の入り口となり、速やかに専門皮膚科に紹介され、WHOの「ハンセン病ゼロ戦略」に沿った診断、治療、追跡調査が行われます。早期介入、障害予防、理学療法やリハビリテーションを含む包括的なケアが優先され、ハンセン病の影響を受けた人々が、急性期から長期的な健康ニーズまで継続的な支援を受け、完全な回復と社会的包摂が促進されるよう努めてきました。<br><br>さらに、チリは人権を保護し、社会的包摂を促進し、差別を防止する広範な法的・社会的枠組みの中でこの偉業を達成しました。国内法は、ハンセン病の影響を受けた人々がスティグマや排除なくケアを受けられるよう、医療、社会保障、障害者サービスへの平等なアクセスを保証しています。また、強固な規制監督を持つ官民混合の医療システムは、移民やその他の脆弱な人々を含むすべての人々への公平なアクセスを強化しています。<br><br>国際的な協力も不可欠でした。PAHOはWHOと連携し、1995年以来、アメリカ大陸の国々に多剤併用療法（MDT）を無償で提供してきました。この継続的な供給は、患者の治癒、障害の予防、感染経路の遮断に不可欠でした。PAHOはまた、チリがサーベイランスを国際基準に合わせ、検査能力を強化し、低発生率の状況下で多くの医療従事者が症例に遭遇しない中でも臨床専門知識を維持できるよう支援してきました。<br><br>ハンセン病は、マイコバクテリウム・レプラエ菌による慢性感染症であり、「顧みられない熱帯病」の一つです。皮膚、末梢神経、上気道粘膜、目を主に侵し、未治療の場合、永続的な神経損傷、障害、社会的スティグマにつながります。しかし、多剤併用療法で完全に治癒可能であり、早期発見が合併症を防ぐ鍵となります。世界では年間20万件以上の新規症例が報告されており、チリの成功は、他国にとっても大きな希望となります。<br><br>撲滅後も、チリはWHOへの報告を継続し、高感度サーベイランスを維持し、将来散発的に発生する可能性のある国内感染や海外で感染した症例に備えて臨床専門知識を保持することが推奨されています。このチリの経験は、病気の不在だけでなく、症例が発生した場合に検出し、対応し、包括的なケアを提供できる持続的な医療システムによって、撲滅が定義されることを示しています。日本の看護師として、この成功事例から、公衆衛生への継続的な貢献と、スティグマのないケアの重要性を改めて認識することができます。</div>
-            <div class="source-box">
-              <strong>ソース・引用元</strong><br>
-              配信元：WHO (World Health Organization)<br>
-              原文URL：<a href="https://www.who.int/news/item/04-03-2026-chile-becomes-the-first-country-in-the-americas-to-be-verified-by-who-for-the-elimination-of-leprosy" target="_blank" rel="noopener">https://www.who.int/news/item/04-03-2026-chile-becomes-the-first-country-in-the-americas-to-be-verified-by-who-for-the-elimination-of-leprosy</a>
-            </div>
-          </article>
-
-          <article>
-            <p class="meta">WHO (World Health Organization)　Fri, 27 Feb 2026 10:01:29 Z</p>
-            <h2 class="article-title">Recommendations for influenza vaccine composition for the 2026-2027 northern hemisphere season</h2>
-            <div class="summary">【2026-2027年北半球インフルエンザシーズン向けワクチン組成推奨について】<br><br>世界保健機関（WHO）は、2026-2027年の北半球インフルエンザシーズンに向けたインフルエンザワクチンのウイルス組成推奨を発表しました。インフルエンザウイルスは常に変異を続けるため、ワクチンが流行ウイルスに適合し、重症化や死亡を最大限に防ぐために、この組成は定期的に更新される必要があります。WHOの推奨は、各国のワクチン規制当局や製薬企業が次シーズン向けのインフルエンザワクチンを開発、製造、承認する際の基準となります。<br><br>この推奨は、世界インフルエンザ監視対応システム（GISRS）の専門家が、グローバルなインフルエンザ監視データを4日間にわたり分析した結果に基づいています。GISRSは1952年から続く世界で最も歴史の長い疾病監視プラットフォームであり、その協働センターや規制検査機関の専門家が年2回、北半球と南半球それぞれについて協議を行い、次のシーズンのワクチン組成を決定しています。<br><br>直近の流行状況として、2025年8月にA(H3N2)ウイルスの新たな変異株である「J.2.4.1」（通称「サブクレードK」）が出現し、世界中で急速に拡大しました。これにより、多くの国でインフルエンザシーズンが例年より早く始まり、通常よりも高い活動レベルが報告されました。多くの地域でインフルエンザウイルスの大半をサブクレードKが占め、全体としてインフルエンザA型が優勢でした。インフルエンザB型（Victoria系統）も低レベルで検出されましたが、B/Yamagata系統のウイルスは2020年3月以降報告されていません。<br><br>また、専門家は動物からヒトへの感染が確認された動物由来インフルエンザウイルスについても評価しました。これらのウイルスはパンデミックを引き起こす可能性があるため、依然として重大な懸念事項です。2025年9月23日以降、6カ国から25例の動物由来インフルエンザのヒト感染がWHOに報告されており、ほとんどのケースは感染した動物やウイルスで汚染された環境への曝露によるもので、ヒトからヒトへの感染は報告されていません。これらの会議では、パンデミック発生時に迅速にワクチン製造に利用できる新規候補ワクチンウイルス（CVV）の選定も行われ、今回はA(H9N2)ウイルスの新規CVV開発が推奨されました。<br><br>WHOが推奨する2026-2027年北半球シーズン向けのインフルエンザワクチン組成は以下の通りです。<br>A型(H1N1)pdm09様ウイルスとして、A/Missouri/11/2025様株。<br>A型(H3N2)様ウイルスとして、A/Darwin/1454/2025様株。<br>B型（Victoria系統）様ウイルスとして、B/Tokyo/EIS13-175/2025様株。<br>（ただし、A型(H3N2)およびB型（Victoria系統）については、状況に応じて別の候補株が示される場合もあります。）<br><br>看護師の皆様にとって、インフルエンザワクチンの組成が毎年更新されることの重要性や、その決定プロセスを理解することは、患者さんへの説明や感染対策に不可欠です。最新の流行状況や推奨株に関する情報を常に把握し、適切な情報提供に努めましょう。</div>
-            <div class="source-box">
-              <strong>ソース・引用元</strong><br>
-              配信元：WHO (World Health Organization)<br>
-              原文URL：<a href="https://www.who.int/news/item/27-02-2026-recommendations-for-influenza-vaccine-composition-for-the-2026-2027-northern-hemisphere-season" target="_blank" rel="noopener">https://www.who.int/news/item/27-02-2026-recommendations-for-influenza-vaccine-composition-for-the-2026-2027-northern-hemisphere-season</a>
-            </div>
-          </article>
-
-          <article>
-            <p class="meta">WHO (World Health Organization)　Thu, 26 Feb 2026 17:17:17 Z</p>
-            <h2 class="article-title">Denmark becomes first country in the European Union to eliminate mother-to-child transmission of HIV and syphilis</h2>
-            <div class="summary">【デンマーク、HIVと梅毒の母子感染排除を達成 EUで初の快挙】<br><br>世界保健機関（WHO）は、デンマークがHIVと梅毒の母子感染排除（EMTCT）を達成したことを認定しました。これは、デンマークが全ての新生児をこれらの感染症から守るという持続的な取り組みを評価したものです。欧州連合（EU）加盟国としては初めての快挙となります。<br><br>WHO事務局長のテドロス・アダノム・ゲブレイェスス博士は、この成果をデンマークにとって公衆衛生上の大きな節目と称賛し、強力な政治的コミットメント、プライマリケアへの継続的な投資、そして統合された母子保健サービスがあれば、各国は全ての妊婦と新生児をこれらの疾患から保護できることを示しました。<br><br>今回の認定は、WHOの地域およびグローバル検証諮問委員会による評価に基づいており、デンマークが2021年から2024年にかけて設定された全ての目標を達成したことを確認しています。これには、低い感染率の維持や、妊婦に対する出生前検査と治療の高いカバー率などが含まれます。WHO欧州地域事務局長のハンス・アンリ・P・クルーゲ博士によると、排除とは妊婦の少なくとも100人中95人が検査と治療を受け、乳児の新規感染を年間出生10万人あたり50人未満に抑えることを意味し、デンマークはこれを長年にわたり達成してきました。<br><br>デンマークのこの成功は、強力な出生前ケア、信頼性の高いデータシステム、そして女性の権利への尊重に支えられた、堅牢な母子保健システムと、数十年にわたる持続的なコミットメントの証です。国民皆保険制度であるユニバーサル・ヘルス・カバレッジを含む普遍的な医療保障制度がこの成果の基盤となり、妊娠中の統合的スクリーニング、優れたデータシステム、強固な検査体制、高い人権基準が不可欠でした。<br><br>デンマークの内務・保健大臣ソフィー・ローデ氏は、このWHOによる認定はデンマークにとって誇らしい瞬間であり、医療従事者、助産師、公衆衛生チームによる長年の努力の賜物であると述べています。国民が平等に医療にアクセスできるユニバーサル・ヘルス・システムが、この偉業の根底にあるとしています。<br><br>デンマークは現在、B型肝炎も加えたトリプル排除（HIV、梅毒、B型肝炎の母子感染排除）の達成に向けて順調に進んでいます。この経験は、権利に基づいた政策、質の高いサービス、そして強力なデータシステムが連携することで何が可能となるかを示しており、母子感染排除プログラムの強化を目指す他の国々にとって強力なモデルとなり得ます。<br><br>日本の看護師の皆様にとっても、デンマークの事例は、包括的な出生前ケア、確実なスクリーニング、そして妊婦と新生児の権利を尊重する医療提供が、いかに感染症の撲滅に貢献するかを示すものです。私たちも、日々の業務を通じて、安全で健康な出産環境を支える重要性を改めて認識するきっかけとなるでしょう。</div>
-            <div class="source-box">
-              <strong>ソース・引用元</strong><br>
-              配信元：WHO (World Health Organization)<br>
-              原文URL：<a href="https://www.who.int/news/item/27-02-2026-denmark-becomes-first-country-in-the-european-union-to-eliminate-of-mother-to-child-transmission-of-hiv-and-syphilis" target="_blank" rel="noopener">https://www.who.int/news/item/27-02-2026-denmark-becomes-first-country-in-the-european-union-to-eliminate-of-mother-to-child-transmission-of-hiv-and-syphilis</a>
-            </div>
-          </article>
-
-          <article>
-            <p class="meta">WHO (World Health Organization)　Wed, 25 Feb 2026 18:06:55 Z</p>
-            <h2 class="article-title">WHO Director-General visits Jordan to recognize strong collaboration on health system delivery, emergency relief and advancing mental health</h2>
-            <div class="summary">【WHO事務局長がヨルダンを訪問：国際保健協力と人道支援の最前線】<br><br>世界保健機関（WHO）事務局長のテドロス・アダノム・ゲブレイエスス博士は、ヨルダンへの公式訪問を終え、ユニバーサルヘルスケア（UHC）、精神保健、人道保健活動におけるWHOとヨルダンの強固なパートナーシップを強調しました。今回の訪問は、アブドラ2世国王との会談が中心となり、健康を国家および世界の優先事項として推進するヨルダンのリーダーシップの重要性が示されました。<br><br>議論は、保健システムの強化、医療へのアクセスの拡大、そして特にパレスチナの人々やガザからヨルダンへ避難した患者、およびヨルダンが受け入れている難民への緊急対応支援の維持に焦点を当てました。テドロス事務局長は、アブドラ2世国王のUHC推進への貢献と、主にガザやシリアからの300万人以上の難民に医療サービスを提供しているヨルダン国民の連帯と寛大さに感謝の意を表明しました。<br><br>事務局長はまた、アブドラ2世国王の「医療回廊イニシアチブ」を含むヨルダンの広範な人道的リーダーシップを高く評価しました。この取り組みは、ガザからの病気や負傷した子どもたちに重要なケアを提供しており、ヨルダンが「健康と人間性を最優先する」ことの真の意味を示していると述べました。訪問中、テドロス事務局長はWHOが支援する病院を訪れ、ガザから避難した子どもたちと家族、そして最前線で治療にあたる医療従事者と面会しました。<br><br>この訪問は、ヨルダンを通じた医療避難回廊の重要性、そして子どもたちや他の困窮者が必須のケアを受けられるよう、持続的な国際支援が必要であることを浮き彫りにしました。事務局長は、保健パートナー、ドナー国、国連機関、慈善団体とのハイレベル会合も開催し、ヨルダンにおける保健システム強化と人道保健活動、特に精神保健サービスの拡充と多数の難民を受け入れている国々への支援のための資金調達の優先事項について議論しました。<br><br>ヨルダンは、UHC達成のためにプライマリヘルスケアのアプローチを強化する上で世界的なリーダーシップを発揮しており、精神保健の統合も進め、人々が日常的なケアの一環として精神保健サービスを受けられるようにしています。WHOは、事務局長の精神保健特別イニシアチブを通じてこの活動を支援し続けています。<br><br>今回の訪問には、サセックス公爵夫妻のハリー王子とメーガン妃も、彼らが設立した慈善団体「アーチウェル・フィランソロピー」の創設者として、また長年にわたるWHOの活動の支持者として同行しました。アーチウェルは、COVID-19ワクチンの公平なアクセスから医療避難、精神保健プログラムに至るまで、WHOの取り組みを支援しています。ハリー王子は、特に男性、若者、子どもたちに焦点を当て、地域社会や緊急時における精神保健への投資の重要性を強調しました。<br><br>テドロス事務局長は、ハリー王子とメーガン妃の精神保健と人道支援への献身が、世界で最も脆弱なコミュニティに可視性、資源、希望をもたらしたことに感謝の意を表しました。ハリー王子は、ヨルダンが思いやり、回復力、革新性において模範を示していると述べ、WHOの精神保健支援や緊急時の救命ケア提供への貢献を直接見てきたと語りました。彼は、紛争や危機の影響を受けるすべての人々の精神保健支援に対する認識を高め、スティグマを減らし、アクセスを拡大することへの深いコミットメントを表明しました。<br><br>訪問2日目には、テドロス事務局長はWHOが支援する薬物依存症のリハビリテーションセンターを訪れる予定です。また、地域社会のリーダーや女性グループ、キング・フセインがんセンターと会談し、地域における医療避難、緊急対応、保健システム回復力のハブとしてのヨルダンの重要な役割がさらに強調されるでしょう。</div>
-            <div class="source-box">
-              <strong>ソース・引用元</strong><br>
-              配信元：WHO (World Health Organization)<br>
-              原文URL：<a href="https://www.who.int/news/item/25-02-2026-who-director-general-visits-jordan-to-recognize-strong-collaboration-on-health-system-delivery--emergency-relief-and-advancing-mental-health" target="_blank" rel="noopener">https://www.who.int/news/item/25-02-2026-who-director-general-visits-jordan-to-recognize-strong-collaboration-on-health-system-delivery--emergency-relief-and-advancing-mental-health</a>
-            </div>
-          </article>
-
-          <article>
-            <p class="meta">WHO (World Health Organization)　Mon, 23 Feb 2026 16:14:35 Z</p>
-            <h2 class="article-title">Attacks on Ukraine’s health care increased by 20% in 2025</h2>
-            <div class="summary">【ウクライナの医療システムへの攻撃が激化】<br><br>ウクライナでの全面戦争が5年目に入る中、2025年には医療施設への攻撃が前年比で約20%増加しました。世界保健機関（WHO）は開戦以来、医療従事者、施設、救急車、医療倉庫に対する少なくとも2881件の攻撃を記録しています。これらの直接的な攻撃に加え、送電網を支える熱電プラントなどの民間インフラへの攻撃が連鎖的に医療システムに深刻な影響を与えています。<br><br>【国民の健康と医療アクセスへの深刻な影響】<br><br>WHOの評価によれば、最前線地域の住民の59%が自身の健康状態を「悪い」または「非常に悪い」と報告しており、非最前線地域の47%と比較してもその深刻さが際立っています。多くの人々が必要なケアを受けられない状況が常態化しており、WHO事務局長のテドロス博士は「病院や診療所が日常的に攻撃されるため、健康ニーズが増加しているにもかかわらず、多くの人々が必要なケアを受けることができない」と述べ、「究極の薬は平和である」と強調しました。<br><br>【精神的健康と慢性疾患の危機】<br><br>戦争は深刻な健康危機を引き起こしており、WHO欧州地域事務局長のクルーゲ博士は特にその現状を訴えています。過去1年間で調査対象者の72%が不安や抑うつを経験していますが、専門家の助けを求めたのはわずか5人に1人です。心血管疾患も急増しており、ウクライナ人の4人に1人が危険な高血圧を抱えています。さらに、10人中8人が必要な医薬品にアクセスできないと報告しており、高価格が主な原因となっています。これは血圧の薬が見つからない心臓病患者や、義足のために数ヶ月待つ切断患者、家を出るのを恐れる若者といった具体的な困難として現れています。<br><br>【医療従事者の疲弊とリハビリテーションの課題】<br><br>医療への攻撃は、2025年には特に第3四半期にピークを迎え、184件の攻撃で12人が命を落とし、110人の医療従事者と患者が負傷しました。過去4年間で233人の医療従事者と患者が死亡、930人が負傷しています。これらの攻撃は国際人道法に違反する行為です。<br>また、エネルギーインフラへの攻撃は、この冬を戦争開始以来最も厳しいものにし、数百万人が暖房、電気、水を失っています。零下の状況で暖房のない医療現場や家庭で、医療従事者は自らも困難な生活を送りながら、患者の命を救い続けることを強いられています。WHOウクライナ代表のハビヒト博士は「4年間の戦争による燃え尽き症候群は甚大であり、医療需要はかつてないほど高まっている」と述べています。<br>新生児の母親や心臓発作から回復中の患者が暖房のない家に戻るなど、病院での治療効果が回復環境の悪化によって損なわれるケースが多発しています。戦争による外傷の増加は、手術、感染症対策、精神保健、リハビリテーションへの需要を押し上げていますが、入院リハビリテーションを提供する病院は4%、義肢などの補助技術を提供する施設はわずか3%と、アクセスは極めて限られています。<br><br>【WHOの支援と今後の課題】<br><br>WHOは2025年に190万人に対し、医療物資の供給、紹介、能力開発などの支援を行いました。特に必須医療サービス維持のため、23の州にある医療施設に284台の発電機を提供しています。2026年もウクライナでの活動を継続し、70万人のケアアクセスを保護するために、4200万ドルの資金調達を呼びかけています。ウクライナの医療システムは持続的な国際社会からの支援を必要としています。</div>
-            <div class="source-box">
-              <strong>ソース・引用元</strong><br>
-              配信元：WHO (World Health Organization)<br>
-              原文URL：<a href="https://www.who.int/news/item/23-02-2026-attacks-on-ukraine-s-health-care-increased-by-20-in-2025" target="_blank" rel="noopener">https://www.who.int/news/item/23-02-2026-attacks-on-ukraine-s-health-care-increased-by-20-in-2025</a>
-            </div>
-          </article>
-
-          <article>
-            <p class="meta">WHO (World Health Organization)　Wed, 18 Feb 2026 14:24:32 Z</p>
-            <h2 class="article-title">WHO validates elimination of trachoma as a public health problem in Libya</h2>
-            <div class="summary">【リビアがトラコーマを公衆衛生上の問題として排除達成】<br><br>世界保健機関（WHO）は、リビアがトラコーマを公衆衛生上の問題として排除したと発表しました。これは、WHO東地中海地域における公衆衛生にとって画期的な成果であり、予防可能な失明から将来の世代を守る大きな勝利です。リビアは、この達成により世界で28番目、東地中海地域では8番目のトラコーマ排除国となります。<br><br>【トラコーマとは何か】<br><br>トラコーマは、クラミジア・トラコマティスという細菌によって引き起こされる感染症です。感染者の目から出る分泌物が、手や衣服、ハエなどを介して広がり、繰り返しの感染によってまぶたの内側が傷つき、まつげが内側に反転して眼球を傷つける「トリキアシス」という痛みを伴う状態に至ることがあります。この状態が放置されると、失明に至る可能性があります。水や衛生設備へのアクセスが限られた地域で特に蔓延しやすい疾患です。<br><br>【リビアのたゆまぬ努力】<br><br>リビアでは1世紀以上にわたりトラコーマの存在が記録され、特に南部地域で高い有病率が見られました。1970年代から80年代にかけて保健省が感染性眼疾患の対策を開始し、保健システムを強化した結果、感染は大幅に減少しました。2017年には、国家失明予防プログラムの一環としてトラコーマ排除を優先事項に設定しました。WHO、Sightsavers、International Trachoma Initiativeなどの国際機関の支援を受け、2022年にはトラコーマの残存が疑われる南部6地区で新たな調査を実施。その結果、活動期のトラコーマとトリキアシスの有病率がWHOの排除基準を下回っていることが確認されました。トリキアシスが高い地域では手術キャンペーンが実施され、2025年の再調査でその有病率も基準以下になったことが確認されました。<br><br>【困難を乗り越えた達成】<br><br>長年にわたる政治的不安定さや人道危機により、医療サービスが逼迫し、人口の移動や水、衛生設備などの基本的なサービスへの需要が増大する中で、この成果を達成したことは特筆すべき点です。リビアの国家トラコーマ排除プログラムは、困難な状況下でも監視体制を統合し、外科的ケアへのアクセスを拡大し、眼科医療従事者の能力を構築し、国内外のステークホルダーと連携して成功を収めました。<br><br>【医療従事者の献身】<br><br>リビアの保健省幹部は、この達成がリビアの誇りであり、困難な状況下でも国民の眼の健康改善に焦点を当て、誰も取り残されないように尽力した医療従事者、医師、看護師のプロフェッショナリズムと献身の証であると述べています。WHOも、保健省チームとWHOチームが一体となって取り組んだ成果であり、科学、国家の動員、国際的な連帯によって達成された公衆衛生上の勝利であると評価しています。<br><br>【顧みられない熱帯病と看護師の役割】<br><br>トラコーマは、「顧みられない熱帯病（Neglected Tropical Diseases: NTDs）」と呼ばれる一群の疾患の一つです。NTDsは世界で10億人に影響を与え、特に貧困層に大きな負担をかけています。リビアは、トラコーマの排除により、少なくとも一つのNTDsを排除した世界で59番目の国となりました。予防可能な失明の克服という今回の成功は、看護師を含む全ての医療従事者が、予防、早期発見、治療、そして患者教育を通じて、公衆衛生の向上と人々の健康な生活に貢献できることを強く示しています。</div>
-            <div class="source-box">
-              <strong>ソース・引用元</strong><br>
-              配信元：WHO (World Health Organization)<br>
-              原文URL：<a href="https://www.who.int/news/item/18-02-2026-who-validates-elimination-of-trachoma-as-a-public-health-problem-in-libya" target="_blank" rel="noopener">https://www.who.int/news/item/18-02-2026-who-validates-elimination-of-trachoma-as-a-public-health-problem-in-libya</a>
-            </div>
-          </article>
-
-          <article>
-            <p class="meta">WHO (World Health Organization)　Tue, 17 Feb 2026 09:24:36 Z</p>
-            <h2 class="article-title">Global commitment on display as countries negotiate key annex to the Pandemic Agreement</h2>
-            <div class="summary">【WHO、新たなパンデミック対策の要「病原体情報と利益の公平配分」交渉進展】<br><br>世界保健機関（WHO）の加盟国は先日、将来のパンデミックに備えるための「病原体へのアクセスと利益配分（PABS）」に関する付属書案の交渉を終えました。これは、WHOが昨年採択したパンデミック協定の非常に重要な部分を占めています。この付属書案を議論するため、昨年世界保健総会（WHA）によって設立された政府間交渉会議（IGWG）の第5回会合が、2026年2月9日から14日までの1週間、実りある議論を経て終了しました。<br><br>PABSシステムの目的は、将来のパンデミックに迅速かつ効果的に対応できるようにすることです。そのためには、パンデミックを引き起こす可能性のある病原体をいち早く特定し、その遺伝子配列情報や病原体そのものを迅速に共有できる体制が不可欠です。この迅速な情報共有によって、科学者たちは診断検査キット、治療薬、そしてワクチンの開発を加速させることが可能になります。<br>さらに、PABSシステムは、公衆衛生上のニーズに基づいて、病原体に関する情報や材料の迅速かつ公平な共有を促進するだけでなく、そこから得られる利益（例えば、新薬やワクチンの開発成果）も、迅速、公平、公正に分配することを目的としています。これは、世界中の人々が等しくパンデミック対策の恩恵を受けられるようにするための重要な仕組みです。<br><br>IGWGの共同議長は、各国がPABS付属書の完成に向けて揺るぎないコミットメントを示したと述べています。特に、意見の対立がある点については、さらに協議を重ねることで、合意形成を目指しています。加盟国は来月にも交渉を再開し、今年5月の世界保健総会で交渉結果が発表される期限に向けて作業を進めています。<br>交渉にはまだ重要な意見の相違があるものの、関係者は「何が懸かっているか」を共有しており、時間がない中で残された溝を埋め、公平で効果的なPABS付属書を完成させることが極めて重要であると認識しています。<br><br>WHOパンデミック協定は、新型コロナウイルス感染症（COVID-19）パンデミックで明らかになった世界的な弱点を是正し、国際的な調整と協力を強化するために昨年加盟国によって採択されました。これは法的拘束力を持つ国際的な取り決めであり、将来のパンデミックに直面しても、世界がより安全で公平になることを目指しています。<br>WHO事務局長のテドロス博士は、これまでの着実な進展に自信を示し、5月の世界保健総会までにPABS付属書で合意に達すると確信していると述べました。<br>私たち看護師の視点から見ると、このような国際的な枠組みが整備されることは、将来のパンデミック発生時に、現場での情報共有の迅速化、診断・治療法の早期確立、そして安定した医療資源（ワクチン、治療薬、診断キットなど）の供給につながる可能性があります。これにより、患者ケアの質向上と、医療従事者の負担軽減にも寄与することが期待されます。交渉には、民間企業、学術機関、研究所、データバンクなど様々な関係者が関わっており、多角的な視点からより良いシステムが構築されるよう議論が進められています。</div>
-            <div class="source-box">
-              <strong>ソース・引用元</strong><br>
-              配信元：WHO (World Health Organization)<br>
-              原文URL：<a href="https://www.who.int/news/item/17-02-2026-global-commitment-on-display-as-countries-negotiate-key-annex-to-the-pandemic-agreement" target="_blank" rel="noopener">https://www.who.int/news/item/17-02-2026-global-commitment-on-display-as-countries-negotiate-key-annex-to-the-pandemic-agreement</a>
-            </div>
-          </article>
-
-          <article>
-            <p class="meta">WHO (World Health Organization)　Fri, 13 Feb 2026 18:18:53 Z</p>
-            <h2 class="article-title">Statement on the planned hepatitis B birth dose vaccine trial in Guinea-Bissau</h2>
-            <div class="summary">【B型肝炎出生時ワクチンに関するWHO声明】<br><br>世界保健機関（WHO）は、B型肝炎出生時ワクチンが効果的で不可欠な公衆衛生介入であり、その実績は確立されていることを強調します。このワクチンは、出生時の母子感染を阻止することで、生涯にわたる重篤な肝疾患を予防します。30年以上にわたり使用され、現在では115カ国以上が国の予防接種スケジュールに組み込んでいます。新生児をタイムリーな出生時接種で保護することは、個人の健康に寄与するだけでなく、国および世界のB型肝炎排除に向けた取り組みの中心となります。<br><br>WHOは、ギニアビサウで提案されているB型肝炎出生時ワクチンに関する無作為化比較試験（RCT）について認識しており、メディアからの質問に応じて声明を発表しました。公表された情報および関連専門家との協議に基づき、WHOはこの研究の科学的正当性、倫理的保護、およびヒトを対象とする研究の確立された原則との全体的な整合性について重大な懸念を抱いています。現在の形式では、この試験は確立された倫理的および科学的原則に矛盾すると判断されています。<br><br>WHOは、ギニアビサウがさらなる技術的レビューを待つ間、この研究を一時停止したことを承知しています。WHOはギニアビサウが今後の進路を検討し、出生時ワクチンの導入を加速し、実施を強化するにあたり、支援を提供する用意があります。<br><br>B型肝炎は世界中で毎年数十万人もの命を奪っています。出生時の感染は、生涯にわたる感染症の最も一般的な経路であり、出産時に感染した新生児の約90%が慢性キャリアとなり、肝硬変や肝がんの高いリスクにさらされます。ギニアビサウでは、成人人口の12%以上（2022年推定）が慢性B型肝炎に罹患しているとされ、5歳未満の子どもの感染率も約2%（2020年）と、世界目標である0.1%以下をはるかに上回っています。<br><br>ギニアビサウは2024年にB型肝炎出生時ワクチンを国の予防接種スケジュールに追加することを正式に決定し、2028年までの導入を計画しています。この政策決定は、ワクチンの価値を改めて肯定するものであり、新生児からタイムリーな保護を奪うべきではないという倫理的必要性をさらに強調しています。WHOは、ギニアビサウおよび世界中のすべての新生児が、B型肝炎からタイムリーかつ科学的根拠に基づいた保護を受けられるよう、また、この分野で行われる研究が最高の倫理的および科学的基準を満たすよう、各国当局、研究者、パートナーと協力し続けることを約束します。</div>
-            <div class="source-box">
-              <strong>ソース・引用元</strong><br>
-              配信元：WHO (World Health Organization)<br>
-              原文URL：<a href="https://www.who.int/news/item/13-02-2026-statement-on-the-planned-hepatitis-b-birth-dose-vaccine-trial-in-guinea-bissau" target="_blank" rel="noopener">https://www.who.int/news/item/13-02-2026-statement-on-the-planned-hepatitis-b-birth-dose-vaccine-trial-in-guinea-bissau</a>
-            </div>
-          </article>
-
-          <article>
-            <p class="meta">WHO (World Health Organization)　Tue, 10 Feb 2026 23:30:33 Z</p>
-            <h2 class="article-title">One in two people facing cataract blindness need access to life-changing surgery</h2>
-            <div class="summary">【世界が直面する白内障失明の課題と解決への道筋】<br><br>世界保健機関（WHO）は、世界中で何百万人もの人々が直面している白内障による失明をなくすため、各国に対し、視力回復手術へのアクセスを加速するよう強く呼びかけています。この手術は、回避可能な失明を防ぐ上で最も効果的かつ経済的な介入の一つとして認識されています。新たに医学誌『ランセット・グローバル・ヘルス』に発表された研究によると、白内障関連の失明に直面している世界中の人々の約半数が、未だに手術を受けられていないという厳しい現実が浮き彫りになりました。<br><br>白内障は、眼の水晶体が濁ることで視界がかすみ、最終的には失明に至る可能性のある疾患で、全世界で9400万人以上が罹患しています。わずか15分程度の簡単な白内障手術は、最も費用対効果の高い医療処置の一つであり、即座に、そして持続的に視力を回復させる効果があります。過去20年間で、世界的な白内障手術のカバー率は約15%増加しましたが、高齢化の進行と白内障症例の増加に伴い、全体的な需要も増大しています。最新の予測では、今世紀中に手術カバー率が約8.4%上昇するとされていますが、2030年までに30%の増加という世界保健総会の目標を達成するには、さらなる大幅な加速が必要です。<br><br>WHOの担当者は、「白内障手術は、視力を回復させ、人々の生活を一変させる最も強力な手段の一つです。視力を取り戻すことで、人々は自立、尊厳、そして新たな機会を取り戻すことができるのです」と語っています。<br><br>この研究は、68カ国の2023年から2024年の推定値を分析したもので、特にアフリカ地域が最も大きな格差に直面していることを示しています。ここでは、白内障手術を必要とする人の4人に3人が未治療のままです。また、すべての地域で女性が男性よりも一貫して医療へのアクセスが低く、不均衡な影響を受けている現状も指摘されています。<br><br>これらの格差の背景には、長年にわたる構造的な障壁が存在します。具体的には、訓練された眼科医療従事者の不足と不均等な分布、自己負担額の高さ、長い待ち時間、そしてサービスが存在する地域であっても手術に対する認識や需要の低さなどが挙げられます。加齢が白内障の主なリスク要因ですが、長期的な紫外線B波への暴露、喫煙、コルチコステロイドの使用、糖尿病などもその発症を加速させることが知られています。<br><br>白内障による回避可能な失明をなくすことは、達成可能であり、必要不可欠です。各国は、プライマリヘルスケアに視力検査や眼科検診を統合し、必要な手術インフラに投資し、特に農村部や医療過疎地域での眼科医療従事者を増強し、より適切に配置することで、進捗を加速させることができます。また、女性や疎外されたコミュニティを優先する的を絞った取り組みは、根強い不平等を削減し、医療アクセス向上の恩恵がすべての人々に及ぶために極めて重要です。<br><br>WHOは、政府、市民社会、そしてパートナーに対し、これまでの勢いを活用し、ジェンダーと地理的な不平等に対処し、医療過疎地域の人々を優先するよう呼びかけています。持続的なコミットメントがあれば、白内障手術は、これまで何百万人もの人々にとって手の届かなかったものから、世界中で普遍的にアクセス可能な介入となり、回避可能な失明を終わらせる助けとなるでしょう。看護師の皆さんには、地域における白内障の早期発見のための啓発活動や、患者さんが適切な医療を受けられるよう支援する重要な役割が期待されます。</div>
-            <div class="source-box">
-              <strong>ソース・引用元</strong><br>
-              配信元：WHO (World Health Organization)<br>
-              原文URL：<a href="https://www.who.int/news/item/11-02-2026-one-in-two-people-facing-cataract-blindness-need-access-to-life-changing-surgery" target="_blank" rel="noopener">https://www.who.int/news/item/11-02-2026-one-in-two-people-facing-cataract-blindness-need-access-to-life-changing-surgery</a>
-            </div>
-          </article>
-
-          <article>
-            <p class="meta">WHO (World Health Organization)　Thu, 05 Feb 2026 13:51:04 Z</p>
-            <h2 class="article-title">Over four million girls still at risk of female genital mutilation: UN leaders call for sustained commitment and investment to end FGM</h2>
-            <div class="summary">【女性器切除（FGM）撲滅への持続的取り組みの呼びかけ】<br><br>2026年だけでも、約450万人の女児が女性器切除（FGM）の危険にさらされており、その多くは5歳未満です。現在、2億3000万人以上の女性が、この行為による生涯にわたる影響に苦しんでいます。国際女性器切除根絶デーに際し、私たちはFGMの根絶と、被害を受けた女性が質の高い適切なサービスを受けられるよう支援するコミットメントを再確認します。<br><br>FGMは人権侵害であり、いかなる理由によっても正当化されません。女児や女性の身体的・精神的健康を著しく損ない、感染症、慢性疼痛、出産時の合併症など、深刻かつ生涯にわたる健康問題を引き起こします。これらの治療には年間約14億ドルもの費用がかかると推計されています。<br><br>この30年間、FGM撲滅のための介入は効果を見せており、普及地域の住民の約3分の2が根絶を支持しています。特に過去10年間で進捗は加速し、1990年以降の成果の半分がこの期間に達成され、施術を受ける女児の割合は2人に1人から3人に1人へと減少しました。私たちはこの勢いをさらに加速させ、2030年までにFGMを根絶するという持続可能な開発目標（SDGs）を達成する必要があります。<br><br>私たちは何が効果的かを知っています。健康教育、宗教・地域リーダー、保護者、そして私たち医療従事者の積極的な関与、さらに伝統的・ソーシャルメディアの活用が効果的な戦略です。地域主導の活動や教育を強化し、私たち医療従事者を含む信頼されるオピニオンリーダーが予防メッセージを広める必要があります。また、FGMの生存者に対しては、状況に応じた包括的な医療ケア、心理社会的支援、法的支援を確保することが重要です。<br><br>FGM撲滅への投資は、1ドルあたり10倍のリターンを生み出すとされています。具体的には、28億ドルの投資で2000万件のFGMを予防し、280億ドルの経済的利益をもたらすことが可能です。しかし、世界的な投資と支援が減少し、これまでの成果が危機に瀕しています。保健、教育、児童保護プログラムへの国際投資の減少は、FGM予防と生存者支援の努力を妨げています。<br><br>さらに、「医師や医療従事者によって行われる場合は許容される」という危険な議論が台頭し、撲滅への努力を阻む新たな障害となっています。十分で安定した資金がなければ、地域での啓発活動は縮小され、最前線のサービスは弱体化し、これまでの進歩が後退する危険性があります。これは、2030年目標達成に向けて重要なこの時期に、何百万もの女児をさらなるリスクにさらすことになります。<br><br>私たちは、生存者を含む地域およびグローバルな公的・民間パートナーシップと共に、FGMをきっぱりと終わらせるためのコミットメントと努力を再確認します。看護師である私たちも、この重要な取り組みの一員として、知識と専門性を活かし、予防、教育、そして生存者支援に貢献できることを心に留めておきましょう。</div>
-            <div class="source-box">
-              <strong>ソース・引用元</strong><br>
-              配信元：WHO (World Health Organization)<br>
-              原文URL：<a href="https://www.who.int/news/item/05-02-2026-over-four-million-girls-still-at-risk-of-female-genital-mutilation--un-leaders-call-for-sustained-commitment-and-investment-to-end-fgm" target="_blank" rel="noopener">https://www.who.int/news/item/05-02-2026-over-four-million-girls-still-at-risk-of-female-genital-mutilation--un-leaders-call-for-sustained-commitment-and-investment-to-end-fgm</a>
-            </div>
-          </article>
-
-          <article>
-            <p class="meta">WHO (World Health Organization)　Wed, 04 Feb 2026 14:20:30 Z</p>
-            <h2 class="article-title">Preventive cholera vaccination resumes as global supply reaches critical milestone</h2>
-            <div class="summary">【コレラ予防接種、世界的なワクチン供給改善により3年ぶりに再開】<br><br>この度、世界的なコレラワクチンの供給が大幅に改善され、3年ぶりに命を守る予防接種キャンペーンが再開されることが、Gaviワクチン同盟、ユニセフ、世界保健機関（WHO）から発表されました。以前は、2022年からの世界的なコレラ症例の急増により、経口コレラワクチン（OCV）の需要が跳ね上がり、深刻な供給不足に陥っていました。これにより予防接種は停止され、各国は発生したアウトブレイクへの対応に追われる状況でした。<br><br>予防接種キャンペーンの再開第一号となったのはモザンビークです。同国では現在もコレラが流行し、最近の洪水により70万人以上が被災、多くの避難民が発生し、医療システムや水道システムが寸断されたことで、コレラのような水系感染症のリスクがさらに高まっていました。WHO事務局長のテドロス博士は、今回のワクチン供給改善により「コレラアウトブレイクへの反応的な対応から、予防へとサイクルを破るより強力な立場になった」と述べ、製造元のEUBiologicsに感謝の意を表し、他の製造業者にも参入を促しています。<br><br>グローバル機関、製造業者、パートナーによる持続的な努力の結果、OCVの年間供給量は2022年の3500万回分から、2025年には約7000万回分へと倍増する見込みです。Gaviが資金提供し、ユニセフが調達・配送を担当しています。<br>最初の配分として2000万回分のワクチンが予防キャンペーンに投入されます。そのうち360万回分がモザンビークへ、610万回分が深刻なアウトブレイクを経験しているコンゴ民主共和国へ、そして1030万回分がバングラデシュへ供給される予定です。これらの国々は、コレラ対策グローバルタスクフォース（GTFCC）が定めた基準に基づき、体系的、公平かつ透明な方法で選定されました。<br><br>経口コレラワクチンは安全で効果的であり、1歳以上の個人に推奨されています。1回の接種で少なくとも6ヶ月の短期的な保護効果が得られ、アウトブレイクの制御に役立ちます。一方、2回の接種では3年間の長期的な感染予防効果が期待できます。ワクチン供給は改善しつつありますが、アウトブレイク対応においては当面、1回接種戦略が標準となり、2回接種は個々の状況に応じて検討されることになります。<br><br>コレラは汚染された食物や水を介して広がり、重度の下痢や脱水を引き起こします。迅速な治療が行われなければ死に至る可能性もあります。安全な水と衛生設備が整っていない地域、特に紛争や貧困の影響を受ける地域で多く見られます。WHOには昨年、33カ国から60万件以上のコレラまたは急性水様性下痢の症例と、約7600人の死亡が報告されていますが、これは過小評価されているとされます。2021年以降、世界的なコレラ症例は年々増加してきましたが、2025年には減少が予測されています。しかし、コレラによる死亡者数は依然として増加傾向にあります。<br><br>ワクチン接種はコレラの予防と対応の一側面に過ぎません。長期的な視点に立ち、安全な水、衛生設備、衛生習慣への投資、さらに疾病サーベイランス、迅速な治療、地域社会との連携が不可欠です。これら全てが揃って初めて、アウトブレイクの発生と拡大を防ぎ、長期的に死亡者数を削減できるでしょう。</div>
-            <div class="source-box">
-              <strong>ソース・引用元</strong><br>
-              配信元：WHO (World Health Organization)<br>
-              原文URL：<a href="https://www.who.int/news/item/04-02-2026-preventive-cholera-vaccination-resumes-as-global-supply-reaches-critical-milestone" target="_blank" rel="noopener">https://www.who.int/news/item/04-02-2026-preventive-cholera-vaccination-resumes-as-global-supply-reaches-critical-milestone</a>
-            </div>
-          </article>
-
-          <article>
-            <p class="meta">WHO (World Health Organization)　Tue, 03 Feb 2026 11:33:19 Z</p>
-            <h2 class="article-title">Four in ten cancer cases could be prevented globally</h2>
-            <div class="summary">【世界の癌の約4割は予防可能】<br><br>世界保健機関（WHO）と国際がん研究機関（IARC）の新たな国際分析により、世界の新規がん症例の約4割、具体的には2022年に発生した約710万件が予防可能な原因に関連していることが明らかになりました。これは、喫煙、飲酒、肥満、運動不足、大気汚染、紫外線といった従来から知られるリスク要因に加え、今回初めて9種類の癌を引き起こす感染症が予防可能な原因として特定された画期的な研究です。<br><br>この研究は、世界185カ国、36種類のがんのデータに基づいています。その結果、がんの予防可能な主要な原因として、喫煙が全新規がん症例の15%を占め、次いで感染症が10%、飲酒が3%を占めることが分かりました。特に、肺がん、胃がん、子宮頸がんの3種類が、予防可能なすべてのがん症例のほぼ半分を占めています。肺がんは主に喫煙と大気汚染が原因であり、胃がんはヘリコバクター・ピロリ感染が、子宮頸がんはヒトパピローマウイルス（HPV）が圧倒的な原因とされています。<br><br>この分析では、性別や地域によって予防可能ながんの割合に大きな差があることも示されました。男性では新規がん症例の45%が予防可能であったのに対し、女性では30%でした。男性における主な原因は喫煙（23%）、感染症（9%）、飲酒（4%）であり、女性では感染症（11%）、喫煙（6%）、そして高BMI（3%）が挙げられています。地域差も顕著で、例えば男性では東アジアで57%と高い割合を示し、女性ではサブサハラアフリカで38%と報告されています。これらの違いは、人々の行動様式、環境、職業、感染症への曝露の度合い、そして各国の社会経済状況や医療システム能力が影響していると考えられます。<br><br>看護師として、この報告は私たちの日々の業務に大きな示唆を与えます。患者さんへの健康指導や予防活動において、喫煙や飲酒の制限、食生活の改善、適度な運動といった生活習慣の指導はもちろんのこと、HPVワクチンやB型肝炎ワクチンの接種推奨など、感染症予防の重要性を改めて伝える必要があります。また、職場環境の改善や大気汚染対策といった、個人だけでは解決できない問題には、地域や行政、他の専門職との連携を通じて働きかける視点も重要です。<br><br>がん予防は、患者さんの苦痛を減らすだけでなく、長期的な医療費の削減にも繋がり、社会全体の健康と福祉の向上に貢献します。今回の分析結果は、がんの発生を未然に防ぐための具体的な介入策を講じる上で、非常に強力な根拠となるでしょう。看護師として、多角的な視点からがん予防に取り組むことの重要性を再認識し、個々の患者さんの背景に合わせたオーダーメイドの予防戦略を支援していきましょう。</div>
-            <div class="source-box">
-              <strong>ソース・引用元</strong><br>
-              配信元：WHO (World Health Organization)<br>
-              原文URL：<a href="https://www.who.int/news/item/03-02-2026-four-in-ten-cancer-cases-could-be-prevented-globally" target="_blank" rel="noopener">https://www.who.int/news/item/03-02-2026-four-in-ten-cancer-cases-could-be-prevented-globally</a>
-            </div>
-          </article>
-
-          <article>
-            <p class="meta">WHO (World Health Organization)　Tue, 03 Feb 2026 11:16:38 Z</p>
-            <h2 class="article-title">WHO launches 2026 appeal to help millions of people in health emergencies and crisis settings</h2>
-            <div class="summary">【WHOが2026年緊急支援を呼びかけ：世界の危機下の人々へ医療を届ける】<br><br>世界保健機関（WHO）は、人道危機や紛争に直面している何百万もの人々が適切な医療を受けられるよう、2026年に向けた世界的な緊急支援アピールを開始しました。これは、命を守り、人々の尊厳を回復するための重要な取り組みです。<br><br>2025年には、WHOとそのパートナー団体は年間緊急支援を通じて約3000万人の人々を支援しました。この支援により、530万人の子どもたちに命を守るワクチンが届けられ、5300万回を超える健康相談が実施されました。また、8000以上の医療施設が支援され、1370の移動クリニックが展開されるなど、具体的な成果を上げています。<br><br>しかし、2026年にはさらなる支援が必要とされています。WHOは、世界中で発生している36の緊急事態、特に組織が最高レベルの対応を必要とする14件の「グレード3」の危機に対応するため、およそ10億米ドルの資金を要請しています。これらの緊急事態は、突発的なものから長期にわたるものまで多岐にわたり、医療ニーズが極めて高い状況が続いています。<br><br>テドロスWHO事務局長は、「この支援は単なる慈善ではなく、健康と安全への戦略的な投資です。医療へのアクセスは人々の尊厳を回復させ、地域社会を安定させ、復興への道筋を提供します」と述べ、支援の意義を強調しています。<br><br>現在、世界は長期化する紛争、気候変動の深刻な影響、そして繰り返される感染症のアウトブレイクといった複合的な圧力に直面しており、これらが医療緊急支援への需要を増大させています。にもかかわらず、世界の人道支援資金は減少傾向にあり、2025年には2016年を下回る水準となりました。その結果、WHOとパートナー団体は、当初目標としていた8100万人のうち、わずか3分の1の人々しか支援できていません。<br><br>この厳しい状況の中、最も脆弱な立場にある人々を守り、支えるためには、新たなコミットメントと国際的な連帯が緊急に求められています。2026年のWHOの優先的な緊急対応地域には、アフガニスタン、コンゴ民主共和国、ハイチ、ミャンマー、占領下のパレスチナ地域、ソマリア、南スーダン、スーダン、シリア、ウクライナ、イエメンなどが挙げられており、さらにコレラやエムポックスなどの感染症アウトブレイクへの対応も含まれます。<br><br>WHOは、人道支援における保健対応の主導機関として、世界24の危機地域で1500以上のパートナー団体と連携し、各国の当局や地域のパートナーが緊急対応の中心となるよう調整しています。アイルランドとノルウェーの国連代表も、この活動の重要性を強調しており、「全ての人道危機は健康危機である」という認識のもと、WHOへの柔軟で予測可能な資金提供の強化を呼びかけています。特にノルウェーの代表は、WHOが「性的・生殖的健康と権利へのアクセスを守り、多大なストレスにさらされている最前線の医療従事者を支援する上で不可欠な役割を担っている」と述べました。<br><br>早期かつ予測可能な投資は、危機が発生した際にWHOとパートナー団体が即座に対応することを可能にし、死亡率や疾患を減らし、アウトブレイクを封じ込め、健康リスクがより広範な人道的・健康安全保障上の危機へと拡大するのを防ぐ上で極めて重要です。この国際的な協力が、世界中の人々の健康と命を守るために不可欠です。</div>
-            <div class="source-box">
-              <strong>ソース・引用元</strong><br>
-              配信元：WHO (World Health Organization)<br>
-              原文URL：<a href="https://www.who.int/news/item/03-02-2026-who-launches-2026-appeal-to-help-millions-of-people-in-health-emergencies-and-crisis-settings" target="_blank" rel="noopener">https://www.who.int/news/item/03-02-2026-who-launches-2026-appeal-to-help-millions-of-people-in-health-emergencies-and-crisis-settings</a>
-            </div>
-          </article>
-
-          <article>
-            <p class="meta">WHO (World Health Organization)　Mon, 02 Feb 2026 22:30:09 Z</p>
-            <h2 class="article-title">Six years after COVID-19’s global alarm: Is the world better prepared for the next pandemic?</h2>
-            <div class="summary">【COVID-19パンデミック宣言から6年、次のパンデミックへの世界の備え】<br><br>世界保健機関（WHO）が新型コロナウイルス感染症（COVID-19）の発生を「公衆衛生上の国際的緊急事態（PHEIC）」と宣言してから6年が経過しました。このPHEICは2023年5月に終結しましたが、COVID-19がもたらした影響は私たちの記憶に深く刻まれ、今も世界中で感じられています。WHOは、この6年という節目にあたり、各国やパートナー、そして私たち自身に、「世界は次のパンデミックに備えができているか」と問いかけています。その答えは「イエス」と「ノー」の両方です。<br><br>多くの点で、世界はより備えができていると言えます。それは、パンデミックへの備えを強化するために、具体的で意味のある措置が取られてきたからです。しかし同時に、「ノー」でもあります。なぜなら、これまでの進歩は脆弱で不均一であり、人類を安全に保つためには、まだやるべきことが多く残されているからです。WHOのテドロス事務局長は、「パンデミックは私たち全員に多くの教訓を与えた。特に、地球規模の脅威には地球規模の対応が求められるということだ。連帯こそが最良の免疫である」と述べています。<br><br>COVID-19から学んだ教訓を活かし、WHOと加盟国、パートナーはパンデミックの備え、予防、対応において大きな進歩を遂げてきました。これには、感染症の発生探知や監視システムの強化、医療物資のサプライチェーンの改善、ワクチンや治療薬の研究開発の加速などが含まれます。パンデミック以前から進められていた活動も、これらの備えをさらに強化しています。例えば、かつてワクチンや迅速な診断法、限られた治療選択肢しかなかったエボラ出血熱は、この10年間で大きく変貌しました。最近コンゴ民主共和国で発生したエボラ出血熱や、ルワンダ、タンザニア、エチオピアで発生したマールブルグ熱の流行は、以前よりもはるかに短い期間で封じ込められ、感染拡大と致死率も低く抑えられました。これらの対応は、WHOの支援のもと、各国の機関が主導したものです。<br><br>しかし、近年、世界の保健分野は深刻な混乱に直面しています。資金が保健分野から防衛や国家安全保障へとシフトする傾向があり、将来のパンデミックから国々を守るためにCOVID-19中に強化されたシステム自体が危険にさらされています。これは近視眼的な考え方です。パンデミックは国家安全保障上の脅威であり、備えへの投資は、命を守り、社会を安定させ、経済的損失を防ぐための投資なのです。<br><br>WHOは、すべての政府、パートナー、関係者に対し、パンデミックへの備えと予防の取り組みを決して緩めないよう強く求めています。今週のWHO執行理事会は、グローバルヘルスにおける協力、説明責任、効率性の未来を形作る上で重要な局面となります。病原体は国境を越えます。どの国も単独でパンデミックを予防したり、管理したりすることはできません。世界の保健安全保障には、セクター、政府、地域を横断した協力が不可欠です。WHOは、すべての国と協力して備えを強化し、イノベーションを加速させ、連帯を維持していくことを約束しています。<br><br>備えには継続的な警戒が必要です。次のパンデミックが襲来する前に、今すぐ準備を整えることが求められています。</div>
-            <div class="source-box">
-              <strong>ソース・引用元</strong><br>
-              配信元：WHO (World Health Organization)<br>
-              原文URL：<a href="https://www.who.int/news/item/02-02-2026-six-years-after-covid-19-s-global-alarm-is-the-world-better-prepared-for-the-next-pandemic" target="_blank" rel="noopener">https://www.who.int/news/item/02-02-2026-six-years-after-covid-19-s-global-alarm-is-the-world-better-prepared-for-the-next-pandemic</a>
-            </div>
-          </article>
-
-          <article>
-            <p class="meta">WHO (World Health Organization)　Mon, 02 Feb 2026 17:02:47 Z</p>
-            <h2 class="article-title">Joint statement on the renewed Quadripartite Memorandum of Understanding  regarding cooperation on One Health until 2030</h2>
-            <div class="summary">【世界規模の健康戦略「ワンヘルス」への新たな取り組み】<br><br>国連食糧農業機関（FAO）、国連環境計画（UNEP）、世界保健機関（WHO）、そして世界動物保健機関（WOAH）の四つの国際機関が、連携強化のための覚書を更新しました。これは、人間、動物、植物、生態系、そして広範な環境の健康が深く相互に関連しているという認識に基づき、「ワンヘルス」アプローチの推進を再確認するものです。この覚書は2030年11月28日まで有効であり、今後の協力を導く法的・運営的枠組みとなります。<br><br>【ワンヘルスとは何か、なぜ重要なのか】<br><br>ワンヘルスは、私たちの健康が動物や環境の健康と切り離せないという考え方です。例えば、動物由来の感染症が人間に広がる問題、食料システムの安全性、気候変動が健康に与える影響など、今日の多くの健康課題は、一つの分野だけでは解決できません。看護師の皆さんにとっても、患者さんの健康状態を考える際に、その生活環境や動物との接触、食習慣など、より広い視点を持つことの重要性を再認識させるアプローチと言えるでしょう。この考え方は、公衆衛生の強化、パンデミックへの備え、そして持続可能な社会の実現に不可欠です。<br><br>【四者連携による多角的アプローチ】<br><br>この覚書更新により、四つの機関はそれぞれの専門知識と強みを活かし、協調的かつ多分野にわたる行動を強化します。目標は、現在進行中のものや新たに生じる健康課題に、総合的に対処することです。協力の原則として、共通の責任、包摂性、公平性、そしてジェンダー平等を掲げ、エビデンスに基づいた政策を推進し、各国やパートナーに対する調整された支援を加速させます。<br><br>【看護師の役割と未来への展望】<br><br>この国際的な取り組みは、感染症の発生源管理から、食の安全確保、環境汚染対策、そして健康教育に至るまで、幅広い分野にわたる影響を持ちます。看護師の皆さんは、日々の臨床現場や地域での活動を通じて、人々の健康と環境とのつながりをより深く理解し、多職種連携の一員として、また健康教育の担い手として、ワンヘルスアプローチの具体化に貢献する役割が期待されます。世界の主要機関が2030年まで連携を強化することは、地球規模での健康リスクを軽減し、人間、動物、植物、生態系、そしてより広い環境全体にとって持続可能な健康成果を促進することを目指すものです。私たちの健康を守るために、広い視野と協調性を持って取り組むことの重要性を、この覚書更新は示しています。</div>
-            <div class="source-box">
-              <strong>ソース・引用元</strong><br>
-              配信元：WHO (World Health Organization)<br>
-              原文URL：<a href="https://www.who.int/news/item/03-02-2026-joint-statement-on-the-renewed-quadripartite-memorandum-of-understanding-regarding-cooperation-on-one-health-until-2030" target="_blank" rel="noopener">https://www.who.int/news/item/03-02-2026-joint-statement-on-the-renewed-quadripartite-memorandum-of-understanding-regarding-cooperation-on-one-health-until-2030</a>
-            </div>
-          </article>
-
-          <article>
-            <p class="meta">WHO (World Health Organization)　Thu, 29 Jan 2026 19:06:53 Z</p>
-            <h2 class="article-title">Communities unite to address stigma and discrimination affecting people with neglected tropical diseases</h2>
-            <div class="summary">【NTDsがもたらす見えない苦しみと看護の役割】<br><br>世界保健機関（WHO）は「世界顧みられない熱帯病（NTDs）デー」に際し、NTDsを患う数百万の人々が、差別、社会的スティグマ、そして未治療の精神疾患によって、深く目に見えない苦しみに直面していると警鐘を鳴らしています。NTDsは世界中で10億人以上を苦しめ、同様に多くの人々が精神的な健康問題を抱えています。「団結し、行動し、根絶する」というスローガンのもと、WHOと協力機関は、政府に対しNTDs排除の取り組みに精神保健ケアを統合し、誰も苦しみや孤立の中に置き去りにしないよう強く求めています。<br><br>特に、皮膚リーシュマニア症、ハンセン病、リンパ系フィラリア症、マイセトーマ、ノーマといった、身体的障害や外見上の変形を引き起こすNTDsの患者は、スティグマや差別の影響を非常に強く受けやすい傾向にあります。病気の感染性に関する誤解は、こうしたスティグマや差別、社会からの排除をさらに深刻化させます。慢性的なNTDsを抱える人々は、一般の人々や他の慢性疾患患者と比較して、うつ病、不安症、自殺行動の割合が高いことが明らかになっています。しかし、彼らの多くは地域社会で必要なケアやサポートを受けられていないのが現状です。<br><br>WHOのテドロス事務局長は、「顧みられない熱帯病との闘いは、病原体との闘いだけでなく、それらが引き起こす深い人間的な苦しみとの闘いである」と述べ、真のNTDsの根絶とは、病気からだけでなく、それに伴う恥、孤立、絶望からも人々を解放することだと強調しました。私たち看護師も、患者の身体的な病状だけでなく、精神的、社会的な側面にも目を向ける必要があります。<br><br>この喫緊の課題に対処するため、WHOはNTDs患者の精神的健康とスティグマに取り組むための「必須ケアパッケージ（ECP）に関するWHOグローバルガイド」を初めて発表しました。このガイドは、保健サービスリーダー向けに、エビデンスに基づいた介入策をまとめたものであり、今後の看護実践にも示唆を与えるものです。<br><br>過去10年間で、NTDs対策には大きな進展がありました。介入を必要とする人々の数は史上最低の14億人にまで減少し、死亡率や罹患率も大幅に減少しています。現在までに58カ国が少なくとも一つのNTDを排除しており、2030年までに100カ国というWHOの目標達成に向けた力強い道筋が示されています。<br><br>しかし、「顧みられない熱帯病に関するグローバルレポート2025」は、NTDsに対する国際的な政府開発援助（ODA）が2018年から2023年の間に41%も減少したことを示しており、これまでの苦労して得た成果が覆される危険性があると警告しています。予防的化学療法への1ドルの投資が約25ドルのリターンをもたらすという経済効果があるにもかかわらず、この資金の減少は憂慮すべき事態です。新たな行動がなければ、NTDsは年間推定330億ドルもの賃金損失や自己負担費用という形で、人々の命と暮らし、そして地域社会からさらなる負担を奪い続けることになります。<br><br>今回の世界NTDsデーは、これまでの進捗を守り、新たな資金とリーダーシップを動員し、イノベーションを加速させ、精神保健ケアを含む保健サービスをNTDs対策に統合するための行動を求めるものです。私たち看護師も、NTDs患者の身体的ケアに加えて、彼らが抱える精神的な苦痛や社会的な孤立に寄り添い、適切なサポートを提供できるよう、多職種連携の中でその役割を果たすことが重要です。</div>
-            <div class="source-box">
-              <strong>ソース・引用元</strong><br>
-              配信元：WHO (World Health Organization)<br>
-              原文URL：<a href="https://www.who.int/news/item/30-01-2026-communities-unite-to-address-stigma-and-discrimination-affecting-people-with-neglected-tropical-diseases" target="_blank" rel="noopener">https://www.who.int/news/item/30-01-2026-communities-unite-to-address-stigma-and-discrimination-affecting-people-with-neglected-tropical-diseases</a>
-            </div>
-          </article>
-
-          <article>
-            <p class="meta">WHO (World Health Organization)　Tue, 27 Jan 2026 15:26:20 Z</p>
-            <h2 class="article-title">WHO urges schools worldwide to promote healthy eating for children</h2>
-            <div class="summary">【WHOが学校での健康的な食環境推進を提言】<br><br>世界保健機関（WHO）は、子どもたちが生涯にわたる健康的な食習慣を身につけられるよう、学校における食環境を改善するための新しいグローバルガイドラインを発表しました。WHOは今回初めて、学校で提供される全ての飲食物が健康的で栄養価が高いことを保証する「学校全体のアプローチ」を各国に推奨しています。<br><br>この背景には、世界的に増加する子どもの肥満と、依然として課題である低栄養という「栄養の二重の負担」があります。2025年には、世界で約10人に1人の学齢期の子どもや青少年、すなわち1億8800万人が肥満と診断され、初めて低体重の子どもの数を上回ると予測されています。WHO事務局長のテドロス・アダノム・ゲブレイェソス博士は、学校で子どもたちが食べるものや、その食環境が学習に深い影響を与え、生涯の健康と幸福に長期的な結果をもたらすと述べています。子どもの時期に適切な栄養を摂ることは、将来の病気を予防し、より健康な成人を育む上で極めて重要です。<br><br>子どもたちは一日のかなりの時間を学校で過ごすため、学校は生涯の食習慣を形成し、健康や栄養の不平等を減らす上で決定的な場所となります。現在、世界中で推定4億6600万人の子どもが学校給食を受けていますが、その栄養の質に関する情報はまだ限られています。<br><br>ガイドラインでは、学校において健康的な食事を促す飲食物の提供改善を推奨しています。特に、政策だけでは不十分であり、ガイドラインが学校で効果的かつ一貫して実施されるためには、モニタリングと実施メカニズムが不可欠であると強調しています。2025年10月時点で、104の加盟国が健全な学校給食に関する政策を有しており、その約4分の3が給食の構成を導く強制的な基準を含んでいました。しかし、砂糖、塩分、不健康な脂肪が多い食品のマーケティングを制限する政策を持つ国はわずか48カ国に留まっています。<br><br>WHOは、このガイドラインを地域および国の両レベルでの行動を支援するために作成し、技術支援や知識共有を通じて加盟国が導入・実施できるようサポートしていく方針です。現役の看護師の皆さんにとっても、この情報は子どもの健康増進や健康教育、そして地域や学校における予防的な取り組みを考える上で重要な視点となるでしょう。</div>
-            <div class="source-box">
-              <strong>ソース・引用元</strong><br>
-              配信元：WHO (World Health Organization)<br>
-              原文URL：<a href="https://www.who.int/news/item/27-01-2026-who-urges-schools-worldwide-to-promote-healthy-eating-for-children" target="_blank" rel="noopener">https://www.who.int/news/item/27-01-2026-who-urges-schools-worldwide-to-promote-healthy-eating-for-children</a>
-            </div>
-          </article>
-
-          <article>
-            <p class="meta">WHO (World Health Organization)　Sat, 24 Jan 2026 20:09:49 Z</p>
-            <h2 class="article-title">WHO statement on notification of withdrawal of the United States</h2>
-            <div class="summary">【WHO、米国の脱退通知に遺憾を表明】<br><br>世界保健機関（WHO）は、創設メンバーであり、天然痘の根絶やポリオ、エイズ、エボラ、結核、マラリアなど多くの公衆衛生上の脅威に対する進展に大きく貢献してきた米国のWHOからの脱退通知に対し、深い遺憾の意を表明しています。この決定は、米国と世界の双方にとって安全保障を損なうものだとWHOは考えています。この脱退通知に関する問題は、2026年2月のWHO執行理事会と5月の世界保健総会で検討される予定です。<br><br>【米国が挙げる脱退理由への反論】<br><br>米国政府は、WHOが「荒らし、汚し」、独立性を損なったと主張していますが、WHOはその真逆であると反論しています。WHOは常に、全ての加盟国と同様に、米国の主権を最大限に尊重し、誠意をもって関与しようと努めてきました。また、米国は脱退理由の一つとして「COVID-19パンデミックにおけるWHOの失敗」、特に「重要な情報のタイムリーかつ正確な共有を妨げ、失敗を隠蔽した」と指摘しています。しかしWHOは、この未曽有の世界的な健康危機に対する自身の対応を支持しています。WHOはパンデミック中、迅速に行動し、入手した全ての情報を速やかに、かつ透明性をもって世界と共有し、利用可能な最良の証拠に基づいて加盟国に助言を提供してきました。マスクやワクチン、身体的距離の確保を推奨しましたが、マスクやワクチンの義務化、ロックダウンを推奨したことはありません。WHOは、各国の政府が国民の最善の利益になると信じる決定を下すことを支援しましたが、最終的な決定は各国自身に委ねられていました。<br><br>具体的には、2019年12月31日に中国・武漢で「原因不明の肺炎」のクラスターが初めて報告されて以来、WHOは中国に詳細な情報を求め、緊急事態管理システムを起動しました。2020年1月11日に中国で最初の死亡例が報告されるまでに、WHOは既に公式チャンネル、声明、ソーシャルメディアを通じて世界に警告を発し、世界中の専門家を招集し、国民と保健システムを保護するための包括的なガイダンスを各国に公開していました。WHO事務局長が国際保健規則に基づきCOVID-19を「国際的に懸念される公衆衛生上の緊急事態」（国際保健法の下で最高の警戒レベル）と宣言した2020年1月30日には、中国国外の報告症例は100件未満で、死亡例はありませんでした。パンデミックの最初の数週間、数ヶ月間、事務局長は各国に対し、国民を保護するための即時行動を繰り返し求め、「機会の窓は閉じつつある」「これは訓練ではない」「COVID-19は公衆の敵ナンバーワンだ」と警告を発しました。<br><br>【WHOの公平性と国際協力の推進】<br><br>米国はまた、WHOが「米国の利益に敵対的な国々に煽られた、政治化された官僚的な議題を追求した」とも主張していますが、これも事実ではありません。国連の専門機関として194の加盟国によって統治されているWHOは、常に公平であり続け、主権を尊重し、いかなる偏見もなく全ての国に奉仕するために存在します。WHOは、全ての加盟国からの支援と継続的な関与を高く評価しており、加盟国は感染症および非感染症を含む世界最大の健康上の脅威に対する解決策を追求するために、WHOの枠組み内で協力し続けています。昨年、WHO加盟国は「WHOパンデミック合意」を採択しました。これは批准されれば、将来のパンデミックから世界をより安全に保つための国際法の画期的な手段となります。現在、加盟国は「病原体アクセスと利益共有システム」というパンデミック合意の附属書を交渉しており、これが採択されれば、パンデミックの可能性のある病原体の迅速な検出と共有、そしてワクチン、治療薬、診断薬への公平かつタイムリーなアクセスが促進されます。<br><br>【米国復帰への期待とWHOの使命】<br><br>WHOは、将来的に米国がWHOに積極的に参加してくれることを期待しています。それまでの間も、WHOは「全ての人々にとって最高の達成可能な健康水準を基本的権利とする」という中核的な使命と憲章上の義務を追求するために、全ての国と協力し続けることに揺るぎない決意を持っています。</div>
-            <div class="source-box">
-              <strong>ソース・引用元</strong><br>
-              配信元：WHO (World Health Organization)<br>
-              原文URL：<a href="https://www.who.int/news/item/24-01-2026-who-statement-on-notification-of-withdrawal-of-the-united-states" target="_blank" rel="noopener">https://www.who.int/news/item/24-01-2026-who-statement-on-notification-of-withdrawal-of-the-united-states</a>
-            </div>
-          </article>
-
-          <article>
-            <p class="meta">WHO (World Health Organization)　Fri, 23 Jan 2026 16:24:59 Z</p>
-            <h2 class="article-title">Countries progress negotiations in support of WHO Pandemic Agreement</h2>
-            <div class="summary">【WHO、パンデミック対策に向けた国際合意の交渉が進展中】<br><br>世界保健機関（WHO）の加盟国は、将来のパンデミック（世界的な感染症の大流行）に備えるための国際的な合意、通称「WHOパンデミック合意」に関する交渉を精力的に進めています。この合意は、2026年5月に開催される世界保健総会（WHA）で採択を目指しており、その中でも特に重要な要素である「病原体アクセスと利益共有（PABS）システム」に焦点が当てられています。<br><br>【PABSシステムとは何か】<br>PABSシステムは、病原体のパンデミックが起こった際に、その病原体自体や遺伝子配列情報を、安全かつ透明性をもって、責任ある方法で各国間で迅速に共有することを目的としています。さらに重要なのは、これらの病原体情報に基づいて開発されるワクチン、治療薬、診断薬などの成果物から生じる利益を、公平かつ公正に世界中で共有する仕組みを構築することです。これは、特定の国だけが利益を独占するのではなく、すべての国がその恩恵を受けられるようにするための画期的な試みと言えます。<br><br>【現在の交渉状況と今後の展望】<br>この合意のドラフト作成と交渉を担う政府間交渉グループ（IGWG）は、2026年1月20日から22日にかけて再開会合を開き、PABSシステムに関する未解決の課題についてテキストベースで議論を深めました。この会合では、いくつかの分野で前向きな進展が見られ、一部では合意形成の兆候も現れています。ブラジルのトバル・ダ・シルバ・ヌネス大使は、この進展に期待を示しつつも、今後の会合では残された複雑な問題に焦点を当てていく必要があると述べています。英国のマシュー・ハーバー氏も、加盟国が建設的な議論を通じて協力し、意見の相違を乗り越えようと努力していることを評価しています。<br>WHOのテドロス事務局長は、「強力なPABSシステムは、より安全で公平な世界の礎となるでしょう」と強調し、多国間での協力と解決策へのコミットメントに感謝の意を表明しています。IGWGの交渉結果は、最終的に2026年5月の第79回世界保健総会に提出され、検討される予定です。<br><br>【看護師の皆様へ】<br>このパンデミック合意とPABSシステムの構築は、将来の公衆衛生危機への備えにおいて極めて重要です。病原体情報の迅速な共有は、私たち医療従事者が患者さんのケアに必要な情報やツール（診断薬、治療薬など）をタイムリーに手に入れる上で不可欠となります。また、利益の公平な共有は、医療資源が限られる地域を含め、世界中の人々が等しく医療の恩恵を受けられる社会を目指すものであり、これは私たち看護師が目指す「質の高いケアの提供」という理念にも深く通じるものです。国際的な協力の進展は、日本の医療現場にも良い影響をもたらし、より安全で持続可能な医療体制の構築に貢献すると期待されます。</div>
-            <div class="source-box">
-              <strong>ソース・引用元</strong><br>
-              配信元：WHO (World Health Organization)<br>
-              原文URL：<a href="https://www.who.int/news/item/23-01-2026-countries-progress-negotiations-in-support-of-who-pandemic-agreement" target="_blank" rel="noopener">https://www.who.int/news/item/23-01-2026-countries-progress-negotiations-in-support-of-who-pandemic-agreement</a>
-            </div>
-          </article>
-
-          <article>
-            <p class="meta">WHO (World Health Organization)　Wed, 21 Jan 2026 17:14:46 Z</p>
-            <h2 class="article-title">WHO renews commitment to a leprosy-free world, spotlighting partnership and progress ahead of World Leprosy Day</h2>
-            <div class="summary">【ハンセン病のない世界へ WHOが取り組みを強化】<br><br>ハンセン病は「らい菌」による感染症で、主に皮膚や末梢神経に影響を及ぼします。未治療だと永続的な障害、差別、社会的孤立を招きますが、多剤併用療法（MDT）で完治可能です。WHOは1月25日の「世界ハンセン病デー」に先立ち、排除に向けたコミットメントを再確認しました。世界では年間17万件以上の新規症例が報告されています。<br><br>WHOは2000年からノバルティス社と協力し、ハンセン病患者へMDTとクロファジミンを無償提供してきました。この25年間のパートナーシップは今回、さらに5年間（2026～2030年）延長されました。これによりMDTとクロファジミンの継続供給に加え、曝露後予防（PEP）のための単回リファンピシン（SDR）の調達・配布も支援されます。治療への無料アクセスは、多くの人々の生活を改善し、ハンセン病のない世界への重要な一歩となっています。<br><br>無償のMDTは、病気の治療、障害の予防、スティグマ軽減に貢献し、患者さんの社会復帰を支えてきました。特にクロファジミンは、重度な炎症反応「らい反応」の治療に不可欠です。<br><br>今年のテーマは「ハンセン病は治療可能、真の課題はスティグマ」です。WHOハンセン病排除親善大使の笹川陽平氏も、治療後も残る社会的スティグマが深刻な問題だと強調しています。後遺症を持つ人々は、強制離婚や不当解雇など、差別や社会的排除に苦しみます。<br><br>ハンセン病は顧みられない熱帯病（NTD）の一つです。WHOのグローバル戦略2021-2030では、伝播の遮断と疾病自体の排除を目指し、接触者検診、予防化学療法の拡大、そしてスティグマと差別の軽減を主要な柱としています。<br><br>WHOは、早期発見・治療だけでなく、患者さんが直面する差別と闘うための取り組みも主導しています。看護師の皆さんも、顧みられない病気や患者さんが抱える見えない苦しみに対し、理解を深め、医療従事者としてできることを共に考えていくことが重要です。</div>
-            <div class="source-box">
-              <strong>ソース・引用元</strong><br>
-              配信元：WHO (World Health Organization)<br>
-              原文URL：<a href="https://www.who.int/news/item/21-01-2026-who-renews-commitment-to-a-leprosy-free-world--spotlighting-partnership-and-progress-ahead-of-world-leprosy-day" target="_blank" rel="noopener">https://www.who.int/news/item/21-01-2026-who-renews-commitment-to-a-leprosy-free-world--spotlighting-partnership-and-progress-ahead-of-world-leprosy-day</a>
-            </div>
-          </article>
-
-
-<!-- ARTICLES_END -->
+  <div class="layout">
+    <nav class="sidebar">
+      <div class="sidebar-section">
+        <p class="sidebar-title">日付</p>
+        <div class="date-group">
+  <button class="date-btn" onclick="toggleDate('2026-03-07')">
+    <span>2026年3月7日</span><span class="count">2</span>
+  </button>
+  <div class="genre-list" id="genres-2026-03-07">
+    <a href="#" class="genre-sublink" onclick="showDate('2026-03-07'); return false;">公衆衛生<span class="count">2</span></a>
   </div>
+</div>
+
+      </div>
+      <hr class="sidebar-divider">
+      <div class="sidebar-section">
+        <p class="sidebar-title">ジャンル</p>
+        <a href="#" class="genre-link" onclick="showGenre('公衆衛生'); return false;">公衆衛生<span class="count">2</span></a>
+
+      </div>
+    </nav>
+    <div class="main">
+      <a href="/hp/" class="back-link">← ホームに戻る</a>
+      <p class="page-title">最新の医療・看護ニュース</p>
+      <p class="page-desc">海外の最新医療ニュースをAIで要約し、定期配信しています。</p>
+      <div class="view active" id="view-date">
+        <div class="date-section" id="2026-03-07">
+<h2 class="date-heading">2026年3月7日</h2>
+<div class="genre-section">
+<h3 class="genre-heading">公衆衛生</h3>
+  <article data-genre="公衆衛生">
+    <p class="meta">WHO (World Health Organization)　Fri, 27 Feb 2026 10:01:29 Z</p>
+    <h4 class="article-title">Recommendations for influenza vaccine composition for the 2026-2027 northern hemisphere season</h4>
+    <div class="summary">【2026-2027年北半球インフルエンザシーズンに向けたWHOの推奨】<br>世界保健機関（WHO）は、2026年から2027年の北半球インフルエンザシーズンに向けたワクチンのウイルス組成推奨を発表しました。インフルエンザウイルスは常に変異するため、そのワクチン組成は毎年更新される必要があります。WHOの推奨は、世界各国のワクチン規制当局や製薬会社が、次シーズンのワクチンを開発、製造、承認する際の基準となります。これにより、実際に流行が予測されるウイルス株とワクチンが合致し、重症化や死亡に対する最適な予防効果を提供できるようになります。この推奨は、WHOの世界インフルエンザサーベイランス・対応システム（GISRS）と連携センターの専門家が、世界的なインフルエンザ監視データを詳細に検討した結果に基づいています。<br><br>【直近のインフルエンザ流行状況と警戒】<br>この度の協議では、直近の流行状況も報告されました。特に2025年8月以降、A(H3N2)ウイルスの新たな変異株（「サブクレードK」）が出現し、世界中で急速に拡大しました。これにより、多くの国で例年よりも早くインフルエンザシーズンが始まり、高い活動レベルが報告されています。全体としてインフルエンザA型ウイルスが優勢であり、B型ウイルス（Victoria系統）は低レベルで検出されました。B型Yamagata系統は2020年3月以降、報告されていません。<br><br>【人獣共通感染症とパンデミックへの警戒】<br>専門家はまた、動物から人へ感染する人獣共通感染症のインフルエンザウイルスにも注目しました。これらのウイルスは、パンデミックを引き起こす潜在的なリスクがあるため、重要な懸念事項です。2025年9月以降、6カ国から25件の動物由来インフルエンザによる人感染がWHOに報告されましたが、現時点では人から人への感染は確認されていません。今回の会議では、パンデミック発生時に迅速なワクチン製造に利用できる新規候補ワクチンウイルスとして、A(H9N2)ウイルスの開発が推奨されました。<br><br>【インフルエンザ対策とWHOの役割】<br>季節性インフルエンザは、世界中で年間約10億人が罹患し、そのうち300万から500万人が重症化し、29万から65万人が呼吸器系の原因で死亡していると推計されています。WHOのテドロス事務局長は、「常に進化するインフルエンザウイルスは、私たちの世界がいかに繋がっているかを示しています。共通のリスクには共通の行動が求められます」と述べ、GISRSの継続的な監視活動に感謝を示しました。GISRSは1952年から続く、世界で最も長く運用されている疾病監視プラットフォームであり、次シーズンのワクチンが最新のウイルス株に対応できるよう、重要な役割を担っています。</div>
+    <div class="source-box">
+      <strong>ソース・引用元</strong><br>
+      配信元：WHO (World Health Organization)<br>
+      原文URL：<a href="https://www.who.int/news/item/27-02-2026-recommendations-for-influenza-vaccine-composition-for-the-2026-2027-northern-hemisphere-season" target="_blank" rel="noopener">https://www.who.int/news/item/27-02-2026-recommendations-for-influenza-vaccine-composition-for-the-2026-2027-northern-hemisphere-season</a>
+    </div>
+  </article>
+  <article data-genre="公衆衛生">
+    <p class="meta">WHO (World Health Organization)　Wed, 04 Mar 2026 14:57:17 Z</p>
+    <h4 class="article-title">Chile becomes the first country in the Americas to be verified by WHO for the elimination of leprosy</h4>
+    <div class="summary">【チリがアメリカ大陸初のハンセン病撲滅国としてWHOに認定】<br>チリが世界保健機関（WHO）と汎米保健機構（PAHO）から、アメリカ大陸で初めてハンセン病（らい病）の撲滅を公式に認定されました。これは世界で2番目の快挙であり、公衆衛生における画期的な成果として注目されています。<br><br>チリでは19世紀後半にラパ・ヌイ（イースター島）でハンセン病が記録されましたが、本土での発生は散発的でした。特に1993年以降、国内での感染例は30年以上報告されていません。しかし、この疾病は公衆衛生上の課題として常に監視され、報告義務のある疾患として、統合されたサーベイランスと医療システム全体での継続的な臨床対応が維持されてきました。<br><br>この撲滅達成は、30年以上にわたる持続的な公衆衛生活動、堅牢なサーベイランス体制、長期的な政治的コミットメント、そして地域内感染がない状況下でも警戒を怠らない医療システムの賜物です。チリの保健大臣も「何十年にもわたる予防戦略、早期診断、効果的な治療、継続的なフォローアップ、そして全国の医療チームの献身的な努力の結晶」と語っています。<br><br>チリの医療モデルは、プライマリケアセンターが疑い例の入り口となり、専門の皮膚科サービスへ速やかに紹介され、診断、治療、フォローアップまでの一貫したケアを提供します。医療従事者はWHOの戦略に沿った研修を受け、早期介入、障害予防、理学療法やリハビリテーションを含むホリスティックなケアが優先され、患者が社会的に包摂されるよう支援しています。<br><br>ハンセン病はらい菌（Mycobacterium leprae）による慢性感染症で、皮膚、末梢神経、上気道粘膜、眼などを主に侵します。未治療の場合、永続的な神経損傷、身体障害、そして深刻な社会的スティグマにつながります。しかし、多剤併用療法（MDT）で完治可能であり、早期発見が合併症を防ぎます。PAHOはWHOと連携し、1995年以降、アメリカ大陸の国々にMDTを無償提供しており、日本財団やノバルティスの支援もこの継続的な供給に貢献してきました。<br><br>今回のチリの成功は、政治的意志、多部門間の連携、適応性のある計画が低発生率の環境下でもいかに重要であるかを示しています。また、ハンセン病が「顧みられない熱帯病（NTDs）」の一つであることを踏まえ、チリはブラジルなど他の5カ国に続き、アメリカ大陸でNTDsを撲滅した6番目の国となりました。<br><br>看護師の皆様にとって、このニュースは、感染症対策における継続的なサーベイランスと早期介入の重要性、患者の全人的なケア、そして病気と貧困の悪循環を断ち切るための公衆衛生上の取り組みの価値を改めて認識する機会となるでしょう。撲滅後も引き続き警戒し、スティグマのない医療を提供し続ける責任があることを示唆しています。</div>
+    <div class="source-box">
+      <strong>ソース・引用元</strong><br>
+      配信元：WHO (World Health Organization)<br>
+      原文URL：<a href="https://www.who.int/news/item/04-03-2026-chile-becomes-the-first-country-in-the-americas-to-be-verified-by-who-for-the-elimination-of-leprosy" target="_blank" rel="noopener">https://www.who.int/news/item/04-03-2026-chile-becomes-the-first-country-in-the-americas-to-be-verified-by-who-for-the-elimination-of-leprosy</a>
+    </div>
+  </article>
+</div>
+</div>
+
+      </div>
+      <div class="view" id="view-genre">
+        <p class="genre-view-title">ジャンル：<span id="genre-view-label"></span></p>
+        <div id="genre-articles"></div>
+      </div>
+    </div>
+  </div>
+  <script>
+    function toggleDate(date) {
+      const list = document.getElementById('genres-' + date);
+      const btn = list.previousElementSibling;
+      list.classList.toggle('open');
+      btn.classList.toggle('open');
+    }
+    function showDate(date) {
+      document.getElementById('view-date').classList.add('active');
+      document.getElementById('view-genre').classList.remove('active');
+      document.querySelectorAll('.genre-link').forEach(l => l.classList.remove('active'));
+      setTimeout(() => {
+        const el = document.getElementById(date);
+        if (el) el.scrollIntoView({behavior:'smooth', block:'start'});
+      }, 50);
+    }
+    function showGenre(genre) {
+      document.querySelectorAll('.genre-link').forEach(l => {
+        l.classList.toggle('active', l.textContent.trim().startsWith(genre));
+      });
+      document.getElementById('view-date').classList.remove('active');
+      document.getElementById('view-genre').classList.add('active');
+      document.getElementById('genre-view-label').textContent = genre;
+      const container = document.getElementById('genre-articles');
+      container.innerHTML = '';
+      document.querySelectorAll(`article[data-genre="${genre}"]`).forEach(a => {
+        container.appendChild(a.cloneNode(true));
+      });
+      window.scrollTo({top:0, behavior:'smooth'});
+    }
+    const firstBtn = document.querySelector('.date-btn');
+    if (firstBtn) firstBtn.click();
+  </script>
 </body>
 </html>
