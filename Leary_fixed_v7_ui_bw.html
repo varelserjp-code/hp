@@ -1,0 +1,1330 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Leary Minimal Monochrome</title>
+<style>
+  :root{
+    --bg:#000000;
+    --bg-2:#000000;
+    --panel:rgba(0,0,0,.92);
+    --panel-2:rgba(255,255,255,.02);
+    --panel-3:rgba(255,255,255,.04);
+    --line:rgba(255,255,255,.10);
+    --line-strong:rgba(255,255,255,.18);
+    --text:#f5f7fb;
+    --muted:rgba(255,255,255,.56);
+    --soft:rgba(255,255,255,.78);
+    --accent:#ffffff;
+    --shadow:none;
+    --radius:18px;
+    --radius-sm:12px;
+  }
+  *{box-sizing:border-box}
+  html,body{
+    height:100%;
+    margin:0;
+    background:#000;
+    color:var(--text);
+    font:13px/1.45 Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans JP",sans-serif;
+    letter-spacing:.01em;
+  }
+  button,input,select{font:inherit}
+  button,input,select{outline:none}
+  ::selection{background:rgba(255,255,255,.10)}
+  #app{
+    height:100%;
+    display:grid;
+    grid-template-columns:390px minmax(0,1fr);
+    gap:0;
+    overflow:hidden;
+  }
+  .panel{
+    position:relative;
+    overflow:auto;
+    padding:18px 16px 40px;
+    background:var(--panel);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-right:1px solid var(--line);
+  }
+  .panel::after{
+    content:"";
+    position:fixed;
+    top:0;
+    left:389px;
+    width:1px;
+    height:100vh;
+    background:rgba(255,255,255,.12);
+    pointer-events:none;
+  }
+  .panel-head{
+    margin-bottom:14px;
+    padding:4px 2px 10px;
+  }
+  .eyebrow{
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
+    color:var(--soft);
+    font-size:10px;
+    letter-spacing:.22em;
+    text-transform:uppercase;
+  }
+  .eyebrow::before{
+    content:"";
+    width:24px;
+    height:1px;
+    background:rgba(255,255,255,.48);
+  }
+  .title,.subtitle{display:none}
+  .toolbar{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    margin:0 0 14px;
+  }
+  .btn{
+    appearance:none;
+    border:1px solid var(--line);
+    background:rgba(255,255,255,.03);
+    color:var(--text);
+    border-radius:14px;
+    padding:11px 12px;
+    cursor:pointer;
+    transition:transform .14s ease, background .14s ease, border-color .14s ease, box-shadow .14s ease, opacity .14s ease;
+    box-shadow:none;
+  }
+  .btn:hover{
+    background:rgba(255,255,255,.06);
+    border-color:var(--line-strong);
+    transform:translateY(-1px);
+  }
+  .btn:active{transform:translateY(0)}
+  .btn.primary{
+    color:#000000;
+    background:#ffffff;
+    border-color:#ffffff;
+    box-shadow:none;
+  }
+  .btn.small{
+    padding:9px 10px;
+    border-radius:12px;
+  }
+  .section{
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:14px;
+    background:var(--panel-2);
+    box-shadow:var(--shadow);
+    margin-bottom:12px;
+  }
+  .section h3{
+    margin:0 0 12px;
+    font-size:11px;
+    font-weight:600;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--soft);
+  }
+  .metrics{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+  }
+  .metric{
+    min-width:0;
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:10px 11px;
+    background:rgba(255,255,255,.015);
+  }
+  .metric-label{
+    color:var(--muted);
+    font-size:11px;
+    margin-bottom:5px;
+  }
+  .metric-value{
+    font-size:13px;
+    color:var(--text);
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .row{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) 96px;
+    gap:12px;
+    align-items:center;
+    margin-bottom:10px;
+  }
+  .row:last-child{margin-bottom:0}
+  .row > label{
+    color:rgba(255,255,255,.88);
+    min-width:0;
+  }
+  .row input[type="number"],
+  .row input[type="text"],
+  .row select{
+    width:100%;
+    padding:9px 10px;
+    border-radius:12px;
+    border:1px solid var(--line);
+    background:#000000;
+    color:var(--text);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.03);
+  }
+  .row input[type="number"]:focus,
+  .row input[type="text"]:focus,
+  .row select:focus,
+  .color-item input:focus{
+    border-color:rgba(255,255,255,.28);
+    box-shadow:0 0 0 3px rgba(255,255,255,.06);
+  }
+  .row input[type="color"]{
+    width:100%;
+    height:40px;
+    padding:3px;
+    border-radius:12px;
+    border:1px solid var(--line);
+    background:#000000;
+  }
+  .stack{display:flex;flex-direction:column;gap:8px}
+  .inline{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .muted{color:var(--muted)}
+  .mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .grid-preset{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+  }
+  .colors{display:flex;flex-direction:column;gap:8px}
+  .color-item{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) 78px 32px;
+    gap:8px;
+    align-items:center;
+    padding:6px;
+    border:1px solid var(--line);
+    border-radius:14px;
+    background:rgba(255,255,255,.015);
+  }
+  .color-item input[type="number"]{
+    padding:8px 7px;
+    border-radius:10px;
+    border:1px solid var(--line);
+    background:#000000;
+    color:var(--text);
+  }
+  .hint{
+    font-size:12px;
+    color:var(--muted);
+    line-height:1.5;
+  }
+  .footer-space{height:24px}
+  .viewer{
+    position:relative;
+    overflow:hidden;
+    background:#000000;
+  }
+  .viewer::before{
+    content:"";
+    position:absolute;
+    inset:22px;
+    border-radius:28px;
+    border:1px solid rgba(255,255,255,.08);
+    pointer-events:none;
+  }
+  .viewer-top{
+    position:absolute;
+    top:20px;
+    left:20px;
+    right:20px;
+    display:flex;
+    justify-content:space-between;
+    gap:10px;
+    pointer-events:none;
+  }
+  .pill{
+    pointer-events:auto;
+    display:inline-flex;
+    gap:10px;
+    align-items:center;
+    min-height:42px;
+    padding:10px 14px;
+    background:rgba(0,0,0,.72);
+    border:1px solid rgba(255,255,255,.08);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border-radius:999px;
+    color:#ffffff;
+    box-shadow:none;
+  }
+  .canvas-wrap{position:absolute;inset:0;display:grid;place-items:center;padding:30px}
+  .stage{position:relative;max-width:100%;max-height:100%}
+  canvas{
+    display:block;
+    background:transparent;
+    border-radius:22px;
+    box-shadow:none;
+  }
+  .checker{
+    background-image:
+      linear-gradient(45deg, rgba(255,255,255,.016) 25%, transparent 25%),
+      linear-gradient(-45deg, rgba(255,255,255,.016) 25%, transparent 25%),
+      linear-gradient(45deg, transparent 75%, rgba(255,255,255,.016) 75%),
+      linear-gradient(-45deg, transparent 75%, rgba(255,255,255,.016) 75%);
+    background-size:24px 24px;
+    background-position:0 0,0 12px,12px -12px,-12px 0;
+  }
+  .source{
+    position:absolute;
+    width:14px;
+    height:14px;
+    border-radius:50%;
+    border:2px solid rgba(255,255,255,.95);
+    background:#000000;
+    transform:translate(-50%,-50%);
+    box-shadow:none;
+    cursor:grab;
+  }
+  .source::after{
+    content:"";
+    position:absolute;
+    inset:-7px;
+    border-radius:50%;
+    border:1px solid rgba(255,255,255,.16);
+  }
+  .source.dragging{cursor:grabbing}
+  .switches{
+    display:flex;
+    gap:18px;
+    flex-wrap:wrap;
+    margin:4px 0 2px;
+  }
+  .switches label{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    color:var(--soft);
+  }
+  input[type="checkbox"]{
+    width:16px;
+    height:16px;
+    accent-color:#ffffff;
+  }
+  .section-note{
+    margin-top:10px;
+    padding-top:10px;
+    border-top:1px solid var(--line);
+  }
+  .toolbar-wide{
+    grid-column:1 / -1;
+  }
+  @media (max-width: 1120px){
+    #app{grid-template-columns:360px minmax(0,1fr)}
+    .panel::after{left:359px}
+  }
+  @media (max-width: 960px){
+    #app{grid-template-columns:1fr;grid-template-rows:48vh 1fr}
+    .panel{
+      order:2;
+      border-right:none;
+      border-top:1px solid var(--line);
+      padding-top:14px;
+    }
+    .panel::after{display:none}
+    .viewer{order:1}
+    .toolbar{grid-template-columns:1fr 1fr}
+    .viewer-top{top:14px;left:14px;right:14px}
+    .canvas-wrap{padding:18px}
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <aside class="panel">
+    <div class="panel-head">
+      <div class="eyebrow">Leary</div>
+    </div>
+
+    <div class="toolbar">
+      <button class="btn primary" id="btnExportPng">PNG保存（全体）</button>
+      <button class="btn" id="btnExportViewPng">PNG保存（表示中そのまま）</button>
+      <button class="btn" id="btnExportSvg">SVG保存</button>
+      <button class="btn" id="btnRandomize">Seed変更</button>
+      <button class="btn toolbar-wide" id="btnResetView">表示リセット</button>
+    </div>
+
+    <div class="section">
+      <h3>状態</h3>
+      <div class="metrics">
+        <div class="metric">
+          <div class="metric-label">描画</div>
+          <div class="metric-value" id="statusRender">待機</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">進行</div>
+          <div class="metric-value mono" id="statusProgress">0%</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">線数</div>
+          <div class="metric-value mono" id="statusCount">0</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">ソース点</div>
+          <div class="metric-value mono" id="statusSwirls">0</div>
+        </div>
+        <div class="metric" style="grid-column:1 / -1">
+          <div class="metric-label">Seed</div>
+          <div class="metric-value mono" id="statusSeed">0</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>プリセット</h3>
+      <div class="grid-preset">
+        <button class="btn small" data-preset="monoBlack">白 / 黒</button>
+        <button class="btn small" data-preset="monoWhite">黒 / 白</button>
+        <button class="btn small" data-preset="denseInk">高密度</button>
+        <button class="btn small" data-preset="silverFog">薄層</button>
+        <button class="btn small" data-preset="ghostField">霧面</button>
+        <button class="btn small" data-preset="noirFlow">輪郭</button>
+        <button class="btn small" data-preset="paperVeil">余白</button>
+        <button class="btn small" data-preset="midnightMass">重層</button>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>出力</h3>
+      <div class="grid-2">
+        <div class="row"><label>幅</label><input id="width" type="number" min="64" step="1" /></div>
+        <div class="row"><label>高さ</label><input id="height" type="number" min="64" step="1" /></div>
+      </div>
+      <div class="row"><label>PNG倍率</label><input id="exportScale" type="number" min="1" max="8" step="1" /></div>
+      <div class="row"><label>プレビュー解像度</label><input id="previewScale" type="number" min="0.25" max="1" step="0.05" /></div>
+      <div class="row"><label>保存品質</label><select id="exportQuality"><option value="standard">standard</option><option value="high">high</option><option value="ultra">ultra</option></select></div>
+      <div class="row"><label>内部SSAA</label><input id="exportSupersample" type="number" min="1" max="2" step="0.25" /></div>
+      <div class="row"><label>保存分割描画</label><input id="exportBatchLines" type="number" min="10" max="4000" step="10" /></div>
+      <div class="switches">
+        <label><input id="exportAutoProtect" type="checkbox" checked /> 自動保護</label>
+        <label><input id="bgTransparent" type="checkbox" /> 背景透過</label>
+      </div>
+      <div class="section-note">
+        <div class="hint" id="exportEstimate">推定: 計算中</div>
+        <div class="hint">保存前に推定負荷を表示し、危険域では品質や内部倍率を自動で安全側へ落とします。</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>色</h3>
+      <div class="row"><label>背景色</label><input id="bgColor" type="color" /></div>
+      <div class="row"><label>色モード</label><select id="colorMode"><option value="sequence">順番</option><option value="linear">横位置グラデーション</option><option value="weighted">重みランダム</option></select></div>
+      <div class="colors" id="colors"></div>
+      <div class="inline">
+        <button class="btn small" id="btnAddColor">色追加</button>
+        <button class="btn small" id="btnRemoveColor">色削除</button>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>線</h3>
+      <div class="row"><label>lineCount</label><input id="lineCount" type="number" min="1" max="30000" step="1" /></div>
+      <div class="row"><label>lineWidthMin</label><input id="lineWidthMin" type="number" min="0.1" max="50" step="0.1" /></div>
+      <div class="row"><label>lineWidthMax</label><input id="lineWidthMax" type="number" min="0.1" max="50" step="0.1" /></div>
+      <div class="row"><label>opacity</label><input id="opacity" type="number" min="0" max="1" step="0.01" /></div>
+      <div class="row"><label>flowCoverage</label><input id="flowCoverage" type="number" min="0.1" max="20" step="0.1" /></div>
+      <div class="row"><label>generationWidth</label><input id="generationWidth" type="number" min="0.1" max="20" step="0.1" /></div>
+      <div class="row"><label>segmentResolution</label><input id="segmentResolution" type="number" min="0.1" max="20" step="0.1" /></div>
+      <div class="row"><label>batchLines</label><input id="batchLines" type="number" min="10" max="4000" step="10" /></div>
+    </div>
+
+    <div class="section">
+      <h3>変形</h3>
+      <div class="row"><label>swirlType</label><select id="swirlType"><option value="vortex">vortex</option><option value="attract">attract</option><option value="repel">repel</option></select></div>
+      <div class="row"><label>swirlRadius</label><input id="swirlRadius" type="number" min="1" max="10000" step="1" /></div>
+      <div class="row"><label>swirlStrength</label><input id="swirlStrength" type="number" min="0" max="10" step="0.01" /></div>
+      <div class="row"><label>curveTension</label><input id="curveTension" type="number" min="0" max="10" step="0.01" /></div>
+      <div class="row"><label>turbulence</label><input id="turbulence" type="number" min="0" max="200" step="0.1" /></div>
+      <div class="row"><label>turbulenceFreq</label><input id="turbulenceFreq" type="number" min="0.0001" max="1" step="0.0001" /></div>
+      <div class="row"><label>verticalStretch</label><input id="verticalStretch" type="number" min="0.1" max="10" step="0.01" /></div>
+      <div class="row"><label>renderShape</label><select id="renderShape"><option value="rect">rect</option><option value="circle">circle</option></select></div>
+    </div>
+
+    <div class="section">
+      <h3>ソース点</h3>
+      <div class="inline">
+        <button class="btn small" id="btnAddSwirl">追加</button>
+        <button class="btn small" id="btnRemoveSwirl">削除</button>
+        <button class="btn small" id="btnResetSwirls">再配置</button>
+      </div>
+      <div class="section-note">
+        <div class="hint">ソース点をドラッグして位置調整。ホイールで拡大縮小、ドラッグでパン。</div>
+      </div>
+    </div>
+
+    <div class="footer-space"></div>
+  </aside>
+
+  <main class="viewer checker" id="viewer">
+    <div class="viewer-top">
+      <div class="pill"><span>ホイール: ズーム</span><span>ドラッグ: パン</span></div>
+      <div class="pill"><span id="viewInfo">zoom 1.00</span></div>
+    </div>
+    <div class="canvas-wrap">
+      <div class="stage" id="stage">
+        <canvas id="canvas" width="1920" height="1080"></canvas>
+        <div id="overlay"></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+(() => {
+  'use strict';
+
+  const state = {
+    size: { width: 1920, height: 1080 },
+    exportScale: 2,
+    previewScale: 1,
+    exportQuality: 'high',
+    exportSupersample: 1.5,
+    exportBatchLines: 180,
+    exportAutoProtect: true,
+    seed: 123,
+    view: { x: 0, y: 0, zoom: 1 },
+    config: {
+      colors: [
+        { hex: '#ffffff', weight: 1 },
+        { hex: '#d0d0d0', weight: 1 },
+        { hex: '#8a8a8a', weight: 1 }
+      ],
+      colorMode: 'sequence',
+      bgColor: '#000000',
+      bgTransparent: false,
+      renderShape: 'rect',
+      lineCount: 900,
+      lineWidthMin: 0.8,
+      lineWidthMax: 3.8,
+      segmentResolution: 1.0,
+      flowCoverage: 3.8,
+      generationWidth: 4.2,
+      swirlRadius: 1100,
+      swirlStrength: 1.0,
+      swirlType: 'vortex',
+      curveTension: 0.5,
+      turbulence: 18,
+      turbulenceFreq: 0.01,
+      verticalStretch: 1.0,
+      opacity: 0.9,
+      batchLines: 250,
+    },
+    swirls: [],
+    baseLines: null,
+    drag: { mode: null, swirlId: null, startClientX: 0, startClientY: 0, startViewX: 0, startViewY: 0 },
+    compositeQueued: false,
+    geometryVersion: 0,
+    currentRenderToken: 0,
+    rendering: false,
+    interactionTimer: 0,
+    geometryDirty: true,
+    previewCache: document.createElement('canvas'),
+  };
+
+  const PRESETS = {
+    monoBlack: { bgColor: '#ffffff', bgTransparent: false, colors: [{hex:'#000000',weight:1},{hex:'#111111',weight:0.82},{hex:'#2b2b2b',weight:0.56}], lineCount: 950, lineWidthMin: 0.7, lineWidthMax: 3.0, turbulence: 10, swirlStrength: 1.1, batchLines: 300, flowCoverage: 3.8, generationWidth: 4.2, segmentResolution: 1.0, opacity: 0.92, renderShape: 'rect' },
+    monoWhite: { bgColor: '#000000', bgTransparent: false, colors: [{hex:'#ffffff',weight:1},{hex:'#e6e6e6',weight:0.78},{hex:'#8f8f8f',weight:0.36}], lineCount: 1000, lineWidthMin: 0.7, lineWidthMax: 3.4, turbulence: 14, swirlStrength: 1.2, batchLines: 300, flowCoverage: 3.8, generationWidth: 4.2, segmentResolution: 1.0, opacity: 0.94, renderShape: 'rect' },
+    denseInk: { bgColor: '#f7f7f7', bgTransparent: false, colors: [{hex:'#000000',weight:1},{hex:'#000000',weight:1},{hex:'#1a1a1a',weight:0.72}], lineCount: 2200, lineWidthMin: 0.5, lineWidthMax: 2.2, flowCoverage: 4.8, generationWidth: 5.5, segmentResolution: 0.8, turbulence: 8, swirlStrength: 1.0, batchLines: 180, opacity: 0.96, renderShape: 'rect' },
+    silverFog: { bgColor: '#ffffff', bgTransparent: false, colors: [{hex:'#ffffff',weight:0.08},{hex:'#d8d8d8',weight:0.7},{hex:'#909090',weight:0.58},{hex:'#1f1f1f',weight:0.18}], colorMode: 'weighted', lineCount: 1550, lineWidthMin: 0.35, lineWidthMax: 1.9, flowCoverage: 5.0, generationWidth: 5.0, segmentResolution: 0.72, turbulence: 5.8, turbulenceFreq: 0.0072, swirlRadius: 1320, swirlStrength: 0.98, curveTension: 0.68, opacity: 0.34, batchLines: 170, renderShape: 'circle' },
+    ghostField: { bgColor: '#000000', bgTransparent: false, colors: [{hex:'#ffffff',weight:0.16},{hex:'#d2d2d2',weight:0.62},{hex:'#787878',weight:0.44},{hex:'#1b1b1b',weight:0.14}], colorMode: 'weighted', lineCount: 1800, lineWidthMin: 0.3, lineWidthMax: 1.65, flowCoverage: 5.6, generationWidth: 6.0, segmentResolution: 0.68, turbulence: 5, turbulenceFreq: 0.0065, swirlRadius: 1500, swirlStrength: 0.92, curveTension: 0.8, opacity: 0.42, batchLines: 150, renderShape: 'circle' },
+    noirFlow: { bgColor: '#000000', bgTransparent: false, colors: [{hex:'#ffffff',weight:0.9},{hex:'#cfcfcf',weight:0.64},{hex:'#5f5f5f',weight:0.22}], colorMode: 'weighted', lineCount: 1280, lineWidthMin: 0.9, lineWidthMax: 4.2, flowCoverage: 4.1, generationWidth: 4.4, segmentResolution: 0.9, turbulence: 16, turbulenceFreq: 0.0105, swirlRadius: 980, swirlStrength: 1.22, curveTension: 0.52, opacity: 0.9, batchLines: 220, renderShape: 'rect' },
+    paperVeil: { bgColor: '#ffffff', bgTransparent: false, colors: [{hex:'#000000',weight:0.42},{hex:'#4c4c4c',weight:0.36},{hex:'#bdbdbd',weight:0.14}], colorMode: 'weighted', lineCount: 1200, lineWidthMin: 0.28, lineWidthMax: 1.2, flowCoverage: 5.9, generationWidth: 6.3, segmentResolution: 0.7, turbulence: 4.4, turbulenceFreq: 0.0062, swirlRadius: 1620, swirlStrength: 0.84, curveTension: 0.82, opacity: 0.22, batchLines: 160, renderShape: 'circle' },
+    midnightMass: { bgColor: '#000000', bgTransparent: false, colors: [{hex:'#ffffff',weight:1},{hex:'#f2f2f2',weight:0.85},{hex:'#8c8c8c',weight:0.3}], colorMode: 'weighted', lineCount: 2400, lineWidthMin: 0.5, lineWidthMax: 2.6, flowCoverage: 5.2, generationWidth: 5.7, segmentResolution: 0.76, turbulence: 9.5, turbulenceFreq: 0.0084, swirlRadius: 1220, swirlStrength: 1.04, curveTension: 0.63, opacity: 0.88, batchLines: 170, renderShape: 'rect' }
+  };
+
+  const $ = (id) => document.getElementById(id);
+  const canvas = $('canvas');
+  const ctx = canvas.getContext('2d', { alpha: true, desynchronized: true });
+  const stage = $('stage');
+  const overlay = $('overlay');
+  const viewer = $('viewer');
+
+  function clamp(v, min, max){ return Math.min(max, Math.max(min, v)); }
+  function round(v, d=3){ const p = 10**d; return Math.round(v*p)/p; }
+  function seededRandomFactory(seed){ let s = seed; return () => { const x = Math.sin(s++) * 10000; return x - Math.floor(x); }; }
+  function deepCopy(obj){ return JSON.parse(JSON.stringify(obj)); }
+
+  function updateStatus(text, progress){
+    $('statusRender').textContent = text;
+    if(typeof progress === 'number') $('statusProgress').textContent = `${Math.round(progress * 100)}%`;
+  }
+
+  function generateRandomLinesSOA(width, height, count, seed, rangeMultiplier){
+    const xs = new Float32Array(count);
+    const yRatios = new Float32Array(count);
+    const widths = new Float32Array(count);
+    const normalizedPos = new Float32Array(count);
+    const random = seededRandomFactory(seed);
+    const offsetMultiplier = rangeMultiplier * 0.4;
+    const totalWidth = width * rangeMultiplier;
+    const startX = -(width * offsetMultiplier);
+    for(let i=0;i<count;i++){
+      const x = (random() * width * rangeMultiplier) - (width * offsetMultiplier);
+      const norm = (x - startX) / totalWidth;
+      xs[i] = x;
+      yRatios[i] = (random() * 2.0) - 0.5;
+      widths[i] = random();
+      normalizedPos[i] = norm;
+    }
+    return { xs, yRatios, widths, normalizedPos, count };
+  }
+
+  function generateInitialSwirls(width, height, count){
+    const random = seededRandomFactory(state.seed * 17 + 11);
+    const arr = [];
+    for(let i=0;i<count;i++){
+      arr.push({ id: Date.now() + i + Math.floor(random()*9999), x: width * (0.28 + 0.44 * random()), y: height * (0.28 + 0.44 * random()) });
+    }
+    return arr;
+  }
+
+  function rebuildBaseLines(){
+    const { width, height } = state.size;
+    state.baseLines = generateRandomLinesSOA(width, height, state.config.lineCount, state.seed, state.config.generationWidth);
+    state.geometryDirty = true;
+    $('statusCount').textContent = String(state.config.lineCount);
+    $('statusSeed').textContent = String(state.seed);
+  }
+
+  function chooseColor(i, normalizedPos){
+    const colors = state.config.colors;
+    const mode = state.config.colorMode;
+    if(mode === 'linear') return colors[clamp(Math.floor(normalizedPos * colors.length), 0, colors.length - 1)];
+    if(mode === 'weighted'){
+      let total = 0;
+      for(const c of colors) total += Math.max(0.0001, Number(c.weight) || 0.0001);
+      let r = (((i + 1) * 2654435761) >>> 0) / 4294967295 * total;
+      for(const c of colors){
+        r -= Math.max(0.0001, Number(c.weight) || 0.0001);
+        if(r <= 0) return c;
+      }
+      return colors[colors.length - 1];
+    }
+    return colors[i % colors.length];
+  }
+
+  function linePoints(lineX, startY, endY, cfg, swirls){
+    const pts = [];
+    const maxRad = Math.PI * cfg.swirlStrength;
+    const s = Math.max(0.1, cfg.verticalStretch);
+    const stretchFactor = 1.0 / s;
+    const radiusSq = Math.max(1, cfg.swirlRadius * cfg.swirlRadius);
+    const safeTension = Math.min(cfg.curveTension, 5.0);
+    const turbFreqY = cfg.turbulenceFreq * stretchFactor;
+    const turbFreqX = cfg.turbulenceFreq;
+    const maxTurbulenceStep = cfg.turbulence > 0.1 ? (1.0 / (Math.max(0.001, cfg.turbulenceFreq) * 10)) : 100.0;
+    const minStep = Math.max(0.1, cfg.segmentResolution);
+    const maxStepAllowed = Math.min(50.0, maxTurbulenceStep);
+    let currentY = startY;
+    while(currentY <= endY){
+      let tx = lineX;
+      let ty = currentY;
+      if(cfg.turbulence > 0){
+        tx += Math.sin(ty * turbFreqY) * cfg.turbulence;
+        ty += Math.cos(lineX * turbFreqX) * cfg.turbulence;
+      }
+      let minDistToSwirlSq = Number.MAX_VALUE;
+      for(let j=0;j<swirls.length;j++){
+        const center = swirls[j];
+        const dx = tx - center.x;
+        const dy = (ty - center.y) * stretchFactor;
+        const distSq = dx*dx + dy*dy;
+        if(distSq < minDistToSwirlSq) minDistToSwirlSq = distSq;
+        const normDistSq = distSq / radiusSq;
+        const falloff = 1 / (1 + normDistSq * safeTension);
+        if(falloff > 0.00001){
+          const rdx = tx - center.x;
+          const rdy = ty - center.y;
+          if(cfg.swirlType === 'vortex'){
+            const angle = falloff * maxRad;
+            const cosA = Math.cos(angle);
+            const sinA = Math.sin(angle);
+            tx = center.x + cosA * rdx - sinA * rdy;
+            ty = center.y + sinA * rdx + cosA * rdy;
+          } else {
+            const force = falloff * cfg.swirlStrength * 0.02;
+            if(cfg.swirlType === 'attract'){ tx -= rdx * force; ty -= rdy * force; }
+            else { tx += rdx * force; ty += rdy * force; }
+          }
+        }
+      }
+      if(Number.isFinite(tx) && Number.isFinite(ty)) pts.push([tx, ty]);
+      const dist = Math.sqrt(minDistToSwirlSq);
+      const dynamicStep = Math.max(minStep, Math.min(maxStepAllowed, dist * 0.2));
+      currentY += dynamicStep;
+      if(currentY > endY && currentY < endY + dynamicStep) currentY = endY;
+      else if(currentY > endY) break;
+    }
+    return pts;
+  }
+
+  function drawPolyline(context, points){
+    if(points.length < 2) return;
+    context.beginPath();
+    context.moveTo(points[0][0], points[0][1]);
+    for(let i=1;i<points.length;i++) context.lineTo(points[i][0], points[i][1]);
+    context.stroke();
+  }
+
+  function setupBaseSurface(context, width, height, cfg){
+    context.setTransform(1,0,0,1,0,0);
+    context.clearRect(0,0,width,height);
+    if(!cfg.bgTransparent){
+      context.fillStyle = cfg.bgColor;
+      context.fillRect(0,0,width,height);
+    }
+    if(cfg.renderShape === 'circle'){
+      context.save();
+      context.beginPath();
+      const radius = Math.min(width, height) / 2 - 20;
+      context.arc(width/2, height/2, radius, 0, Math.PI*2);
+      context.clip();
+      if(!cfg.bgTransparent){
+        context.fillStyle = cfg.bgColor;
+        context.fillRect(0,0,width,height);
+      }
+    }
+    context.globalAlpha = cfg.opacity;
+    context.lineCap = 'round';
+    context.lineJoin = 'round';
+  }
+
+  function finishBaseSurface(context, cfg){
+    context.globalAlpha = 1;
+    context.setTransform(1,0,0,1,0,0);
+    if(cfg.renderShape === 'circle') context.restore();
+  }
+
+  function ensurePreviewCache(){
+    const w = Math.max(64, Math.round(state.size.width * state.previewScale));
+    const h = Math.max(64, Math.round(state.size.height * state.previewScale));
+    if(state.previewCache.width !== w || state.previewCache.height !== h){
+      state.previewCache.width = w;
+      state.previewCache.height = h;
+      state.geometryDirty = true;
+    }
+    return { width: w, height: h };
+  }
+
+  async function renderGeometryPreview(){
+    const token = ++state.currentRenderToken;
+    const cfg = state.config;
+    const { width, height } = ensurePreviewCache();
+    const scaleX = width / state.size.width;
+    const scaleY = height / state.size.height;
+    const baseLines = generateRandomLinesSOA(width, height, cfg.lineCount, state.seed, cfg.generationWidth);
+    const swirls = state.swirls.map(s => ({ id: s.id, x: s.x * scaleX, y: s.y * scaleY }));
+    const previewCfg = { ...cfg, swirlRadius: cfg.swirlRadius * Math.max(scaleX, scaleY), turbulence: cfg.turbulence * Math.max(scaleX, scaleY), lineWidthMin: cfg.lineWidthMin * Math.max(scaleX, scaleY), lineWidthMax: cfg.lineWidthMax * Math.max(scaleX, scaleY) };
+    const pctx = state.previewCache.getContext('2d', { alpha: true, desynchronized: true });
+
+    state.rendering = true;
+    updateStatus('描画中', 0);
+    setupBaseSurface(pctx, width, height, previewCfg);
+
+    const flowHalfLen = (height * previewCfg.flowCoverage) / 2;
+    const renderYMin = -500 * scaleY;
+    const renderYMax = height + 500 * scaleY;
+    const { xs, yRatios, widths, normalizedPos, count } = baseLines;
+    const batch = clamp(Math.round(cfg.batchLines), 10, 4000);
+
+    for(let start=0; start<count; start += batch){
+      if(token !== state.currentRenderToken) return;
+      const end = Math.min(count, start + batch);
+      for(let i=start;i<end;i++){
+        const colorDef = chooseColor(i, normalizedPos[i]);
+        const yCenter = yRatios[i] * height;
+        const startY = yCenter - flowHalfLen;
+        const endY = yCenter + flowHalfLen;
+        if(endY < renderYMin || startY > renderYMax) continue;
+        pctx.strokeStyle = colorDef.hex;
+        const baseW = previewCfg.lineWidthMin + widths[i] * (previewCfg.lineWidthMax - previewCfg.lineWidthMin);
+        pctx.lineWidth = Math.max(0.01, baseW * (Number(colorDef.weight) || 1));
+        drawPolyline(pctx, linePoints(xs[i], startY, endY, previewCfg, swirls));
+      }
+      updateStatus('描画中', end / count);
+      compositePreview();
+      await new Promise(requestAnimationFrame);
+    }
+
+    finishBaseSurface(pctx, previewCfg);
+    state.geometryDirty = false;
+    state.rendering = false;
+    updateStatus('待機', 1);
+    compositePreview();
+  }
+
+  function compositePreview(){
+    canvas.width = state.size.width;
+    canvas.height = state.size.height;
+    ctx.setTransform(1,0,0,1,0,0);
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    ctx.setTransform(state.view.zoom,0,0,state.view.zoom,state.view.x,state.view.y);
+    ctx.imageSmoothingEnabled = true;
+    ctx.drawImage(state.previewCache, 0, 0, state.size.width, state.size.height);
+    ctx.setTransform(1,0,0,1,0,0);
+    updateStageSize();
+    updateOverlay();
+  }
+
+  function scheduleComposite(){
+    if(state.compositeQueued) return;
+    state.compositeQueued = true;
+    requestAnimationFrame(() => {
+      state.compositeQueued = false;
+      compositePreview();
+    });
+  }
+
+  function scheduleGeometryRender(){
+    state.geometryDirty = true;
+    renderGeometryPreview().catch(err => {
+      console.error(err);
+      state.rendering = false;
+      updateStatus('エラー');
+      alert('描画中にエラーが発生しました。コンソールを確認してください。');
+    });
+  }
+
+  function scheduleAfterInteraction(){
+    window.clearTimeout(state.interactionTimer);
+    state.interactionTimer = window.setTimeout(() => {
+      if(state.geometryDirty && !state.rendering) scheduleGeometryRender();
+    }, 120);
+  }
+
+  function updateStageSize(){
+    const rect = viewer.getBoundingClientRect();
+    const fit = Math.min(rect.width / state.size.width, rect.height / state.size.height);
+    stage.style.width = (state.size.width * fit) + 'px';
+    stage.style.height = (state.size.height * fit) + 'px';
+    canvas.style.width = stage.style.width;
+    canvas.style.height = stage.style.height;
+    overlay.style.position = 'absolute';
+    overlay.style.inset = '0';
+    overlay.style.pointerEvents = 'none';
+  }
+
+  function worldToScreen(x, y){
+    const rect = canvas.getBoundingClientRect();
+    return {
+      x: (x * state.view.zoom + state.view.x) * (rect.width / state.size.width),
+      y: (y * state.view.zoom + state.view.y) * (rect.height / state.size.height),
+    };
+  }
+
+  function clientToWorld(clientX, clientY){
+    const rect = canvas.getBoundingClientRect();
+    const localX = (clientX - rect.left) * (state.size.width / rect.width);
+    const localY = (clientY - rect.top) * (state.size.height / rect.height);
+    return { x: (localX - state.view.x) / state.view.zoom, y: (localY - state.view.y) / state.view.zoom };
+  }
+
+  function updateOverlay(){
+    overlay.innerHTML = '';
+    $('statusSwirls').textContent = String(state.swirls.length);
+    $('viewInfo').textContent = `zoom ${state.view.zoom.toFixed(2)} / x ${Math.round(state.view.x)} / y ${Math.round(state.view.y)}`;
+    state.swirls.forEach(swirl => {
+      const p = worldToScreen(swirl.x, swirl.y);
+      const el = document.createElement('div');
+      el.className = 'source';
+      el.style.left = p.x + 'px';
+      el.style.top = p.y + 'px';
+      el.style.pointerEvents = 'auto';
+      el.dataset.id = String(swirl.id);
+      el.addEventListener('pointerdown', onSwirlPointerDown);
+      overlay.appendChild(el);
+    });
+  }
+
+  function onSwirlPointerDown(e){
+    e.preventDefault();
+    e.stopPropagation();
+    const id = Number(e.currentTarget.dataset.id);
+    state.drag.mode = 'swirl';
+    state.drag.swirlId = id;
+    e.currentTarget.classList.add('dragging');
+    window.addEventListener('pointermove', onPointerMove);
+    window.addEventListener('pointerup', onPointerUp, { once: true });
+  }
+
+  function onCanvasPointerDown(e){
+    if(e.button !== 0) return;
+    state.drag.mode = 'pan';
+    state.drag.startClientX = e.clientX;
+    state.drag.startClientY = e.clientY;
+    state.drag.startViewX = state.view.x;
+    state.drag.startViewY = state.view.y;
+    window.addEventListener('pointermove', onPointerMove);
+    window.addEventListener('pointerup', onPointerUp, { once: true });
+  }
+
+  function onPointerMove(e){
+    if(state.drag.mode === 'pan'){
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = state.size.width / rect.width;
+      const scaleY = state.size.height / rect.height;
+      state.view.x = state.drag.startViewX + (e.clientX - state.drag.startClientX) * scaleX;
+      state.view.y = state.drag.startViewY + (e.clientY - state.drag.startClientY) * scaleY;
+      scheduleComposite();
+      return;
+    }
+    if(state.drag.mode === 'swirl'){
+      const s = state.swirls.find(v => v.id === state.drag.swirlId);
+      if(!s) return;
+      const p = clientToWorld(e.clientX, e.clientY);
+      s.x = p.x;
+      s.y = p.y;
+      state.geometryDirty = true;
+      scheduleComposite();
+      updateOverlay();
+      scheduleAfterInteraction();
+    }
+  }
+
+  function onPointerUp(){
+    if(state.drag.mode === 'swirl') scheduleGeometryRender();
+    state.drag.mode = null;
+    state.drag.swirlId = null;
+    window.removeEventListener('pointermove', onPointerMove);
+    overlay.querySelectorAll('.source.dragging').forEach(el => el.classList.remove('dragging'));
+  }
+
+  function onWheel(e){
+    e.preventDefault();
+    const rect = canvas.getBoundingClientRect();
+    const mx = (e.clientX - rect.left) * (state.size.width / rect.width);
+    const my = (e.clientY - rect.top) * (state.size.height / rect.height);
+    const delta = -Math.sign(e.deltaY) * 0.1;
+    const newZoom = clamp(state.view.zoom * (1 + delta), 0.1, 10);
+    const worldX = (mx - state.view.x) / state.view.zoom;
+    const worldY = (my - state.view.y) / state.view.zoom;
+    state.view.x = mx - worldX * newZoom;
+    state.view.y = my - worldY * newZoom;
+    state.view.zoom = newZoom;
+    scheduleComposite();
+  }
+
+  function syncInputs(){
+    const map = {
+      width: state.size.width, height: state.size.height, exportScale: state.exportScale, previewScale: state.previewScale,
+      exportQuality: state.exportQuality, exportSupersample: state.exportSupersample, exportBatchLines: state.exportBatchLines, exportAutoProtect: state.exportAutoProtect,
+      bgTransparent: state.config.bgTransparent, bgColor: state.config.bgColor, colorMode: state.config.colorMode,
+      lineCount: state.config.lineCount, lineWidthMin: state.config.lineWidthMin, lineWidthMax: state.config.lineWidthMax,
+      opacity: state.config.opacity, flowCoverage: state.config.flowCoverage, generationWidth: state.config.generationWidth,
+      segmentResolution: state.config.segmentResolution, batchLines: state.config.batchLines,
+      swirlType: state.config.swirlType, swirlRadius: state.config.swirlRadius, swirlStrength: state.config.swirlStrength,
+      curveTension: state.config.curveTension, turbulence: state.config.turbulence, turbulenceFreq: state.config.turbulenceFreq,
+      verticalStretch: state.config.verticalStretch, renderShape: state.config.renderShape,
+    };
+    Object.entries(map).forEach(([id, value]) => {
+      const el = $(id);
+      if(!el) return;
+      if(el.type === 'checkbox') el.checked = !!value;
+      else el.value = String(value);
+    });
+    renderColorInputs();
+  }
+
+  function renderColorInputs(){
+    const wrap = $('colors');
+    wrap.innerHTML = '';
+    state.config.colors.forEach((c, idx) => {
+      const row = document.createElement('div');
+      row.className = 'color-item';
+      row.innerHTML = `
+        <input type="color" value="${c.hex}" data-role="hex" data-idx="${idx}">
+        <input type="number" min="0.01" max="10" step="0.01" value="${c.weight}" data-role="weight" data-idx="${idx}">
+        <button class="btn small danger" data-role="delete" data-idx="${idx}">×</button>`;
+      wrap.appendChild(row);
+    });
+    wrap.querySelectorAll('input,button').forEach(el => {
+      el.addEventListener('input', onColorInput);
+      el.addEventListener('click', onColorInput);
+    });
+  }
+
+  function onColorInput(e){
+    const role = e.target.dataset.role;
+    const idx = Number(e.target.dataset.idx);
+    if(role === 'hex') state.config.colors[idx].hex = e.target.value;
+    if(role === 'weight') state.config.colors[idx].weight = clamp(Number(e.target.value) || 1, 0.01, 10);
+    if(role === 'delete'){
+      if(state.config.colors.length <= 1) return;
+      state.config.colors.splice(idx, 1);
+      renderColorInputs();
+    }
+    scheduleGeometryRender();
+  }
+
+  function bindInputs(){
+    [
+      'width','height','exportScale','previewScale','exportQuality','exportSupersample','exportBatchLines','bgColor','colorMode','lineCount','lineWidthMin','lineWidthMax','opacity',
+      'flowCoverage','generationWidth','segmentResolution','batchLines','swirlType','swirlRadius','swirlStrength','curveTension',
+      'turbulence','turbulenceFreq','verticalStretch','renderShape'
+    ].forEach(id => {
+      $(id).addEventListener('input', () => {
+        if(id === 'width' || id === 'height'){
+          state.size[id] = clamp(Math.round(Number($(id).value) || 1), 64, 16384);
+          rebuildBaseLines();
+        } else if(id === 'exportScale') state.exportScale = clamp(Math.round(Number($(id).value) || 1), 1, 8);
+        else if(id === 'previewScale') state.previewScale = clamp(Number($(id).value) || 1, 0.25, 1);
+        else if(id === 'exportQuality') state.exportQuality = $(id).value;
+        else if(id === 'exportSupersample') state.exportSupersample = clamp(Number($(id).value) || 1, 1, 2);
+        else if(id === 'exportBatchLines') state.exportBatchLines = clamp(Math.round(Number($(id).value) || 180), 10, 4000);
+        else {
+          const numFields = new Set(['lineCount','lineWidthMin','lineWidthMax','opacity','flowCoverage','generationWidth','segmentResolution','batchLines','swirlRadius','swirlStrength','curveTension','turbulence','turbulenceFreq','verticalStretch']);
+          state.config[id] = numFields.has(id) ? Number($(id).value) : $(id).value;
+          if(id === 'lineCount' || id === 'generationWidth') rebuildBaseLines();
+        }
+        scheduleGeometryRender();
+        updateExportEstimate();
+      });
+    });
+
+    $('exportAutoProtect').addEventListener('change', () => { state.exportAutoProtect = $('exportAutoProtect').checked; updateExportEstimate(); });
+    $('bgTransparent').addEventListener('change', () => { state.config.bgTransparent = $('bgTransparent').checked; scheduleGeometryRender(); });
+    $('btnAddColor').addEventListener('click', () => { state.config.colors.push({ hex: '#ffffff', weight: 1 }); renderColorInputs(); scheduleGeometryRender(); });
+    $('btnRemoveColor').addEventListener('click', () => { if(state.config.colors.length > 1) state.config.colors.pop(); renderColorInputs(); scheduleGeometryRender(); });
+    $('btnAddSwirl').addEventListener('click', () => { state.swirls.push(...generateInitialSwirls(state.size.width, state.size.height, 1)); scheduleGeometryRender(); });
+    $('btnRemoveSwirl').addEventListener('click', () => { if(state.swirls.length > 1) state.swirls.pop(); scheduleGeometryRender(); });
+    $('btnResetSwirls').addEventListener('click', () => { state.swirls = generateInitialSwirls(state.size.width, state.size.height, Math.max(1, state.swirls.length)); scheduleGeometryRender(); });
+    $('btnRandomize').addEventListener('click', () => { state.seed = Math.floor(Math.random() * 1000000); rebuildBaseLines(); scheduleGeometryRender(); });
+    $('btnResetView').addEventListener('click', () => { state.view = { x: 0, y: 0, zoom: 1 }; scheduleComposite(); });
+    document.querySelectorAll('[data-preset]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        Object.assign(state.config, deepCopy(PRESETS[btn.dataset.preset]));
+        syncInputs();
+        updateExportEstimate();
+        rebuildBaseLines();
+        scheduleGeometryRender();
+        updateExportEstimate();
+      });
+    });
+    $('btnExportPng').addEventListener('click', exportPNG);
+    $('btnExportViewPng').addEventListener('click', exportCurrentViewPNG);
+    $('btnExportSvg').addEventListener('click', exportSVG);
+    canvas.addEventListener('pointerdown', onCanvasPointerDown);
+    viewer.addEventListener('wheel', onWheel, { passive: false });
+    window.addEventListener('resize', () => { updateStageSize(); updateOverlay(); scheduleComposite(); });
+  }
+
+
+
+  function formatBytes(bytes){
+    const units = ['B','KB','MB','GB'];
+    let v = bytes;
+    let i = 0;
+    while(v >= 1024 && i < units.length - 1){ v /= 1024; i++; }
+    return `${v >= 100 ? Math.round(v) : round(v, 1)} ${units[i]}`;
+  }
+
+  function estimateExportPlan(mode='full'){
+    const targetWidth = Math.max(1, Math.round(state.size.width * state.exportScale));
+    const targetHeight = Math.max(1, Math.round(state.size.height * state.exportScale));
+    const requestedQuality = state.exportQuality;
+    let effectiveQuality = requestedQuality;
+    let effectiveSupersample = state.exportQuality === 'standard' ? 1 : Math.max(1, state.exportSupersample);
+    let effectiveBatchLines = clamp(Math.round(state.exportBatchLines || 180), 10, 4000);
+
+    const applyProfile = () => {
+      if(effectiveQuality === 'ultra') return { detailMultiplier: 0.42, smoothing: 'high' };
+      if(effectiveQuality === 'high') return { detailMultiplier: 0.6, smoothing: 'high' };
+      effectiveSupersample = 1;
+      effectiveQuality = 'standard';
+      return { detailMultiplier: 1, smoothing: 'medium' };
+    };
+
+    let profile = applyProfile();
+    const requestedWorkWidth = Math.max(1, Math.round(targetWidth * effectiveSupersample));
+    const requestedWorkHeight = Math.max(1, Math.round(targetHeight * effectiveSupersample));
+
+    const estimateBytesFor = (ssaa) => {
+      const ww = Math.max(1, Math.round(targetWidth * ssaa));
+      const wh = Math.max(1, Math.round(targetHeight * ssaa));
+      const fullBytes = ww * wh * 4;
+      const outBytes = targetWidth * targetHeight * 4;
+      return Math.round(fullBytes * 3.2 + outBytes * 2.2 + state.config.lineCount * 96);
+    };
+
+    const warnings = [];
+    let estimatedBytes = estimateBytesFor(effectiveSupersample);
+    let risk = estimatedBytes > 900 * 1024 * 1024 ? 'critical' : estimatedBytes > 550 * 1024 * 1024 ? 'high' : estimatedBytes > 280 * 1024 * 1024 ? 'medium' : 'low';
+
+    if(state.exportAutoProtect){
+      while((estimatedBytes > 850 * 1024 * 1024 || targetWidth * targetHeight * effectiveSupersample * effectiveSupersample > 95_000_000) && (effectiveQuality !== 'standard' || effectiveSupersample > 1)){
+        if(effectiveSupersample > 1.5) effectiveSupersample = 1.5;
+        else if(effectiveSupersample > 1.25) effectiveSupersample = 1.25;
+        else if(effectiveSupersample > 1) effectiveSupersample = 1;
+        else if(effectiveQuality === 'ultra') effectiveQuality = 'high';
+        else if(effectiveQuality === 'high') effectiveQuality = 'standard';
+        profile = applyProfile();
+        estimatedBytes = estimateBytesFor(effectiveSupersample);
+      }
+      if(estimatedBytes > 700 * 1024 * 1024){
+        effectiveBatchLines = Math.min(effectiveBatchLines, 120);
+        warnings.push('分割描画を強めます');
+      }
+      if(effectiveQuality !== requestedQuality) warnings.push(`品質 ${requestedQuality} → ${effectiveQuality}`);
+      if(Math.abs(effectiveSupersample - (state.exportQuality === 'standard' ? 1 : Math.max(1, state.exportSupersample))) > 1e-9) warnings.push(`SSAA ${state.exportSupersample} → ${effectiveSupersample}`);
+    }
+
+    const workWidth = Math.max(1, Math.round(targetWidth * effectiveSupersample));
+    const workHeight = Math.max(1, Math.round(targetHeight * effectiveSupersample));
+    estimatedBytes = estimateBytesFor(effectiveSupersample);
+    risk = estimatedBytes > 900 * 1024 * 1024 ? 'critical' : estimatedBytes > 550 * 1024 * 1024 ? 'high' : estimatedBytes > 280 * 1024 * 1024 ? 'medium' : 'low';
+    if(mode === 'view' && state.view.zoom > 2.5) warnings.push('表示中保存では高ズームでエッジ負荷が増えます');
+    return {
+      targetWidth, targetHeight, workWidth, workHeight,
+      requestedQuality, effectiveQuality,
+      requestedSupersample: state.exportQuality === 'standard' ? 1 : Math.max(1, state.exportSupersample),
+      effectiveSupersample, effectiveBatchLines,
+      detailMultiplier: profile.detailMultiplier,
+      smoothing: profile.smoothing,
+      estimatedBytes, megapixels: (workWidth * workHeight) / 1_000_000,
+      risk, warnings,
+    };
+  }
+
+  function updateExportEstimate(){
+    const el = $('exportEstimate');
+    if(!el) return;
+    const plan = estimateExportPlan('full');
+    const riskMap = { low: '低', medium: '中', high: '高', critical: '危険' };
+    const auto = state.exportAutoProtect ? 'ON' : 'OFF';
+    const changed = [];
+    if(plan.effectiveQuality !== plan.requestedQuality) changed.push(`品質 ${plan.effectiveQuality}`);
+    if(Math.abs(plan.effectiveSupersample - plan.requestedSupersample) > 1e-9) changed.push(`SSAA ${plan.effectiveSupersample}`);
+    let text = `推定: ${plan.targetWidth}×${plan.targetHeight} / 作業 ${plan.workWidth}×${plan.workHeight} / 約${formatBytes(plan.estimatedBytes)} / リスク ${riskMap[plan.risk]} / 自動保護 ${auto}`;
+    if(changed.length) text += ` / 自動調整: ${changed.join(', ')}`;
+    el.textContent = text;
+    el.style.color = plan.risk === 'critical' ? '#ff8f8f' : plan.risk === 'high' ? '#ffbe78' : plan.risk === 'medium' ? '#e9d27a' : '#9a9a9a';
+  }
+
+  function getExportProfile(plan){
+    const q = state.exportQuality;
+    if(q === 'ultra') return { detailMultiplier: 0.42, supersample: state.exportSupersample, batchLines: state.exportBatchLines, smoothing: 'high' };
+    if(q === 'high') return { detailMultiplier: 0.6, supersample: Math.max(1, state.exportSupersample), batchLines: state.exportBatchLines, smoothing: 'high' };
+    return { detailMultiplier: 1, supersample: 1, batchLines: Math.max(60, state.exportBatchLines), smoothing: 'medium' };
+  }
+
+  async function renderFullToContextBatched(context, width, height, cfg, baseLines, swirls, progressLabel){
+    setupBaseSurface(context, width, height, cfg);
+    const flowHalfLen = (height * cfg.flowCoverage) / 2;
+    const renderYMin = -500;
+    const renderYMax = height + 500;
+    const { xs, yRatios, widths, normalizedPos, count } = baseLines;
+    const batch = clamp(Math.round(cfg.batchLines || state.exportBatchLines || 180), 10, 4000);
+    for(let start=0; start<count; start += batch){
+      const end = Math.min(count, start + batch);
+      for(let i=start;i<end;i++){
+        const colorDef = chooseColor(i, normalizedPos[i]);
+        const yCenter = yRatios[i] * height;
+        const startY = yCenter - flowHalfLen;
+        const endY = yCenter + flowHalfLen;
+        if(endY < renderYMin || startY > renderYMax) continue;
+        context.strokeStyle = colorDef.hex;
+        const baseW = cfg.lineWidthMin + widths[i] * (cfg.lineWidthMax - cfg.lineWidthMin);
+        context.lineWidth = Math.max(0.01, baseW * (Number(colorDef.weight) || 1));
+        drawPolyline(context, linePoints(xs[i], startY, endY, cfg, swirls));
+      }
+      updateStatus(progressLabel, end / Math.max(1, count));
+      await new Promise(requestAnimationFrame);
+    }
+    finishBaseSurface(context, cfg);
+  }
+
+  async function exportPNGAdvanced(mode){
+    const preserveView = mode === 'view';
+    const label = preserveView ? 'PNG出力中（表示中）' : 'PNG出力中';
+    updateStatus(label, 0);
+    const plan = estimateExportPlan(mode);
+    const targetWidth = plan.targetWidth;
+    const targetHeight = plan.targetHeight;
+    const profile = getExportProfile(plan);
+    const supersample = profile.supersample;
+    const workWidth = plan.workWidth;
+    const workHeight = plan.workHeight;
+    if(plan.warnings.length) updateStatus(`${label} / ${plan.warnings.join(' / ')}`, 0);
+
+    const full = document.createElement('canvas');
+    full.width = workWidth;
+    full.height = workHeight;
+    const fullCtx = full.getContext('2d', { alpha: true });
+
+    const baseLines = generateRandomLinesSOA(workWidth, workHeight, state.config.lineCount, state.seed, state.config.generationWidth);
+    const swirls = state.swirls.map(s => ({ id: s.id, x: s.x * state.exportScale * supersample, y: s.y * state.exportScale * supersample }));
+    const exportCfg = {
+      ...state.config,
+      segmentResolution: Math.max(0.08, state.config.segmentResolution * profile.detailMultiplier),
+      swirlRadius: state.config.swirlRadius * state.exportScale * supersample,
+      turbulence: state.config.turbulence * state.exportScale * supersample,
+      lineWidthMin: Math.max(0.05, state.config.lineWidthMin * state.exportScale * supersample),
+      lineWidthMax: Math.max(0.05, state.config.lineWidthMax * state.exportScale * supersample),
+      batchLines: profile.batchLines,
+    };
+
+    await renderFullToContextBatched(fullCtx, workWidth, workHeight, exportCfg, baseLines, swirls, label);
+
+    const out = document.createElement('canvas');
+    out.width = targetWidth;
+    out.height = targetHeight;
+    const outCtx = out.getContext('2d', { alpha: true });
+
+    outCtx.setTransform(1,0,0,1,0,0);
+    outCtx.clearRect(0,0,targetWidth,targetHeight);
+    if(!state.config.bgTransparent){
+      outCtx.fillStyle = state.config.bgColor;
+      outCtx.fillRect(0,0,targetWidth,targetHeight);
+    }
+    outCtx.imageSmoothingEnabled = true;
+    outCtx.imageSmoothingQuality = profile.smoothing;
+    if(preserveView){
+      outCtx.setTransform(
+        state.view.zoom,
+        0,
+        0,
+        state.view.zoom,
+        state.view.x * state.exportScale,
+        state.view.y * state.exportScale
+      );
+      outCtx.drawImage(full, 0, 0, workWidth / supersample, workHeight / supersample);
+      outCtx.setTransform(1,0,0,1,0,0);
+    } else {
+      outCtx.drawImage(full, 0, 0, targetWidth, targetHeight);
+    }
+
+    out.toBlob(blob => {
+      if(!blob){ updateStatus('PNG失敗', 0); alert('PNG保存に失敗しました'); return; }
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = preserveView ? `Leary_fixed_v5_view_${targetWidth}x${targetHeight}.png` : `Leary_fixed_v5_${targetWidth}x${targetHeight}.png`;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      updateStatus('待機', 1);
+    }, 'image/png');
+  }
+
+  function renderFullToContext(context, width, height, cfg, baseLines, swirls){
+    setupBaseSurface(context, width, height, cfg);
+    const flowHalfLen = (height * cfg.flowCoverage) / 2;
+    const renderYMin = -500;
+    const renderYMax = height + 500;
+    const { xs, yRatios, widths, normalizedPos, count } = baseLines;
+    for(let i=0;i<count;i++){
+      const colorDef = chooseColor(i, normalizedPos[i]);
+      const yCenter = yRatios[i] * height;
+      const startY = yCenter - flowHalfLen;
+      const endY = yCenter + flowHalfLen;
+      if(endY < renderYMin || startY > renderYMax) continue;
+      context.strokeStyle = colorDef.hex;
+      const baseW = cfg.lineWidthMin + widths[i] * (cfg.lineWidthMax - cfg.lineWidthMin);
+      context.lineWidth = Math.max(0.01, baseW * (Number(colorDef.weight) || 1));
+      drawPolyline(context, linePoints(xs[i], startY, endY, cfg, swirls));
+    }
+    finishBaseSurface(context, cfg);
+  }
+
+
+  function renderTransformedImageToContext(outputCtx, sourceCanvas){
+    outputCtx.setTransform(1,0,0,1,0,0);
+    outputCtx.clearRect(0,0,outputCtx.canvas.width, outputCtx.canvas.height);
+    if(!state.config.bgTransparent){
+      outputCtx.fillStyle = state.config.bgColor;
+      outputCtx.fillRect(0,0,outputCtx.canvas.width, outputCtx.canvas.height);
+    }
+    outputCtx.imageSmoothingEnabled = true;
+    outputCtx.imageSmoothingQuality = 'high';
+    outputCtx.setTransform(
+      state.view.zoom,
+      0,
+      0,
+      state.view.zoom,
+      state.view.x * state.exportScale,
+      state.view.y * state.exportScale
+    );
+    outputCtx.drawImage(sourceCanvas, 0, 0);
+    outputCtx.setTransform(1,0,0,1,0,0);
+  }
+
+  async function exportCurrentViewPNG(){
+    return exportPNGAdvanced('view');
+  }
+
+  async function exportPNG(){
+    return exportPNGAdvanced('full');
+  }
+
+  function svgEsc(str){ return String(str).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  function exportSVG(){
+    updateStatus('SVG出力中', 0);
+    const width = state.size.width;
+    const height = state.size.height;
+    const cfg = state.config;
+    const baseLines = state.baseLines;
+    const flowHalfLen = (height * cfg.flowCoverage) / 2;
+    const renderYMin = -500;
+    const renderYMax = height + 500;
+    const { xs, yRatios, widths, normalizedPos, count } = baseLines;
+    let svg = `<?xml version="1.0" encoding="UTF-8"?>\n`;
+    svg += `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}">`;
+    if(cfg.renderShape === 'circle'){
+      const r = Math.min(width, height) / 2 - 20;
+      svg += `<defs><clipPath id="clipCircle"><circle cx="${width/2}" cy="${height/2}" r="${r}"/></clipPath></defs><g clip-path="url(#clipCircle)">`;
+    }
+    if(!cfg.bgTransparent) svg += `<rect width="100%" height="100%" fill="${svgEsc(cfg.bgColor)}"/>`;
+    for(let i=0;i<count;i++){
+      const colorDef = chooseColor(i, normalizedPos[i]);
+      const yCenter = yRatios[i] * height;
+      const startY = yCenter - flowHalfLen;
+      const endY = yCenter + flowHalfLen;
+      if(endY < renderYMin || startY > renderYMax) continue;
+      const baseW = cfg.lineWidthMin + widths[i] * (cfg.lineWidthMax - cfg.lineWidthMin);
+      const strokeW = Math.max(0.01, baseW * (Number(colorDef.weight) || 1));
+      const points = linePoints(xs[i], startY, endY, cfg, state.swirls);
+      if(points.length < 2) continue;
+      const d = points.map((p, idx) => `${idx===0 ? 'M' : 'L'} ${round(p[0],2)} ${round(p[1],2)}`).join(' ');
+      svg += `<path d="${d}" fill="none" stroke="${svgEsc(colorDef.hex)}" stroke-width="${round(strokeW,3)}" stroke-linecap="round" stroke-linejoin="round" opacity="${cfg.opacity}"/>`;
+    }
+    if(cfg.renderShape === 'circle') svg += `</g>`;
+    svg += `</svg>`;
+    const blob = new Blob([svg], { type: 'image/svg+xml;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Leary_fixed_v5_${width}x${height}.svg`;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    updateStatus('待機', 1);
+  }
+
+  function init(){
+    state.swirls = generateInitialSwirls(state.size.width, state.size.height, 1);
+    syncInputs();
+    bindInputs();
+    rebuildBaseLines();
+    ensurePreviewCache();
+    updateExportEstimate();
+    scheduleGeometryRender();
+  }
+
+  init();
+})();
+</script>
+</body>
+</html>
