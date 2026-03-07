@@ -1,24 +1,59 @@
-try:
-    ai_response = model.generate_content(prompt)
-    raw = getattr(ai_response, "text", "") or ""
-    print(f"[DEBUG] title={entry.title}")
-    print(f"[DEBUG] raw_length={len(raw)}")
-    print(f"[DEBUG] raw_preview={raw[:300]!r}")
+name: Daily Nursing News Update
 
-    raw = raw.strip()
-    if not raw:
-        print(f"[WARN] Gemini returned empty text: {entry.title}")
-        continue
+on:
+  schedule:
+    - cron: '0 22 * * *'
+    - cron: '0 3 * * *'
+    - cron: '0 8 * * *'
+  workflow_dispatch:
 
-    if "SUMMARY:" in raw and "GENRE:" in raw:
-        ai_summary = raw.split("GENRE:")[0].replace("SUMMARY:", "").strip()
-        genre_raw = raw.split("GENRE:")[-1].strip()
-        genre = genre_raw if genre_raw in GENRES else "その他"
-    else:
-        print(f"[WARN] Gemini format mismatch: {entry.title}")
-        ai_summary = raw
-        genre = "その他"
+jobs:
+  update-news:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
-except Exception as e:
-    print(f"[AI ERROR] title={entry.title} url={article_url} error={repr(e)}")
-    continue
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install feedparser google-generativeai requests beautifulsoup4
+
+      - name: Verify files
+        run: |
+          pwd
+          ls -la
+          test -f update_news.py
+
+      - name: Run updater
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          python update_news.py
+
+      - name: Show git diff
+        run: |
+          git status
+          git diff -- articles_data.json seen_urls.json nurse-news.html || true
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add articles_data.json seen_urls.json nurse-news.html
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+          git commit -m "Automated update: nursing news"
+          git push
