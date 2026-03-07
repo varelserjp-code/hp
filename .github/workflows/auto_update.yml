@@ -1,16 +1,14 @@
-name: Auto Update Nurse News
+name: Daily Nursing News Update
 
 on:
   schedule:
-    # 毎日日本時間の朝7時に実行するロジック（UTCで前日22時を指定）
+    # 毎日日本時間の朝7時に実行
     - cron: '0 22 * * *'
-  workflow_dispatch: # 手動で即時実行するためのトリガー
+  workflow_dispatch: # 手動実行用
 
 jobs:
   update-news:
     runs-on: ubuntu-latest
-    # 【メカニズム】リポジトリの設定画面を操作する手間を省くため、
-    # この設計図自体に「ファイルの上書き保存権限」を付与しています。
     permissions:
       contents: write
 
@@ -24,14 +22,14 @@ jobs:
           python-version: '3.10'
 
       - name: 必要なライブラリのインストール
-        run: pip install feedparser google-generativeai
+        run: pip install feedparser google-generativeai requests beautifulsoup4
 
       - name: AI要約プログラムの実行
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: python update_news.py
 
-      - name: 変更されたHTMLをGitHubに保存（自動コミット）
+      - name: 変更されたHTMLをGitHubに保存
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
