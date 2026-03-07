@@ -1,5 +1,4 @@
 import os
-import re
 import feedparser
 import requests
 from bs4 import BeautifulSoup
@@ -14,8 +13,13 @@ RSS_SOURCES = [
     {"name": "MedlinePlus (Health News)", "url": "https://medlineplus.gov/feeds/news_en.xml"}
 ]
 
-# 2. AIの初期設定
-genai.configure(api_key=os.environ["GEMINI_API_KEY"])
+# 2. AIの初期設定とエラーチェック
+api_key = os.environ.get("GEMINI_API_KEY")
+if not api_key:
+    print("Error: GEMINI_API_KEY is not set in GitHub Secrets.")
+    exit(1)
+
+genai.configure(api_key=api_key)
 model = genai.GenerativeModel('gemini-2.5-flash')
 
 new_html_content = ""
@@ -30,7 +34,6 @@ for source in RSS_SOURCES:
         latest_entry = feed.entries[0]
         article_url = latest_entry.link
         
-        # 元記事のURLにアクセスし、テキストを抽出するロジック
         full_text = ""
         try:
             headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
@@ -44,7 +47,6 @@ for source in RSS_SOURCES:
             print(f"Scraping failed for {article_url}: {scrape_error}")
             full_text = latest_entry.summary if 'summary' in latest_entry else ''
 
-        # AIへのプロンプト
         prompt = f"""
         以下の英語の医療・看護系ニュース（元記事の抽出テキスト）を、日本の現役看護師向けに【1000文字以内】でわかりやすく日本語に翻訳・要約してください。
         情報のエビデンスやメカニズムが正確に伝わるよう、専門用語を適切に用いて論理的に解説してください。
@@ -57,7 +59,6 @@ for source in RSS_SOURCES:
         response = model.generate_content(prompt)
         ai_summary = response.text
 
-        # 4. 取得・要約した内容と「ソース・引用元」をHTMLとしてフォーマット
         new_html_content += f"""
           <article style="margin-bottom: 40px; padding-bottom: 20px; border-bottom: 1px solid #eee;">
             <h3 style="font-size: 18px; margin-bottom: 10px;">{latest_entry.title}</h3>
@@ -74,15 +75,35 @@ for source in RSS_SOURCES:
         print(f"Error processing {source['name']}: {e}")
         continue
 
-# 5. nurse-news.html の読み込みと物理的な書き換え処理
-file_path = "nurse-news.html"
-with open(file_path, "r", encoding="utf-8") as file:
-    html_data = file.read()
+# 4. HTMLファイルを「丸ごと」上書き生成する（手作業でのHTML修正を不要にするロジック）
+final_html = f"""<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Nursing News | VARELSER</title>
+  <style>
+    :root{{ --bg:#fff; --fg:#111; --muted:rgba(0,0,0,.55); }}
+    body{{ margin:0; background:var(--bg); color:var(--fg); font-family: ui-sans-serif, system-ui, -apple-system, "Hiragino Kaku Gothic ProN","Noto Sans JP", sans-serif; line-height: 1.6; }}
+    .container {{ max-width: 800px; margin: 0 auto; padding: 40px 20px; }}
+    h1 {{ font-size: 24px; margin-bottom: 40px; border-bottom: 1px solid #eee; padding-bottom: 10px; }}
+    .back-link {{ display: inline-block; margin-bottom: 30px; color: var(--muted); text-decoration: none; font-size: 14px; }}
+    .back-link:hover {{ color: var(--fg); }}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a href="/" class="back-link">← ホームに戻る</a>
+    <h1>最新の医療・看護ニュース</h1>
+    <p style="color:var(--muted); font-size:14px; margin-bottom:30px;">
+      海外の最新医療ニュースをAIで要約し、定期配信しています。
+    </p>
+    {new_html_content}
+  </div>
+</body>
+</html>"""
 
-pattern = r"()(.*?)()"
-updated_html = re.sub(pattern, rf"\1\n{new_html_content}\n\3", html_data, flags=re.DOTALL)
+with open("nurse-news.html", "w", encoding="utf-8") as file:
+    file.write(final_html)
 
-with open(file_path, "w", encoding="utf-8") as file:
-    file.write(updated_html)
-
-print("要約テキストの更新が完了しました。")
+print("ニュースページの完全上書き生成が完了しました。")
