@@ -1,0 +1,2825 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Punkt - local halftone and stipple processor. Offline single-file build with presets, compare, masks, history, multilayer rendering, and optimized exports." />
+  <title>Punkt - Full Suite Oldstyle</title>
+  <style>
+    :root {
+      --bg: #050507;
+      --panel: rgba(12,12,14,0.94);
+      --panel-2: rgba(255,255,255,0.035);
+      --line: rgba(255,255,255,0.08);
+      --line-2: rgba(255,255,255,0.05);
+      --text: #f5f5f7;
+      --muted: #8a8a96;
+      --muted-2: #646470;
+      --ok: #10b981;
+      --busy: #60a5fa;
+      --danger: #ff8b8b;
+      --shadow: 0 -20px 50px rgba(0,0,0,0.5);
+      color-scheme: dark;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 50% 0%, rgba(255,255,255,0.05), transparent 34%),
+        linear-gradient(180deg, #0a0a0d 0%, #050506 100%);
+      color: var(--text);
+    }
+    button, input, select { font: inherit; }
+    .app {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .preview {
+      position: relative;
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow: hidden;
+    }
+    .preview-toolbar {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      z-index: 8;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 10px;
+      border-radius: 14px;
+      background: rgba(0,0,0,0.46);
+      border: 1px solid var(--line);
+      backdrop-filter: blur(14px);
+      box-shadow: 0 18px 50px rgba(0,0,0,0.3);
+      max-width: calc(100vw - 28px);
+    }
+    .preview-toolbar .left,
+    .preview-toolbar .right {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+    }
+    .preview-toolbar .left { min-width: min(36vw, 320px); }
+    .small {
+      font-size: 10px;
+      line-height: 1.4;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .small.primary {
+      color: #f1f1f4;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: none;
+      font-size: 12px;
+    }
+    .canvas-wrap {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: 68px 14px 10px;
+      background-image:
+        linear-gradient(45deg, rgba(255,255,255,0.035) 25%, transparent 25%),
+        linear-gradient(-45deg, rgba(255,255,255,0.035) 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, rgba(255,255,255,0.035) 75%),
+        linear-gradient(-45deg, transparent 75%, rgba(255,255,255,0.035) 75%);
+      background-size: 24px 24px;
+      background-position: 0 0, 0 12px, 12px -12px, -12px 0;
+    }
+    .canvas-holder {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+    }
+    .scene-wrap {
+      position: relative;
+      display: inline-block;
+      transform: translateY(-32px);
+      border-radius: 4px;
+      border: 1px solid rgba(255,255,255,0.06);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.38);
+      overflow: hidden;
+      background: transparent;
+      cursor: default;
+      touch-action: none;
+    }
+    .scene-wrap.masking { cursor: crosshair; }
+    .scene-wrap canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+    #previewCanvas, #maskCanvas {
+      position: absolute;
+      inset: 0;
+    }
+    #previewCanvas { z-index: 1; }
+    #maskCanvas { z-index: 2; pointer-events: none; }
+    .compare-split {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: rgba(255,255,255,0.88);
+      box-shadow: 0 0 0 1px rgba(0,0,0,0.4), 0 0 18px rgba(255,255,255,0.18);
+      z-index: 3;
+      display: none;
+      pointer-events: none;
+    }
+    .compare-split.show { display: block; }
+    .compare-labels {
+      position: absolute;
+      inset: 12px 12px auto 12px;
+      display: none;
+      justify-content: space-between;
+      z-index: 4;
+      pointer-events: none;
+    }
+    .compare-labels.show { display: flex; }
+    .compare-chip {
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: rgba(0,0,0,0.72);
+      border: 1px solid rgba(255,255,255,0.08);
+      font: 700 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #f4f4f7;
+    }
+    .overlay {
+      position: absolute;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,0,0,0.56);
+      backdrop-filter: blur(4px);
+      border-radius: 18px;
+      z-index: 10;
+    }
+    .overlay.show { display: flex; }
+    .overlay-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      padding: 18px 20px;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      background: rgba(12,12,15,0.92);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.38);
+    }
+    .spinner {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 3px solid rgba(255,255,255,0.16);
+      border-top-color: white;
+      animation: spin 0.9s linear infinite;
+    }
+    .control-dock {
+      position: relative;
+      flex: 0 0 auto;
+      pointer-events: none;
+      z-index: 20;
+    }
+    .control-dock > * { pointer-events: auto; }
+    .nodes-pill {
+      position: absolute;
+      left: 50%;
+      top: -40px;
+      transform: translateX(-50%);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: rgba(0,0,0,0.8);
+      border: 1px solid rgba(255,255,255,0.10);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.3);
+      backdrop-filter: blur(16px);
+      white-space: nowrap;
+    }
+    .node-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--ok);
+      box-shadow: 0 0 8px rgba(16,185,129,0.7);
+    }
+    .node-dot.busy {
+      background: var(--busy);
+      box-shadow: 0 0 8px rgba(96,165,250,0.8);
+      animation: pulse 0.9s infinite alternate;
+    }
+    .nodes-pill span {
+      color: var(--muted);
+      font: 600 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+    .dock-shell {
+      background: var(--panel);
+      backdrop-filter: blur(24px);
+      border-top: 1px solid rgba(255,255,255,0.10);
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+    }
+    .dock-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      min-height: 56px;
+      padding: 10px 18px;
+      border-bottom: 1px solid var(--line-2);
+      background: rgba(255,255,255,0.01);
+    }
+    .dock-left, .dock-right, .dock-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+      flex-wrap: wrap;
+    }
+    .brand {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      color: #ffffff;
+      text-transform: uppercase;
+      opacity: 0.92;
+    }
+    .divider {
+      width: 1px;
+      height: 14px;
+      background: rgba(255,255,255,0.10);
+      flex: 0 0 auto;
+    }
+    .upload-inline {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      opacity: 0.72;
+      transition: opacity 140ms ease;
+      user-select: none;
+    }
+    .upload-inline:hover, .upload-inline.drag { opacity: 1; }
+    .upload-chip {
+      width: 24px;
+      height: 24px;
+      display: grid;
+      place-items: center;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.10);
+      color: #d4d4db;
+      font-size: 12px;
+      transition: background 140ms ease;
+    }
+    .upload-inline:hover .upload-chip,
+    .upload-inline.drag .upload-chip { background: rgba(255,255,255,0.18); }
+    .upload-inline span {
+      font-size: 10px;
+      font-weight: 700;
+      color: #cfd0d7;
+      text-transform: uppercase;
+      letter-spacing: 0.10em;
+      white-space: nowrap;
+    }
+    .processing {
+      color: var(--busy);
+      font: 700 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      animation: pulse 0.9s infinite alternate;
+      display: none;
+    }
+    .processing.show { display: inline-block; }
+    .btn, .mode, .toggle, .scale, .toolchip, .pill, .select, .preset-list button {
+      appearance: none;
+      border: 1px solid rgba(255,255,255,0.06);
+      background: rgba(255,255,255,0.05);
+      color: #d6d7de;
+      border-radius: 8px;
+      min-height: 32px;
+      padding: 0 12px;
+      cursor: pointer;
+      transition: background 140ms ease, color 140ms ease, border-color 140ms ease, transform 140ms ease, opacity 140ms ease;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+    }
+    .btn:hover, .mode:hover, .toggle:hover, .scale:hover, .toolchip:hover, .pill:hover, .preset-list button:hover {
+      background: rgba(255,255,255,0.10);
+      color: #f2f2f6;
+      transform: translateY(-1px);
+    }
+    .btn:disabled, .mode:disabled, .toggle:disabled, .scale:disabled, .toolchip:disabled, .pill:disabled, .select:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      transform: none;
+    }
+    .mode.active, .toggle.active, .scale.active, .toolchip.active, .pill.active {
+      background: #f0f0f2;
+      color: #0b0b0f;
+      border-color: rgba(255,255,255,0.9);
+      box-shadow: 0 0 15px rgba(255,255,255,0.12);
+    }
+    .btn.subtle { color: var(--muted); }
+    .btn.danger { color: var(--danger); }
+    .toggle-compact {
+      width: 32px;
+      min-width: 32px;
+      min-height: 32px;
+      padding: 0;
+      font-size: 15px;
+      line-height: 1;
+      letter-spacing: 0;
+    }
+    .dock-details {
+      overflow: auto;
+      max-height: 90vh;
+      opacity: 1;
+      transition: max-height 260ms cubic-bezier(0.32,0.72,0,1), opacity 180ms ease;
+    }
+    body.dock-collapsed .dock-details {
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+    }
+    .dock-grid {
+      max-width: 1880px;
+      margin: 0 auto;
+      padding: 22px 28px 24px;
+      display: grid;
+      grid-template-columns: 190px minmax(360px, 1fr) minmax(360px, 1fr) minmax(340px, 420px);
+      gap: 28px;
+    }
+    .dock-col {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+    .dock-col.bordered {
+      padding-left: 28px;
+      border-left: 1px solid var(--line-2);
+    }
+    .section-title {
+      margin: 0 0 4px;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--muted-2);
+    }
+    .stack { display: flex; flex-direction: column; gap: 8px; }
+    .stack.tight { gap: 6px; }
+    .mode-row { display: flex; flex-direction: column; gap: 6px; }
+    .mode {
+      min-height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 12px;
+      text-transform: none;
+      letter-spacing: 0.14em;
+    }
+    .mode.active::after {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #0a0a0c;
+    }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px 24px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      min-width: 0;
+    }
+    .field.wide { grid-column: 1 / -1; }
+    .label-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      font-size: 10px;
+      color: var(--muted);
+      line-height: 1.3;
+    }
+    .label-row .label {
+      color: #d9d9e1;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .label-row .value {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      background: rgba(255,255,255,0.05);
+      padding: 2px 6px;
+      border-radius: 6px;
+      opacity: 0.8;
+      white-space: nowrap;
+    }
+    .range, .number, .mini-note, input[type="color"], .text, .select {
+      width: 100%;
+    }
+    .range {
+      appearance: none;
+      height: 8px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.08);
+      outline: none;
+    }
+    .range::-webkit-slider-thumb {
+      appearance: none;
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      background: #f2f2f4;
+      border: none;
+      box-shadow: 0 0 0 2px rgba(0,0,0,0.35);
+      cursor: pointer;
+    }
+    .range::-moz-range-thumb {
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      background: #f2f2f4;
+      border: none;
+      cursor: pointer;
+    }
+    .toggle-row, .scale-row, .button-row, .tool-row {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .scale-row { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .tool-row.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .feature-card > .label-row {
+      min-height: 20px;
+      align-items: center;
+      margin-bottom: 2px;
+    }
+    .feature-card .tool-row {
+      align-items: stretch;
+    }
+    .feature-card .toolchip {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      line-height: 1.1;
+      padding: 0 10px 1px;
+    }
+    .feature-card .value {
+      display: inline-flex;
+      align-items: center;
+      min-height: 20px;
+    }
+    .color-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .color-field { display: flex; flex-direction: column; gap: 8px; }
+    .color-field input[type="color"] {
+      height: 34px;
+      padding: 4px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.04);
+    }
+    .number, .text, .select {
+      min-height: 34px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.04);
+      color: var(--text);
+      padding: 0 10px;
+    }
+    .select { text-transform: none; letter-spacing: 0.02em; }
+    .mini-note, .hint {
+      margin: 0;
+      font-size: 10px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    .meta-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .meta-item {
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.04);
+      min-width: 0;
+    }
+    .meta-item strong {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--muted-2);
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+    .meta-item span {
+      display: block;
+      color: #d5d5dc;
+      font-size: 10px;
+      line-height: 1.45;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      word-break: break-word;
+    }
+    .message {
+      min-height: 18px;
+      color: var(--muted);
+      font-size: 10px;
+      line-height: 1.5;
+      margin: 0;
+      white-space: pre-wrap;
+    }
+    .card {
+      padding: 12px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+    .curve-canvas {
+      width: 100%;
+      height: 120px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.06);
+      background: rgba(255,255,255,0.03);
+      display: block;
+    }
+    .preset-list, .seed-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .preset-list button, .seed-list button {
+      min-height: 28px;
+      padding: 0 10px;
+      text-transform: none;
+      letter-spacing: 0.04em;
+      font-size: 10px;
+    }
+    .inline-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .inline-row > * { min-width: 0; }
+    .grow { flex: 1 1 auto; }
+    .mask-legend {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    .legend-chip {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.05);
+      font-size: 10px;
+      color: var(--muted);
+    }
+    .legend-color {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex: 0 0 auto;
+    }
+    .tool-note {
+      font-size: 10px;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes pulse { from { opacity: 0.56; } to { opacity: 1; } }
+    @media (max-width: 1460px) {
+      .dock-grid { grid-template-columns: 180px 1fr 1fr; }
+      .dock-col.bordered:last-child { grid-column: 1 / -1; }
+    }
+    @media (max-width: 1120px) {
+      .dock-grid { grid-template-columns: 1fr 1fr; }
+      .dock-col.bordered:last-child { grid-column: auto; }
+      .dock-col.bordered:nth-child(3), .dock-col.bordered:nth-child(4) { grid-column: 1 / -1; }
+    }
+    @media (max-width: 860px) {
+      .preview-toolbar { top: 10px; left: 10px; right: 10px; max-width: none; }
+      .canvas-wrap { padding: 58px 12px 10px; }
+      .dock-top { padding: 10px 12px; }
+      .dock-grid { padding: 18px 14px 20px; grid-template-columns: 1fr; gap: 18px; }
+      .dock-col.bordered { padding-left: 0; border-left: 0; padding-top: 6px; border-top: 1px solid var(--line-2); }
+    }
+    @media (max-width: 680px) {
+      .preview-toolbar { display: none; }
+      .button-row, .toggle-row, .scale-row, .grid-2, .grid-3, .color-wrap, .meta-grid, .tool-row, .mask-legend { grid-template-columns: 1fr; }
+      .canvas-wrap { padding: 8px; }
+      .nodes-pill { top: -34px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <input id="fileInput" type="file" accept="image/*" hidden />
+
+    <main class="preview">
+      <div class="preview-toolbar">
+        <div class="left">
+          <span class="small primary" id="previewTitle">Preview</span>
+          <span class="small" id="previewSub">Waiting for image</span>
+        </div>
+        <div class="right">
+          <span class="small">Dimensions</span>
+          <span class="small primary" id="previewDims">—</span>
+        </div>
+      </div>
+      <div class="canvas-wrap" id="canvasWrap">
+        <div class="canvas-holder" id="canvasHolder">
+          <div class="scene-wrap" id="sceneWrap" aria-label="preview canvas area">
+            <canvas id="previewCanvas"></canvas>
+            <canvas id="maskCanvas"></canvas>
+            <div class="compare-split" id="compareSplit"></div>
+            <div class="compare-labels" id="compareLabels">
+              <span class="compare-chip" id="compareLabelA">A</span>
+              <span class="compare-chip" id="compareLabelB">B</span>
+            </div>
+          </div>
+          <div class="overlay" id="overlay">
+            <div class="overlay-card">
+              <div class="spinner"></div>
+              <div id="overlayText">Processing</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <div class="control-dock">
+      <div class="nodes-pill">
+        <span class="node-dot" id="statusDot"></span>
+        <span><span id="nodeCount">0</span> nodes</span>
+      </div>
+      <div class="dock-shell">
+        <div class="dock-top">
+          <div class="dock-left">
+            <span class="brand">Punkt</span>
+            <span class="divider"></span>
+            <label class="upload-inline" id="uploadDrop" tabindex="0" role="button" aria-label="Load image">
+              <span class="upload-chip">↑</span>
+              <span>Load Image</span>
+            </label>
+            <span class="processing" id="statusText">Processing...</span>
+          </div>
+          <div class="dock-right">
+            <div class="dock-actions">
+              <button class="btn subtle" id="reprocessBtn" disabled>Reprocess</button>
+              <button class="btn subtle" id="undoBtn" disabled>Undo</button>
+              <button class="btn subtle" id="redoBtn" disabled>Redo</button>
+              <button class="btn danger" id="clearBtn" disabled>Clear</button>
+              <button class="btn" id="exportPngBtn" disabled>Export PNG</button>
+              <button class="btn" id="exportViewBtn" disabled>Export View</button>
+              <button class="btn" id="exportSvgBtn" disabled>SVG</button>
+            </div>
+            <span class="divider"></span>
+            <button class="btn toggle-compact" id="collapseBtn" aria-expanded="true" title="Collapse controls">▾</button>
+          </div>
+        </div>
+
+        <div class="dock-details" id="dockDetails">
+          <div class="dock-grid">
+            <section class="dock-col">
+              <h2 class="section-title">Algorithm</h2>
+              <div class="mode-row" id="modeRow">
+                <button class="mode active" data-mode="HALFTONE">HALFTONE</button>
+                <button class="mode" data-mode="STIPPLE">STIPPLE</button>
+                <button class="mode" data-mode="POISSON">POISSON</button>
+              </div>
+              <div class="card stack tight feature-card preview-card">
+                <div class="label-row"><span class="label">Preview</span><span class="value" id="previewModeValue">Single</span></div>
+                <div class="tool-row three" id="previewModeRow">
+                  <button class="toolchip active" data-preview-mode="single">Single</button>
+                  <button class="toolchip" data-preview-mode="split">Split</button>
+                  <button class="toolchip" data-preview-mode="overlay">Overlay</button>
+                </div>
+                <label class="field">
+                  <span class="label-row"><span class="label">Split / Overlay</span><span class="value" id="compareMixValue">50 %</span></span>
+                  <input class="range" type="range" id="compareMix" min="0" max="100" step="1" />
+                </label>
+                <div class="tool-row">
+                  <button class="toolchip" id="captureABtn" disabled>Capture A</button>
+                  <button class="toolchip" id="captureBBtn" disabled>Capture B</button>
+                </div>
+                <div class="tool-row">
+                  <button class="toolchip" id="swapCompareBtn" disabled>Swap A/B</button>
+                  <button class="toolchip" id="clearCompareBtn" disabled>Clear Compare</button>
+                </div>
+              </div>
+              <div class="card stack tight feature-card mask-card">
+                <div class="label-row"><span class="label">Mask</span><span class="value" id="maskModeValue">Off</span></div>
+                <div class="tool-row three" id="maskModeRow">
+                  <button class="toolchip active" data-mask-mode="off">Off</button>
+                  <button class="toolchip" data-mask-mode="erase">Erase</button>
+                  <button class="toolchip" data-mask-mode="keep">Keep</button>
+                </div>
+                <div class="tool-row three" id="maskModeRow2">
+                  <button class="toolchip" data-mask-mode="boost">Boost</button>
+                  <button class="toolchip" data-mask-mode="smooth">Smooth</button>
+                  <button class="toolchip" id="clearMaskBtn" disabled>Clear</button>
+                </div>
+                <label class="field">
+                  <span class="label-row"><span class="label">Brush</span><span class="value" id="brushSizeValue"></span></span>
+                  <input class="range" type="range" id="brushSize" min="4" max="320" step="1" />
+                </label>
+                <label class="field">
+                  <span class="label-row"><span class="label">Softness</span><span class="value" id="brushSoftnessValue"></span></span>
+                  <input class="range" type="range" id="brushSoftness" min="0" max="100" step="1" />
+                </label>
+                <label class="field">
+                  <span class="label-row"><span class="label">Mask Opacity</span><span class="value" id="maskOpacityValue"></span></span>
+                  <input class="range" type="range" id="maskOpacity" min="0" max="100" step="1" />
+                </label>
+                <div class="mask-legend">
+                  <div class="legend-chip"><span class="legend-color" style="background:#ff5f6d"></span><span>erase</span></div>
+                  <div class="legend-chip"><span class="legend-color" style="background:#6ee7b7"></span><span>keep</span></div>
+                  <div class="legend-chip"><span class="legend-color" style="background:#60a5fa"></span><span>boost</span></div>
+                </div>
+              </div>
+            </section>
+
+            <section class="dock-col bordered">
+              <h2 class="section-title">Parameters</h2>
+              <div class="grid-2">
+                <label class="field">
+                  <span class="label-row"><span class="label">Min Size</span><span class="value" id="minDotSizeValue"></span></span>
+                  <input class="range" type="range" id="minDotSize" min="0.1" max="50" step="0.1" />
+                </label>
+                <label class="field">
+                  <span class="label-row"><span class="label">Max Size</span><span class="value" id="maxDotSizeValue"></span></span>
+                  <input class="range" type="range" id="maxDotSize" min="0.1" max="50" step="0.1" />
+                </label>
+                <label class="field">
+                  <span class="label-row"><span class="label">Grid Spacing</span><span class="value" id="spacingValue"></span></span>
+                  <input class="range" type="range" id="spacing" min="1" max="80" step="1" />
+                </label>
+                <label class="field">
+                  <span class="label-row"><span class="label">Contrast</span><span class="value" id="contrastValue"></span></span>
+                  <input class="range" type="range" id="contrast" min="0.4" max="4" step="0.05" />
+                </label>
+                <label class="field wide">
+                  <span class="label-row"><span class="label">Threshold</span><span class="value" id="thresholdValue"></span></span>
+                  <input class="range" type="range" id="threshold" min="0" max="1" step="0.01" />
+                </label>
+                <label class="field">
+                  <span class="label-row"><span class="label">Shadow Size</span><span class="value" id="shadowBoostValue"></span></span>
+                  <input class="range" type="range" id="shadowBoost" min="-1" max="2" step="0.01" />
+                </label>
+                <label class="field">
+                  <span class="label-row"><span class="label">Highlight Size</span><span class="value" id="highlightBoostValue"></span></span>
+                  <input class="range" type="range" id="highlightBoost" min="-1" max="2" step="0.01" />
+                </label>
+                <label class="field wide">
+                  <span class="label-row"><span class="label">Edge Weight</span><span class="value" id="edgeBoostValue"></span></span>
+                  <input class="range" type="range" id="edgeBoost" min="0" max="3" step="0.01" />
+                </label>
+                <label class="field">
+                  <span class="label-row"><span class="label">Margin</span><span class="value" id="marginPxValue"></span></span>
+                  <input class="range" type="range" id="marginPx" min="0" max="400" step="1" />
+                </label>
+                <label class="field">
+                  <span class="label-row"><span class="label">Preview Budget</span><span class="value" id="previewBudgetValue"></span></span>
+                  <input class="range" type="range" id="previewBudget" min="500" max="200000" step="500" />
+                </label>
+              </div>
+              <div class="stack">
+                <div class="toggle-row">
+                  <button class="toggle" id="invertBtn">Invert</button>
+                  <button class="toggle" id="transparentBtn">No BG</button>
+                </div>
+                <div class="toggle-row">
+                  <button class="toggle active" id="autoQualityBtn">Auto Quality</button>
+                  <button class="toggle" id="optimizeSvgBtn">Optimize SVG</button>
+                </div>
+              </div>
+              <div class="card stack tight">
+                <div class="label-row"><span class="label">Density Curve</span><span class="value" id="curveSummary">0 / 0 / 0</span></div>
+                <canvas id="curveCanvas" class="curve-canvas" width="640" height="240"></canvas>
+                <div class="grid-3">
+                  <label class="field">
+                    <span class="label-row"><span class="label">Shadow</span><span class="value" id="curveShadowValue"></span></span>
+                    <input class="range" type="range" id="curveShadow" min="-1" max="1" step="0.01" />
+                  </label>
+                  <label class="field">
+                    <span class="label-row"><span class="label">Mid</span><span class="value" id="curveMidValue"></span></span>
+                    <input class="range" type="range" id="curveMid" min="-1" max="1" step="0.01" />
+                  </label>
+                  <label class="field">
+                    <span class="label-row"><span class="label">High</span><span class="value" id="curveHighValue"></span></span>
+                    <input class="range" type="range" id="curveHigh" min="-1" max="1" step="0.01" />
+                  </label>
+                </div>
+              </div>
+            </section>
+
+            <section class="dock-col bordered">
+              <h2 class="section-title">Layers & Library</h2>
+              <div class="stack">
+                <div class="label-row"><span class="label">Layers</span><span class="value" id="layerSummary">Base / Edge / Accent</span></div>
+                <div class="toggle-row">
+                  <button class="toggle active" id="baseLayerBtn">Base</button>
+                  <button class="toggle active" id="edgeLayerBtn">Edge</button>
+                </div>
+                <div class="toggle-row">
+                  <button class="toggle active" id="accentLayerBtn">Accent</button>
+                  <button class="toggle active" id="asSeenExportBtn">Match Preview</button>
+                </div>
+                <div class="color-wrap">
+                  <label class="color-field">
+                    <span class="label-row"><span class="label">Ink</span><span class="value" id="inkValue"></span></span>
+                    <input id="inkColor" type="color" />
+                  </label>
+                  <label class="color-field">
+                    <span class="label-row"><span class="label">Paper</span><span class="value" id="paperValue"></span></span>
+                    <input id="paperColor" type="color" />
+                  </label>
+                  <label class="color-field">
+                    <span class="label-row"><span class="label">Accent</span><span class="value" id="accentValue"></span></span>
+                    <input id="accentColor" type="color" />
+                  </label>
+                  <label class="color-field">
+                    <span class="label-row"><span class="label">Edge</span><span class="value" id="edgeColorValue"></span></span>
+                    <input id="edgeColor" type="color" />
+                  </label>
+                </div>
+                <div class="grid-2">
+                  <label class="field">
+                    <span class="label-row"><span class="label">Base Opacity</span><span class="value" id="baseOpacityValue"></span></span>
+                    <input class="range" type="range" id="baseOpacity" min="0" max="100" step="1" />
+                  </label>
+                  <label class="field">
+                    <span class="label-row"><span class="label">Edge Opacity</span><span class="value" id="edgeOpacityValue"></span></span>
+                    <input class="range" type="range" id="edgeOpacity" min="0" max="100" step="1" />
+                  </label>
+                  <label class="field">
+                    <span class="label-row"><span class="label">Accent Opacity</span><span class="value" id="accentOpacityValue"></span></span>
+                    <input class="range" type="range" id="accentOpacity" min="0" max="100" step="1" />
+                  </label>
+                  <label class="field">
+                    <span class="label-row"><span class="label">Edge Threshold</span><span class="value" id="edgeThresholdValue"></span></span>
+                    <input class="range" type="range" id="edgeThreshold" min="0" max="1" step="0.01" />
+                  </label>
+                  <label class="field">
+                    <span class="label-row"><span class="label">Accent Threshold</span><span class="value" id="accentThresholdValue"></span></span>
+                    <input class="range" type="range" id="accentThreshold" min="0" max="1" step="0.01" />
+                  </label>
+                  <label class="field">
+                    <span class="label-row"><span class="label">Accent Scale</span><span class="value" id="accentScaleValue"></span></span>
+                    <input class="range" type="range" id="accentScale" min="0.2" max="3" step="0.01" />
+                  </label>
+                </div>
+              </div>
+              <div class="card stack tight">
+                <div class="label-row"><span class="label">Presets</span><span class="value" id="presetCountValue">0</span></div>
+                <div class="inline-row">
+                  <input class="text grow" id="presetName" type="text" maxlength="48" placeholder="preset name" />
+                  <button class="pill" id="savePresetBtn">Save</button>
+                </div>
+                <div class="preset-list" id="presetList"></div>
+                <div class="inline-row">
+                  <button class="pill" id="exportPresetBtn">Copy JSON</button>
+                  <button class="pill" id="importPresetBtn">Paste JSON</button>
+                </div>
+              </div>
+              <div class="card stack tight">
+                <div class="label-row"><span class="label">Seed Library</span><span class="value" id="seedCountValue">0</span></div>
+                <div class="inline-row">
+                  <input class="text grow" id="seedName" type="text" maxlength="40" placeholder="seed label" />
+                  <button class="pill" id="saveSeedBtn">Save</button>
+                </div>
+                <div class="inline-row">
+                  <button class="pill" id="randomSeedBtn">Randomize</button>
+                  <button class="pill" id="applySeedBtn">Apply</button>
+                </div>
+                <div class="seed-list" id="seedList"></div>
+              </div>
+            </section>
+
+            <section class="dock-col bordered">
+              <h2 class="section-title">Output</h2>
+              <div class="stack">
+                <label class="field">
+                  <span class="label-row"><span class="label">Seed</span><span class="value">integer</span></span>
+                  <input class="number" id="seedInput" type="number" min="0" max="2147483647" step="1" />
+                </label>
+                <div class="field">
+                  <span class="label-row"><span class="label">Output Scale</span><span class="value" id="actualScaleText">1x</span></span>
+                  <div class="scale-row" id="scaleRow">
+                    <button class="scale active" data-scale="1">1x</button>
+                    <button class="scale" data-scale="2">2x</button>
+                    <button class="scale" data-scale="4">4x</button>
+                    <button class="scale" data-scale="8">8x</button>
+                  </div>
+                </div>
+                <label class="field">
+                  <span class="label-row"><span class="label">SVG Precision</span><span class="value" id="svgPrecisionValue"></span></span>
+                  <input class="range" type="range" id="svgPrecision" min="0" max="4" step="1" />
+                </label>
+                <p class="hint" id="exportHint">PNG scale is clamped to a visible safe limit for the current image size. SVG keeps the requested scale and is the fallback for very large outputs.</p>
+                <div class="meta-grid">
+                  <div class="meta-item"><strong>Image</strong><span id="imageMeta">No image loaded</span></div>
+                  <div class="meta-item"><strong>Points</strong><span id="pointMeta">0</span></div>
+                  <div class="meta-item"><strong>Safe PNG</strong><span id="safeScaleMeta">—</span></div>
+                  <div class="meta-item"><strong>Last Process</strong><span id="processMeta">—</span></div>
+                  <div class="meta-item"><strong>Mask</strong><span id="maskMeta">No mask</span></div>
+                  <div class="meta-item"><strong>Compare</strong><span id="compareMeta">A: no / B: no</span></div>
+                </div>
+                <p class="message" id="message"></p>
+              </div>
+            </section>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+  (() => {
+    'use strict';
+
+    const STORAGE_PRESETS = 'punkt_presets_v3';
+    const STORAGE_SEEDS = 'punkt_seed_library_v3';
+    const MAX_CANVAS_DIM = 16384;
+    const MAX_CANVAS_PIXELS = 120_000_000;
+    const PREVIEW_BATCH = 2500;
+    const EXPORT_BATCH = 6000;
+    const MODES = ['HALFTONE', 'STIPPLE', 'POISSON'];
+    const MASK_BASE = 100;
+    const DEFAULTS = Object.freeze({
+      mode: 'HALFTONE',
+      minDotSize: 1,
+      maxDotSize: 8,
+      spacing: 6,
+      threshold: 0.2,
+      invert: false,
+      contrast: 1,
+      color: '#ffffff',
+      edgeColor: '#ffffff',
+      accentColor: '#60a5fa',
+      backgroundColor: '#000000',
+      transparentBackground: false,
+      exportScale: 1,
+      seed: 1,
+      shadowBoost: 0.35,
+      highlightBoost: -0.15,
+      edgeBoost: 0.55,
+      curveShadow: 0,
+      curveMid: 0,
+      curveHigh: 0,
+      marginPx: 24,
+      previewBudget: 40000,
+      autoQuality: true,
+      optimizeSvg: true,
+      svgPrecision: 2,
+      maskMode: 'off',
+      brushSize: 64,
+      brushSoftness: 55,
+      maskOpacity: 45,
+      previewMode: 'single',
+      compareMix: 50,
+      baseLayer: true,
+      edgeLayer: true,
+      accentLayer: true,
+      baseOpacity: 100,
+      edgeOpacity: 50,
+      accentOpacity: 48,
+      edgeThreshold: 0.28,
+      accentThreshold: 0.72,
+      accentScale: 1.35,
+      asSeenExport: true,
+      compareLabelA: 'A',
+      compareLabelB: 'B'
+    });
+
+    const state = {
+      config: { ...DEFAULTS },
+      source: null,
+      records: null,
+      pointCount: 0,
+      pointMeta: null,
+      isProcessing: false,
+      isExporting: false,
+      lastProcessMs: null,
+      fit: null,
+      renderToken: 0,
+      processToken: 0,
+      worker: null,
+      workerReady: false,
+      workerPendingSource: false,
+      objectUrl: null,
+      uiCollapsed: false,
+      previewRaster: null,
+      compareA: null,
+      compareB: null,
+      maskData: null,
+      maskDirty: false,
+      maskImageData: null,
+      historyUndo: [],
+      historyRedo: [],
+      suppressHistory: false,
+      currentPointer: null,
+      localPresets: [],
+      seedLibrary: [],
+      scheduledProcessTimer: 0
+    };
+
+    const els = {
+      fileInput: document.getElementById('fileInput'),
+      uploadDrop: document.getElementById('uploadDrop'),
+      reprocessBtn: document.getElementById('reprocessBtn'),
+      undoBtn: document.getElementById('undoBtn'),
+      redoBtn: document.getElementById('redoBtn'),
+      clearBtn: document.getElementById('clearBtn'),
+      exportPngBtn: document.getElementById('exportPngBtn'),
+      exportViewBtn: document.getElementById('exportViewBtn'),
+      exportSvgBtn: document.getElementById('exportSvgBtn'),
+      invertBtn: document.getElementById('invertBtn'),
+      transparentBtn: document.getElementById('transparentBtn'),
+      autoQualityBtn: document.getElementById('autoQualityBtn'),
+      optimizeSvgBtn: document.getElementById('optimizeSvgBtn'),
+      baseLayerBtn: document.getElementById('baseLayerBtn'),
+      edgeLayerBtn: document.getElementById('edgeLayerBtn'),
+      accentLayerBtn: document.getElementById('accentLayerBtn'),
+      asSeenExportBtn: document.getElementById('asSeenExportBtn'),
+      scaleRow: document.getElementById('scaleRow'),
+      modeRow: document.getElementById('modeRow'),
+      previewModeRow: document.getElementById('previewModeRow'),
+      maskModeRow: document.getElementById('maskModeRow'),
+      maskModeRow2: document.getElementById('maskModeRow2'),
+      previewCanvas: document.getElementById('previewCanvas'),
+      maskCanvas: document.getElementById('maskCanvas'),
+      sceneWrap: document.getElementById('sceneWrap'),
+      canvasHolder: document.getElementById('canvasHolder'),
+      canvasWrap: document.getElementById('canvasWrap'),
+      overlay: document.getElementById('overlay'),
+      overlayText: document.getElementById('overlayText'),
+      message: document.getElementById('message'),
+      statusDot: document.getElementById('statusDot'),
+      statusText: document.getElementById('statusText'),
+      nodeCount: document.getElementById('nodeCount'),
+      collapseBtn: document.getElementById('collapseBtn'),
+      dockDetails: document.getElementById('dockDetails'),
+      imageMeta: document.getElementById('imageMeta'),
+      pointMeta: document.getElementById('pointMeta'),
+      safeScaleMeta: document.getElementById('safeScaleMeta'),
+      processMeta: document.getElementById('processMeta'),
+      maskMeta: document.getElementById('maskMeta'),
+      compareMeta: document.getElementById('compareMeta'),
+      previewTitle: document.getElementById('previewTitle'),
+      previewSub: document.getElementById('previewSub'),
+      previewDims: document.getElementById('previewDims'),
+      exportHint: document.getElementById('exportHint'),
+      actualScaleText: document.getElementById('actualScaleText'),
+      minDotSize: document.getElementById('minDotSize'),
+      maxDotSize: document.getElementById('maxDotSize'),
+      spacing: document.getElementById('spacing'),
+      contrast: document.getElementById('contrast'),
+      threshold: document.getElementById('threshold'),
+      shadowBoost: document.getElementById('shadowBoost'),
+      highlightBoost: document.getElementById('highlightBoost'),
+      edgeBoost: document.getElementById('edgeBoost'),
+      marginPx: document.getElementById('marginPx'),
+      previewBudget: document.getElementById('previewBudget'),
+      minDotSizeValue: document.getElementById('minDotSizeValue'),
+      maxDotSizeValue: document.getElementById('maxDotSizeValue'),
+      spacingValue: document.getElementById('spacingValue'),
+      contrastValue: document.getElementById('contrastValue'),
+      thresholdValue: document.getElementById('thresholdValue'),
+      shadowBoostValue: document.getElementById('shadowBoostValue'),
+      highlightBoostValue: document.getElementById('highlightBoostValue'),
+      edgeBoostValue: document.getElementById('edgeBoostValue'),
+      marginPxValue: document.getElementById('marginPxValue'),
+      previewBudgetValue: document.getElementById('previewBudgetValue'),
+      inkColor: document.getElementById('inkColor'),
+      paperColor: document.getElementById('paperColor'),
+      accentColor: document.getElementById('accentColor'),
+      edgeColor: document.getElementById('edgeColor'),
+      inkValue: document.getElementById('inkValue'),
+      paperValue: document.getElementById('paperValue'),
+      accentValue: document.getElementById('accentValue'),
+      edgeColorValue: document.getElementById('edgeColorValue'),
+      seedInput: document.getElementById('seedInput'),
+      brushSize: document.getElementById('brushSize'),
+      brushSoftness: document.getElementById('brushSoftness'),
+      maskOpacity: document.getElementById('maskOpacity'),
+      brushSizeValue: document.getElementById('brushSizeValue'),
+      brushSoftnessValue: document.getElementById('brushSoftnessValue'),
+      maskOpacityValue: document.getElementById('maskOpacityValue'),
+      curveCanvas: document.getElementById('curveCanvas'),
+      curveShadow: document.getElementById('curveShadow'),
+      curveMid: document.getElementById('curveMid'),
+      curveHigh: document.getElementById('curveHigh'),
+      curveShadowValue: document.getElementById('curveShadowValue'),
+      curveMidValue: document.getElementById('curveMidValue'),
+      curveHighValue: document.getElementById('curveHighValue'),
+      curveSummary: document.getElementById('curveSummary'),
+      baseOpacity: document.getElementById('baseOpacity'),
+      edgeOpacity: document.getElementById('edgeOpacity'),
+      accentOpacity: document.getElementById('accentOpacity'),
+      edgeThreshold: document.getElementById('edgeThreshold'),
+      accentThreshold: document.getElementById('accentThreshold'),
+      accentScale: document.getElementById('accentScale'),
+      baseOpacityValue: document.getElementById('baseOpacityValue'),
+      edgeOpacityValue: document.getElementById('edgeOpacityValue'),
+      accentOpacityValue: document.getElementById('accentOpacityValue'),
+      edgeThresholdValue: document.getElementById('edgeThresholdValue'),
+      accentThresholdValue: document.getElementById('accentThresholdValue'),
+      accentScaleValue: document.getElementById('accentScaleValue'),
+      svgPrecision: document.getElementById('svgPrecision'),
+      svgPrecisionValue: document.getElementById('svgPrecisionValue'),
+      compareMix: document.getElementById('compareMix'),
+      compareMixValue: document.getElementById('compareMixValue'),
+      previewModeValue: document.getElementById('previewModeValue'),
+      compareSplit: document.getElementById('compareSplit'),
+      compareLabels: document.getElementById('compareLabels'),
+      compareLabelA: document.getElementById('compareLabelA'),
+      compareLabelB: document.getElementById('compareLabelB'),
+      captureABtn: document.getElementById('captureABtn'),
+      captureBBtn: document.getElementById('captureBBtn'),
+      swapCompareBtn: document.getElementById('swapCompareBtn'),
+      clearCompareBtn: document.getElementById('clearCompareBtn'),
+      clearMaskBtn: document.getElementById('clearMaskBtn'),
+      maskModeValue: document.getElementById('maskModeValue'),
+      presetName: document.getElementById('presetName'),
+      savePresetBtn: document.getElementById('savePresetBtn'),
+      presetList: document.getElementById('presetList'),
+      presetCountValue: document.getElementById('presetCountValue'),
+      exportPresetBtn: document.getElementById('exportPresetBtn'),
+      importPresetBtn: document.getElementById('importPresetBtn'),
+      seedName: document.getElementById('seedName'),
+      saveSeedBtn: document.getElementById('saveSeedBtn'),
+      randomSeedBtn: document.getElementById('randomSeedBtn'),
+      applySeedBtn: document.getElementById('applySeedBtn'),
+      seedList: document.getElementById('seedList'),
+      seedCountValue: document.getElementById('seedCountValue')
+    };
+
+    const previewCtx = els.previewCanvas.getContext('2d', { alpha: true });
+    const maskCtx = els.maskCanvas.getContext('2d', { alpha: true });
+    const curveCtx = els.curveCanvas.getContext('2d', { alpha: true });
+    if (!previewCtx || !maskCtx || !curveCtx) {
+      alert('2D canvas context is not available in this browser.');
+      return;
+    }
+
+    function clamp(v, min, max) {
+      return v < min ? min : (v > max ? max : v);
+    }
+
+    function lerp(a, b, t) {
+      return a + (b - a) * t;
+    }
+
+    function hexToRgba(hex, alpha = 1) {
+      const v = (hex || '#000000').replace('#', '');
+      const normalized = v.length === 3 ? v.split('').map((c) => c + c).join('') : v;
+      const n = parseInt(normalized, 16) || 0;
+      const r = (n >> 16) & 255;
+      const g = (n >> 8) & 255;
+      const b = n & 255;
+      return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    }
+
+    function safeFileName(name) {
+      return (name || 'punkt-output')
+        .replace(/\.[^.]+$/, '')
+        .replace(/[^a-z0-9\-_]+/gi, '-')
+        .replace(/^-+|-+$/g, '') || 'punkt-output';
+    }
+
+    function formatTime(ms) {
+      if (typeof ms !== 'number' || !Number.isFinite(ms)) return '—';
+      return ms >= 1000 ? `${(ms / 1000).toFixed(2)} s` : `${ms.toFixed(1)} ms`;
+    }
+
+    function mulberry32(seed) {
+      let t = seed >>> 0;
+      return function () {
+        t += 0x6D2B79F5;
+        let r = Math.imul(t ^ (t >>> 15), t | 1);
+        r ^= r + Math.imul(r ^ (r >>> 7), r | 61);
+        return ((r ^ (r >>> 14)) >>> 0) / 4294967296;
+      };
+    }
+
+    function getRequestedScale() {
+      return clamp(Number(state.config.exportScale) || 1, 1, 8);
+    }
+
+    function getSafePngScale() {
+      if (!state.source) return 1;
+      const margin = Math.max(0, Number(state.config.marginPx) || 0) * 2;
+      const width = state.source.width + margin;
+      const height = state.source.height + margin;
+      const byDim = Math.min(MAX_CANVAS_DIM / width, MAX_CANVAS_DIM / height);
+      const byPixels = Math.sqrt(MAX_CANVAS_PIXELS / (width * height));
+      return Math.max(1, Math.floor(Math.min(byDim, byPixels, 8)));
+    }
+
+    function getActualPngScale() {
+      return Math.min(getRequestedScale(), getSafePngScale());
+    }
+
+    function setMessage(text) {
+      els.message.textContent = text || '';
+    }
+
+    function setBusyState(busy, text) {
+      const isBusy = !!busy;
+      state.isProcessing = isBusy;
+      els.overlay.classList.toggle('show', isBusy || state.isExporting);
+      els.overlayText.textContent = isBusy ? (text || 'Processing') : (state.isExporting ? 'Exporting' : '');
+      els.statusDot.classList.toggle('busy', isBusy || state.isExporting);
+      els.statusText.classList.toggle('show', isBusy || state.isExporting);
+      els.statusText.textContent = text || ((isBusy || state.isExporting) ? 'Processing...' : '');
+      refreshUi();
+    }
+
+    function setExportBusy(busy, text) {
+      state.isExporting = !!busy;
+      els.overlay.classList.toggle('show', state.isExporting || state.isProcessing);
+      els.overlayText.textContent = state.isExporting ? (text || 'Exporting') : (state.isProcessing ? 'Processing' : '');
+      els.statusDot.classList.toggle('busy', state.isExporting || state.isProcessing);
+      els.statusText.classList.toggle('show', state.isExporting || state.isProcessing);
+      els.statusText.textContent = text || ((state.isProcessing || state.isExporting) ? 'Processing...' : '');
+      refreshUi();
+    }
+
+    function downloadBlob(blob, filename) {
+      if (!blob) throw new Error('Export returned no blob.');
+      if (state.objectUrl) {
+        URL.revokeObjectURL(state.objectUrl);
+        state.objectUrl = null;
+      }
+      const url = URL.createObjectURL(blob);
+      state.objectUrl = url;
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => {
+        if (state.objectUrl) {
+          URL.revokeObjectURL(state.objectUrl);
+          state.objectUrl = null;
+        }
+      }, 1500);
+    }
+
+    function loadStorageArray(key) {
+      try {
+        const raw = localStorage.getItem(key);
+        if (!raw) return [];
+        const parsed = JSON.parse(raw);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch {
+        return [];
+      }
+    }
+
+    function saveStorageArray(key, value) {
+      try { localStorage.setItem(key, JSON.stringify(value || [])); } catch {}
+    }
+
+    function ensureMask() {
+      if (!state.source) return null;
+      const size = state.source.width * state.source.height;
+      if (!state.maskData || state.maskData.length !== size) {
+        state.maskData = new Uint8Array(size);
+        state.maskData.fill(MASK_BASE);
+      }
+      return state.maskData;
+    }
+
+    function clearMaskData() {
+      if (!state.source) return;
+      ensureMask().fill(MASK_BASE);
+      state.maskDirty = true;
+      updateMaskCanvas();
+      scheduleProcess(80);
+    }
+
+    function serializeConfig() {
+      return JSON.parse(JSON.stringify(state.config));
+    }
+
+    function cloneMask() {
+      return state.maskData ? state.maskData.slice() : null;
+    }
+
+    function pushHistory(label = '') {
+      if (state.suppressHistory) return;
+      state.historyUndo.push({ config: serializeConfig(), mask: cloneMask(), label });
+      if (state.historyUndo.length > 50) state.historyUndo.shift();
+      state.historyRedo.length = 0;
+      refreshUi();
+    }
+
+    function applySnapshot(snapshot) {
+      if (!snapshot) return;
+      state.suppressHistory = true;
+      try {
+        state.config = { ...DEFAULTS, ...(snapshot.config || {}) };
+        sanitizeConfig();
+        if (state.source) {
+          const size = state.source.width * state.source.height;
+          if (snapshot.mask && snapshot.mask.length === size) {
+            state.maskData = snapshot.mask.slice();
+          } else {
+            ensureMask();
+          }
+        } else {
+          state.maskData = null;
+        }
+        updateInputsFromConfig();
+        updateMaskCanvas();
+      } finally {
+        state.suppressHistory = false;
+      }
+      if (state.source) scheduleProcess(40);
+      else refreshUi();
+    }
+
+    function undo() {
+      if (!state.historyUndo.length) return;
+      const current = { config: serializeConfig(), mask: cloneMask(), label: 'redo' };
+      const snapshot = state.historyUndo.pop();
+      state.historyRedo.push(current);
+      applySnapshot(snapshot);
+      refreshUi();
+    }
+
+    function redo() {
+      if (!state.historyRedo.length) return;
+      const current = { config: serializeConfig(), mask: cloneMask(), label: 'undo' };
+      const snapshot = state.historyRedo.pop();
+      state.historyUndo.push(current);
+      applySnapshot(snapshot);
+      refreshUi();
+    }
+
+    function sanitizeConfig() {
+      const cfg = state.config;
+      cfg.minDotSize = clamp(Number(cfg.minDotSize) || DEFAULTS.minDotSize, 0.1, 50);
+      cfg.maxDotSize = clamp(Number(cfg.maxDotSize) || DEFAULTS.maxDotSize, cfg.minDotSize, 50);
+      cfg.spacing = clamp(Math.round(Number(cfg.spacing) || DEFAULTS.spacing), 1, 80);
+      cfg.contrast = clamp(Number(cfg.contrast) || DEFAULTS.contrast, 0.4, 4);
+      cfg.threshold = clamp(Number(cfg.threshold) || DEFAULTS.threshold, 0, 1);
+      cfg.seed = Math.max(0, Math.floor(Number(cfg.seed) || 1));
+      cfg.shadowBoost = clamp(Number(cfg.shadowBoost) || 0, -1, 2);
+      cfg.highlightBoost = clamp(Number(cfg.highlightBoost) || 0, -1, 2);
+      cfg.edgeBoost = clamp(Number(cfg.edgeBoost) || 0, 0, 3);
+      cfg.curveShadow = clamp(Number(cfg.curveShadow) || 0, -1, 1);
+      cfg.curveMid = clamp(Number(cfg.curveMid) || 0, -1, 1);
+      cfg.curveHigh = clamp(Number(cfg.curveHigh) || 0, -1, 1);
+      cfg.marginPx = clamp(Math.round(Number(cfg.marginPx) || 0), 0, 400);
+      cfg.previewBudget = clamp(Math.round(Number(cfg.previewBudget) || DEFAULTS.previewBudget), 500, 200000);
+      cfg.brushSize = clamp(Math.round(Number(cfg.brushSize) || DEFAULTS.brushSize), 4, 320);
+      cfg.brushSoftness = clamp(Math.round(Number(cfg.brushSoftness) || DEFAULTS.brushSoftness), 0, 100);
+      cfg.maskOpacity = clamp(Math.round(Number(cfg.maskOpacity) || DEFAULTS.maskOpacity), 0, 100);
+      cfg.baseOpacity = clamp(Math.round(Number(cfg.baseOpacity) || DEFAULTS.baseOpacity), 0, 100);
+      cfg.edgeOpacity = clamp(Math.round(Number(cfg.edgeOpacity) || DEFAULTS.edgeOpacity), 0, 100);
+      cfg.accentOpacity = clamp(Math.round(Number(cfg.accentOpacity) || DEFAULTS.accentOpacity), 0, 100);
+      cfg.edgeThreshold = clamp(Number(cfg.edgeThreshold) || DEFAULTS.edgeThreshold, 0, 1);
+      cfg.accentThreshold = clamp(Number(cfg.accentThreshold) || DEFAULTS.accentThreshold, 0, 1);
+      cfg.accentScale = clamp(Number(cfg.accentScale) || DEFAULTS.accentScale, 0.2, 3);
+      cfg.svgPrecision = clamp(Math.round(Number(cfg.svgPrecision) || DEFAULTS.svgPrecision), 0, 4);
+      cfg.compareMix = clamp(Math.round(Number(cfg.compareMix) || DEFAULTS.compareMix), 0, 100);
+      if (!MODES.includes(cfg.mode)) cfg.mode = DEFAULTS.mode;
+      if (!['single', 'split', 'overlay'].includes(cfg.previewMode)) cfg.previewMode = 'single';
+      if (!['off', 'erase', 'keep', 'boost', 'smooth'].includes(cfg.maskMode)) cfg.maskMode = 'off';
+      cfg.exportScale = clamp(Math.round(Number(cfg.exportScale) || DEFAULTS.exportScale), 1, Math.max(1, getSafePngScale()));
+    }
+
+    function updateValueLabels() {
+      const cfg = state.config;
+      els.minDotSizeValue.textContent = `${cfg.minDotSize.toFixed(1)} px`;
+      els.maxDotSizeValue.textContent = `${cfg.maxDotSize.toFixed(1)} px`;
+      els.spacingValue.textContent = `${cfg.spacing.toFixed(0)} px`;
+      els.contrastValue.textContent = `${cfg.contrast.toFixed(2)} ×`;
+      els.thresholdValue.textContent = `${Math.round(cfg.threshold * 100)} %`;
+      els.shadowBoostValue.textContent = cfg.shadowBoost.toFixed(2);
+      els.highlightBoostValue.textContent = cfg.highlightBoost.toFixed(2);
+      els.edgeBoostValue.textContent = cfg.edgeBoost.toFixed(2);
+      els.marginPxValue.textContent = `${cfg.marginPx}px`;
+      els.previewBudgetValue.textContent = cfg.previewBudget.toLocaleString();
+      els.inkValue.textContent = cfg.color;
+      els.paperValue.textContent = cfg.backgroundColor;
+      els.accentValue.textContent = cfg.accentColor;
+      els.edgeColorValue.textContent = cfg.edgeColor;
+      els.brushSizeValue.textContent = `${cfg.brushSize}px`;
+      els.brushSoftnessValue.textContent = `${cfg.brushSoftness}%`;
+      els.maskOpacityValue.textContent = `${cfg.maskOpacity}%`;
+      els.curveShadowValue.textContent = cfg.curveShadow.toFixed(2);
+      els.curveMidValue.textContent = cfg.curveMid.toFixed(2);
+      els.curveHighValue.textContent = cfg.curveHigh.toFixed(2);
+      els.curveSummary.textContent = `${cfg.curveShadow.toFixed(2)} / ${cfg.curveMid.toFixed(2)} / ${cfg.curveHigh.toFixed(2)}`;
+      els.baseOpacityValue.textContent = `${cfg.baseOpacity}%`;
+      els.edgeOpacityValue.textContent = `${cfg.edgeOpacity}%`;
+      els.accentOpacityValue.textContent = `${cfg.accentOpacity}%`;
+      els.edgeThresholdValue.textContent = `${Math.round(cfg.edgeThreshold * 100)}%`;
+      els.accentThresholdValue.textContent = `${Math.round(cfg.accentThreshold * 100)}%`;
+      els.accentScaleValue.textContent = `${cfg.accentScale.toFixed(2)}×`;
+      els.svgPrecisionValue.textContent = `${cfg.svgPrecision} dp`;
+      els.compareMixValue.textContent = `${cfg.compareMix} %`;
+      els.previewModeValue.textContent = cfg.previewMode.charAt(0).toUpperCase() + cfg.previewMode.slice(1);
+      els.maskModeValue.textContent = cfg.maskMode.charAt(0).toUpperCase() + cfg.maskMode.slice(1);
+      els.actualScaleText.textContent = `${getActualPngScale()}x`;
+    }
+
+    function updateInputsFromConfig() {
+      const cfg = state.config;
+      const mapValue = {
+        minDotSize: cfg.minDotSize,
+        maxDotSize: cfg.maxDotSize,
+        spacing: cfg.spacing,
+        contrast: cfg.contrast,
+        threshold: cfg.threshold,
+        shadowBoost: cfg.shadowBoost,
+        highlightBoost: cfg.highlightBoost,
+        edgeBoost: cfg.edgeBoost,
+        marginPx: cfg.marginPx,
+        previewBudget: cfg.previewBudget,
+        curveShadow: cfg.curveShadow,
+        curveMid: cfg.curveMid,
+        curveHigh: cfg.curveHigh,
+        baseOpacity: cfg.baseOpacity,
+        edgeOpacity: cfg.edgeOpacity,
+        accentOpacity: cfg.accentOpacity,
+        edgeThreshold: cfg.edgeThreshold,
+        accentThreshold: cfg.accentThreshold,
+        accentScale: cfg.accentScale,
+        svgPrecision: cfg.svgPrecision,
+        compareMix: cfg.compareMix,
+        brushSize: cfg.brushSize,
+        brushSoftness: cfg.brushSoftness,
+        maskOpacity: cfg.maskOpacity
+      };
+      Object.entries(mapValue).forEach(([key, value]) => {
+        if (els[key]) els[key].value = String(value);
+      });
+      els.inkColor.value = cfg.color;
+      els.paperColor.value = cfg.backgroundColor;
+      els.accentColor.value = cfg.accentColor;
+      els.edgeColor.value = cfg.edgeColor;
+      els.seedInput.value = String(cfg.seed);
+      els.invertBtn.classList.toggle('active', cfg.invert);
+      els.transparentBtn.classList.toggle('active', cfg.transparentBackground);
+      els.autoQualityBtn.classList.toggle('active', cfg.autoQuality);
+      els.optimizeSvgBtn.classList.toggle('active', cfg.optimizeSvg);
+      els.baseLayerBtn.classList.toggle('active', cfg.baseLayer);
+      els.edgeLayerBtn.classList.toggle('active', cfg.edgeLayer);
+      els.accentLayerBtn.classList.toggle('active', cfg.accentLayer);
+      els.asSeenExportBtn.classList.toggle('active', cfg.asSeenExport);
+      [...els.modeRow.querySelectorAll('.mode')].forEach((btn) => btn.classList.toggle('active', btn.dataset.mode === cfg.mode));
+      [...els.scaleRow.querySelectorAll('.scale')].forEach((btn) => btn.classList.toggle('active', Number(btn.dataset.scale) === Number(cfg.exportScale)));
+      [...els.previewModeRow.querySelectorAll('[data-preview-mode]')].forEach((btn) => btn.classList.toggle('active', btn.dataset.previewMode === cfg.previewMode));
+      [...document.querySelectorAll('[data-mask-mode]')].forEach((btn) => btn.classList.toggle('active', btn.dataset.maskMode === cfg.maskMode));
+      updateValueLabels();
+      drawCurveEditor();
+    }
+
+    function refreshUi() {
+      updateInputsFromConfig();
+      const hasImage = !!state.source;
+      const hasRecords = !!state.records && state.pointCount > 0;
+      const safeScale = getSafePngScale();
+      const actualScale = getActualPngScale();
+      const requestedScale = getRequestedScale();
+      const hasCompare = !!state.compareA || !!state.compareB;
+      els.reprocessBtn.disabled = !hasImage || state.isProcessing || state.isExporting;
+      els.undoBtn.disabled = !state.historyUndo.length || state.isProcessing || state.isExporting;
+      els.redoBtn.disabled = !state.historyRedo.length || state.isProcessing || state.isExporting;
+      els.clearBtn.disabled = !hasImage || state.isProcessing || state.isExporting;
+      els.clearMaskBtn.disabled = !hasImage || state.isProcessing || state.isExporting;
+      els.exportPngBtn.disabled = !hasRecords || state.isProcessing || state.isExporting;
+      els.exportViewBtn.disabled = !hasRecords || state.isProcessing || state.isExporting;
+      els.exportSvgBtn.disabled = !hasRecords || state.isProcessing || state.isExporting;
+      els.captureABtn.disabled = !hasRecords || state.isProcessing || state.isExporting;
+      els.captureBBtn.disabled = !hasRecords || state.isProcessing || state.isExporting;
+      els.swapCompareBtn.disabled = !state.compareA || !state.compareB;
+      els.clearCompareBtn.disabled = !hasCompare;
+      els.paperColor.disabled = state.config.transparentBackground;
+      els.sceneWrap.classList.toggle('masking', state.config.maskMode !== 'off');
+      [...els.scaleRow.querySelectorAll('.scale')].forEach((btn) => {
+        const scale = Number(btn.dataset.scale);
+        btn.disabled = !hasImage || state.isProcessing || state.isExporting || scale > safeScale;
+        btn.title = scale > safeScale ? `Disabled because safe PNG scale is ${safeScale}x for the current image size.` : '';
+      });
+      els.imageMeta.textContent = hasImage ? `${state.source.name} · ${state.source.width.toLocaleString()} × ${state.source.height.toLocaleString()}` : 'No image loaded';
+      els.pointMeta.textContent = hasRecords ? state.pointCount.toLocaleString() : '0';
+      els.nodeCount.textContent = hasRecords ? state.pointCount.toLocaleString() : '0';
+      els.safeScaleMeta.textContent = hasImage ? `${safeScale}x PNG · requested ${requestedScale}x · actual ${actualScale}x` : '—';
+      els.processMeta.textContent = formatTime(state.lastProcessMs);
+      els.maskMeta.textContent = hasImage ? summarizeMask() : 'No mask';
+      els.compareMeta.textContent = `A: ${state.compareA ? 'yes' : 'no'} / B: ${state.compareB ? 'yes' : 'no'}`;
+      els.previewTitle.textContent = hasImage ? state.source.name : 'Preview';
+      els.previewSub.textContent = hasRecords ? `${state.pointCount.toLocaleString()} points · ${state.config.mode}` : (hasImage ? 'Ready to process' : 'Waiting for image');
+      els.previewDims.textContent = hasImage ? `${state.source.width.toLocaleString()} × ${state.source.height.toLocaleString()}` : '—';
+      els.exportHint.textContent = hasImage
+        ? `Safe PNG scale: ${safeScale}x. Requested ${requestedScale}x, actual PNG export ${actualScale}x. “Export View” saves the preview exactly as seen.`
+        : 'PNG scale is clamped to a visible safe limit for the current image size. SVG keeps the requested scale and is the fallback for very large outputs.';
+      els.compareSplit.classList.toggle('show', state.config.previewMode === 'split' && !!state.compareA && !!state.compareB);
+      els.compareLabels.classList.toggle('show', state.config.previewMode !== 'single' && (!!state.compareA || !!state.compareB));
+      els.compareLabelA.textContent = state.config.compareLabelA || 'A';
+      els.compareLabelB.textContent = state.config.compareLabelB || 'B';
+      document.body.classList.toggle('dock-collapsed', !!state.uiCollapsed);
+      els.collapseBtn.textContent = state.uiCollapsed ? '▴' : '▾';
+      els.collapseBtn.setAttribute('aria-expanded', state.uiCollapsed ? 'false' : 'true');
+      els.collapseBtn.title = state.uiCollapsed ? 'Expand controls' : 'Collapse controls';
+      renderPresetList();
+      renderSeedList();
+      updateCompareSplitUi();
+    }
+
+    function summarizeMask() {
+      if (!state.maskData || !state.maskData.length) return 'No mask';
+      let cut = 0, keep = 0, boost = 0;
+      for (let i = 0; i < state.maskData.length; i += Math.max(1, Math.floor(state.maskData.length / 40000))) {
+        const v = state.maskData[i];
+        if (v < 60) cut++;
+        else if (v > 140) boost++;
+        else keep++;
+      }
+      const total = cut + keep + boost || 1;
+      return `cut ${Math.round(cut / total * 100)}% · neutral ${Math.round(keep / total * 100)}% · boost ${Math.round(boost / total * 100)}%`;
+    }
+
+    function fitPreviewSize(width, height) {
+      const bounds = els.canvasHolder.getBoundingClientRect();
+      const maxW = Math.max(160, Math.floor(bounds.width));
+      const maxH = Math.max(160, Math.floor(bounds.height));
+      const scale = Math.max(0.01, Math.min(maxW / width, maxH / height));
+      return {
+        width: Math.max(1, Math.floor(width * scale)),
+        height: Math.max(1, Math.floor(height * scale)),
+        scale
+      };
+    }
+
+    function buildCurveY(t) {
+      const cfg = state.config;
+      const pts = [
+        { x: 0, y: 1 },
+        { x: 0.25, y: clamp(1 - 0.25 - cfg.curveShadow * 0.25, 0, 1) },
+        { x: 0.5, y: clamp(1 - 0.5 - cfg.curveMid * 0.25, 0, 1) },
+        { x: 0.75, y: clamp(1 - 0.75 - cfg.curveHigh * 0.25, 0, 1) },
+        { x: 1, y: 0 }
+      ];
+      for (let i = 0; i < pts.length - 1; i++) {
+        const a = pts[i];
+        const b = pts[i + 1];
+        if (t <= b.x) {
+          const lt = (t - a.x) / Math.max(1e-6, b.x - a.x);
+          return lerp(a.y, b.y, clamp(lt, 0, 1));
+        }
+      }
+      return 0;
+    }
+
+    function drawCurveEditor() {
+      const width = els.curveCanvas.width;
+      const height = els.curveCanvas.height;
+      curveCtx.clearRect(0, 0, width, height);
+      curveCtx.fillStyle = 'rgba(255,255,255,0.02)';
+      curveCtx.fillRect(0, 0, width, height);
+      curveCtx.strokeStyle = 'rgba(255,255,255,0.08)';
+      curveCtx.lineWidth = 1;
+      for (let i = 1; i < 4; i++) {
+        const x = width * (i / 4);
+        const y = height * (i / 4);
+        curveCtx.beginPath(); curveCtx.moveTo(x, 0); curveCtx.lineTo(x, height); curveCtx.stroke();
+        curveCtx.beginPath(); curveCtx.moveTo(0, y); curveCtx.lineTo(width, y); curveCtx.stroke();
+      }
+      curveCtx.strokeStyle = 'rgba(255,255,255,0.85)';
+      curveCtx.lineWidth = 3;
+      curveCtx.beginPath();
+      for (let i = 0; i <= 120; i++) {
+        const t = i / 120;
+        const x = t * width;
+        const y = buildCurveY(t) * height;
+        if (i === 0) curveCtx.moveTo(x, y); else curveCtx.lineTo(x, y);
+      }
+      curveCtx.stroke();
+      const points = [0.25, 0.5, 0.75];
+      const labels = [state.config.curveShadow, state.config.curveMid, state.config.curveHigh];
+      points.forEach((p, idx) => {
+        const x = p * width;
+        const y = buildCurveY(p) * height;
+        curveCtx.fillStyle = idx === 0 ? '#f59e0b' : idx === 1 ? '#e5e7eb' : '#60a5fa';
+        curveCtx.beginPath(); curveCtx.arc(x, y, 7, 0, Math.PI * 2); curveCtx.fill();
+        curveCtx.fillStyle = 'rgba(255,255,255,0.8)';
+        curveCtx.font = '12px ui-monospace, SFMono-Regular, Menlo, monospace';
+        curveCtx.fillText(labels[idx].toFixed(2), x + 10, y - 10);
+      });
+    }
+
+    function getCurvePointFromCanvas(event) {
+      const rect = els.curveCanvas.getBoundingClientRect();
+      const x = clamp((event.clientX - rect.left) / rect.width, 0, 1);
+      if (x < 0.375) return 'curveShadow';
+      if (x < 0.625) return 'curveMid';
+      return 'curveHigh';
+    }
+
+    function updateCurveFromPointer(event) {
+      const key = getCurvePointFromCanvas(event);
+      const rect = els.curveCanvas.getBoundingClientRect();
+      const y = clamp((event.clientY - rect.top) / rect.height, 0, 1);
+      const value = clamp((0.5 - y) * 2, -1, 1);
+      state.config[key] = Number(value.toFixed(2));
+      sanitizeConfig();
+      updateInputsFromConfig();
+      scheduleProcess(40);
+    }
+
+    function workerCode() {
+      return `
+        let source = null;
+        function clamp(v,min,max){return v<min?min:(v>max?max:v);}
+        function mulberry32(seed){let t=seed>>>0;return function(){t+=0x6D2B79F5;let r=Math.imul(t^(t>>>15),t|1);r^=r+Math.imul(r^(r>>>7),r|61);return ((r^(r>>>14))>>>0)/4294967296;};}
+        function brightness(data, index, contrast){
+          let v=(0.299*data[index]+0.587*data[index+1]+0.114*data[index+2])/255;
+          v=(v-0.5)*contrast+0.5;
+          return clamp(v,0,1);
+        }
+        function curveAdjust(d, cfg){
+          const pts=[{x:0,y:0},{x:0.25,y:clamp(0.25+cfg.curveShadow*0.25,0,1)},{x:0.5,y:clamp(0.5+cfg.curveMid*0.25,0,1)},{x:0.75,y:clamp(0.75+cfg.curveHigh*0.25,0,1)},{x:1,y:1}];
+          for(let i=0;i<pts.length-1;i++){
+            const a=pts[i], b=pts[i+1];
+            if(d<=b.x){ const t=(d-a.x)/Math.max(1e-6,b.x-a.x); return clamp(a.y+(b.y-a.y)*t,0,1); }
+          }
+          return d;
+        }
+        function edgeAt(data,w,h,x,y,contrast){
+          const xl=Math.max(0,x-1), xr=Math.min(w-1,x+1), yu=Math.max(0,y-1), yd=Math.min(h-1,y+1);
+          const il=(y*w+xl)*4, ir=(y*w+xr)*4, iu=(yu*w+x)*4, id=(yd*w+x)*4;
+          const dx=Math.abs(brightness(data,ir,contrast)-brightness(data,il,contrast));
+          const dy=Math.abs(brightness(data,id,contrast)-brightness(data,iu,contrast));
+          return clamp((dx+dy)*1.5,0,1);
+        }
+        function maskWeight(mask, idx){
+          if(!mask) return 1;
+          const v=mask[idx];
+          if(v<=0) return 0;
+          if(v<100) return v/100;
+          return 1+((v-100)/100)*0.75;
+        }
+        function process(config, requestId, maskBuffer){
+          if(!source) throw new Error('No source image loaded.');
+          const { width, height, data } = source;
+          const mask = maskBuffer ? new Uint8Array(maskBuffer) : null;
+          const values=[];
+          const minRadius=Math.max(0.01,config.minDotSize)*0.5;
+          const maxRadius=Math.max(minRadius,config.maxDotSize)*0.5;
+          const radiusRange=maxRadius-minRadius;
+          const thresholdGate=config.threshold;
+          const spacing=Math.max(1,config.spacing);
+          const contrast=config.contrast;
+          const invert=!!config.invert;
+          const rng=mulberry32((config.seed>>>0)||1);
+          let skippedTransparent=0, included=0;
+          function samplePoint(px,py){
+            if(px<0||py<0||px>=width||py>=height) return;
+            const xi=Math.floor(px), yi=Math.floor(py), flat=yi*width+xi, idx=flat*4;
+            if(data[idx+3]===0){ skippedTransparent++; return; }
+            let gray=brightness(data, idx, contrast);
+            let density=invert ? gray : (1-gray);
+            density=curveAdjust(density, config);
+            const weight=maskWeight(mask, flat);
+            density=clamp(density*weight,0,1.6);
+            if(density < thresholdGate) return;
+            const edge=edgeAt(data,width,height,xi,yi,contrast);
+            let radius=minRadius + radiusRange * Math.min(1, density);
+            const sizeFactor=1 + config.shadowBoost*density + config.highlightBoost*(1-Math.min(1,density)) + config.edgeBoost*edge;
+            radius *= Math.max(0.05,sizeFactor);
+            if(radius < 0.01) return;
+            values.push(px,py,radius,density,edge);
+            included++;
+          }
+          if(config.mode==='HALFTONE'){
+            const step=Math.max(0.5,spacing), half=step*0.5;
+            for(let y=0;y<height;y+=step){
+              for(let x=0;x<width;x+=step){ samplePoint(x+half,y+half); }
+            }
+          } else {
+            const jitterFactor=config.mode==='POISSON' ? 0.45 : 0.8;
+            for(let y=0;y<height;y+=spacing){
+              for(let x=0;x<width;x+=spacing){
+                const jitter=spacing*jitterFactor;
+                const px=x+spacing*0.5 + (rng()-0.5)*jitter*2;
+                const py=y+spacing*0.5 + (rng()-0.5)*jitter*2;
+                samplePoint(px,py);
+              }
+            }
+          }
+          const arr=new Float32Array(values);
+          return { requestId, points: arr, meta: { included, skippedTransparent, width, height } };
+        }
+        self.onmessage = (event) => {
+          const payload=event.data||{};
+          if(payload.type==='setImage'){
+            source={ width: payload.width, height: payload.height, data: new Uint8ClampedArray(payload.buffer) };
+            self.postMessage({ type:'ready' });
+            return;
+          }
+          if(payload.type==='process'){
+            try{
+              const start=performance.now();
+              const result=process(payload.config||{}, payload.requestId, payload.maskBuffer || null);
+              self.postMessage({ type:'done', requestId: result.requestId, width: source.width, height: source.height, points: result.points, meta: result.meta, elapsed: performance.now()-start }, [result.points.buffer]);
+            }catch(error){
+              self.postMessage({ type:'error', requestId: payload.requestId, message: error && error.message ? error.message : String(error) });
+            }
+          }
+        };
+      `;
+    }
+
+    function createWorker() {
+      try {
+        const blob = new Blob([workerCode()], { type: 'text/javascript' });
+        const url = URL.createObjectURL(blob);
+        const worker = new Worker(url);
+        URL.revokeObjectURL(url);
+        return worker;
+      } catch (error) {
+        console.warn('Worker init failed, falling back to main thread.', error);
+        return null;
+      }
+    }
+
+    function getMaskBufferForWorker() {
+      if (!state.source) return null;
+      ensureMask();
+      return state.maskData.slice().buffer;
+    }
+
+    function processOnMainThread(sourceImage, config, maskData) {
+      const width = sourceImage.width;
+      const height = sourceImage.height;
+      const data = sourceImage.data;
+      const values = [];
+      const minRadius = Math.max(0.01, config.minDotSize) * 0.5;
+      const maxRadius = Math.max(minRadius, config.maxDotSize) * 0.5;
+      const radiusRange = maxRadius - minRadius;
+      const thresholdGate = config.threshold;
+      const spacing = Math.max(1, config.spacing);
+      const contrast = config.contrast;
+      const invert = !!config.invert;
+      const rng = mulberry32((config.seed >>> 0) || 1);
+      const start = performance.now();
+      let skippedTransparent = 0;
+      let included = 0;
+      const mask = maskData || null;
+
+      function brightness(index) {
+        let v = (0.299 * data[index] + 0.587 * data[index + 1] + 0.114 * data[index + 2]) / 255;
+        v = (v - 0.5) * contrast + 0.5;
+        return clamp(v, 0, 1);
+      }
+      function edgeAt(x, y) {
+        const xl = Math.max(0, x - 1), xr = Math.min(width - 1, x + 1), yu = Math.max(0, y - 1), yd = Math.min(height - 1, y + 1);
+        const il = (y * width + xl) * 4, ir = (y * width + xr) * 4, iu = (yu * width + x) * 4, id = (yd * width + x) * 4;
+        const dx = Math.abs(brightness(ir) - brightness(il));
+        const dy = Math.abs(brightness(id) - brightness(iu));
+        return clamp((dx + dy) * 1.5, 0, 1);
+      }
+      function curveAdjust(d) {
+        const pts = [
+          { x: 0, y: 0 },
+          { x: 0.25, y: clamp(0.25 + config.curveShadow * 0.25, 0, 1) },
+          { x: 0.5, y: clamp(0.5 + config.curveMid * 0.25, 0, 1) },
+          { x: 0.75, y: clamp(0.75 + config.curveHigh * 0.25, 0, 1) },
+          { x: 1, y: 1 }
+        ];
+        for (let i = 0; i < pts.length - 1; i++) {
+          const a = pts[i], b = pts[i + 1];
+          if (d <= b.x) {
+            const t = (d - a.x) / Math.max(1e-6, b.x - a.x);
+            return clamp(a.y + (b.y - a.y) * t, 0, 1);
+          }
+        }
+        return d;
+      }
+      function maskWeight(flat) {
+        if (!mask) return 1;
+        const v = mask[flat];
+        if (v <= 0) return 0;
+        if (v < 100) return v / 100;
+        return 1 + ((v - 100) / 100) * 0.75;
+      }
+      function sample(px, py) {
+        if (px < 0 || py < 0 || px >= width || py >= height) return;
+        const xi = Math.floor(px), yi = Math.floor(py), flat = yi * width + xi, idx = flat * 4;
+        if (data[idx + 3] === 0) { skippedTransparent++; return; }
+        let gray = brightness(idx);
+        let density = invert ? gray : (1 - gray);
+        density = curveAdjust(density);
+        density = clamp(density * maskWeight(flat), 0, 1.6);
+        if (density < thresholdGate) return;
+        const edge = edgeAt(xi, yi);
+        let radius = minRadius + radiusRange * Math.min(1, density);
+        const sizeFactor = 1 + config.shadowBoost * density + config.highlightBoost * (1 - Math.min(1, density)) + config.edgeBoost * edge;
+        radius *= Math.max(0.05, sizeFactor);
+        if (radius < 0.01) return;
+        values.push(px, py, radius, density, edge);
+        included++;
+      }
+      if (config.mode === 'HALFTONE') {
+        const step = Math.max(0.5, spacing), half = step * 0.5;
+        for (let y = 0; y < height; y += step) for (let x = 0; x < width; x += step) sample(x + half, y + half);
+      } else {
+        const jitterFactor = config.mode === 'POISSON' ? 0.45 : 0.8;
+        for (let y = 0; y < height; y += spacing) {
+          for (let x = 0; x < width; x += spacing) {
+            const jitter = spacing * jitterFactor;
+            const px = x + spacing * 0.5 + (rng() - 0.5) * jitter * 2;
+            const py = y + spacing * 0.5 + (rng() - 0.5) * jitter * 2;
+            sample(px, py);
+          }
+        }
+      }
+      return {
+        points: new Float32Array(values),
+        meta: { included, skippedTransparent, width, height },
+        elapsed: performance.now() - start
+      };
+    }
+
+    state.worker = createWorker();
+    if (state.worker) {
+      state.worker.onmessage = (event) => {
+        const data = event.data || {};
+        if (data.type === 'ready') {
+          state.workerReady = true;
+          if (state.workerPendingSource) {
+            state.workerPendingSource = false;
+            scheduleProcess(20);
+          }
+          return;
+        }
+        if (data.type === 'done') {
+          if (data.requestId !== state.processToken) return;
+          state.records = new Float32Array(data.points);
+          state.pointCount = Math.floor(state.records.length / 5);
+          state.pointMeta = data.meta || null;
+          state.lastProcessMs = data.elapsed;
+          state.isProcessing = false;
+          setBusyState(false, `Done · ${state.pointCount.toLocaleString()} points`);
+          setMessage(`Processed ${state.pointCount.toLocaleString()} points from ${data.width.toLocaleString()} × ${data.height.toLocaleString()} source pixels.`);
+          refreshUi();
+          renderPreview();
+          return;
+        }
+        if (data.type === 'error') {
+          if (data.requestId !== state.processToken) return;
+          state.isProcessing = false;
+          setBusyState(false, 'Error');
+          setMessage(`Processing failed: ${data.message}`);
+        }
+      };
+      state.worker.onerror = (error) => {
+        console.error(error);
+        state.worker = null;
+        state.workerReady = false;
+        setMessage('Worker failed. Falling back to main-thread processing.');
+      };
+    }
+
+    async function loadImage(file) {
+      if (!file) return;
+      setMessage('Decoding image…');
+      setBusyState(true, 'Loading');
+      try {
+        const bitmap = await createImageBitmap(file);
+        const canvas = document.createElement('canvas');
+        canvas.width = bitmap.width;
+        canvas.height = bitmap.height;
+        const ctx = canvas.getContext('2d', { alpha: true, willReadFrequently: true });
+        if (!ctx) throw new Error('2D canvas context unavailable.');
+        ctx.drawImage(bitmap, 0, 0);
+        const imageData = ctx.getImageData(0, 0, bitmap.width, bitmap.height);
+        const sourceData = new Uint8ClampedArray(imageData.data);
+        bitmap.close?.();
+        state.source = { name: file.name, width: imageData.width, height: imageData.height, data: sourceData };
+        state.records = null;
+        state.pointCount = 0;
+        state.lastProcessMs = null;
+        state.compareA = null;
+        state.compareB = null;
+        state.historyUndo.length = 0;
+        state.historyRedo.length = 0;
+        state.maskData = new Uint8Array(imageData.width * imageData.height);
+        state.maskData.fill(MASK_BASE);
+        sanitizeConfig();
+        refreshUi();
+        updateMaskCanvas();
+        if (state.worker) {
+          state.workerReady = false;
+          state.workerPendingSource = true;
+          const workerCopy = sourceData.slice();
+          state.worker.postMessage({ type: 'setImage', width: imageData.width, height: imageData.height, buffer: workerCopy.buffer }, [workerCopy.buffer]);
+        } else {
+          scheduleProcess(20);
+        }
+        els.fileInput.value = '';
+        setBusyState(false, 'Loaded');
+        setMessage(`Loaded ${file.name} (${state.source.width.toLocaleString()} × ${state.source.height.toLocaleString()}).`);
+        pushHistory('load-image');
+        refreshUi();
+      } catch (error) {
+        state.source = null;
+        state.records = null;
+        state.pointCount = 0;
+        state.maskData = null;
+        setBusyState(false, 'Idle');
+        setMessage(`Image load failed: ${error && error.message ? error.message : String(error)}`);
+        refreshUi();
+      }
+    }
+
+    function scheduleProcess(delay = 60) {
+      if (!state.source) { refreshUi(); return; }
+      clearTimeout(state.scheduledProcessTimer);
+      state.scheduledProcessTimer = setTimeout(processImage, delay);
+    }
+
+    async function processImage() {
+      if (!state.source) return;
+      sanitizeConfig();
+      refreshUi();
+      const requestId = ++state.processToken;
+      setBusyState(true, 'Processing');
+      const maskBuffer = getMaskBufferForWorker();
+      if (state.worker && state.workerReady) {
+        state.worker.postMessage({ type: 'process', requestId, config: { ...state.config }, maskBuffer }, maskBuffer ? [maskBuffer] : []);
+        return;
+      }
+      await new Promise(requestAnimationFrame);
+      try {
+        const result = processOnMainThread(state.source, state.config, state.maskData);
+        if (requestId !== state.processToken) return;
+        state.records = result.points;
+        state.pointCount = Math.floor(result.points.length / 5);
+        state.pointMeta = result.meta;
+        state.lastProcessMs = result.elapsed;
+        state.isProcessing = false;
+        setBusyState(false, `Done · ${state.pointCount.toLocaleString()} points`);
+        setMessage(`Processed ${state.pointCount.toLocaleString()} points from ${state.source.width.toLocaleString()} × ${state.source.height.toLocaleString()} source pixels.`);
+        refreshUi();
+        renderPreview();
+      } catch (error) {
+        state.isProcessing = false;
+        setBusyState(false, 'Error');
+        setMessage(`Processing failed: ${error && error.message ? error.message : String(error)}`);
+        refreshUi();
+      }
+    }
+
+    function computeRenderSpec(targetScale = 1) {
+      if (!state.source) return null;
+      const margin = Math.max(0, Number(state.config.marginPx) || 0) * targetScale;
+      const width = Math.max(1, Math.round((state.source.width * targetScale) + margin * 2));
+      const height = Math.max(1, Math.round((state.source.height * targetScale) + margin * 2));
+      return { width, height, scale: targetScale, margin };
+    }
+
+    function selectPreviewRecords() {
+      if (!state.records) return null;
+      if (!state.config.autoQuality) return state.records;
+      const budget = Math.max(500, state.config.previewBudget || DEFAULTS.previewBudget);
+      if (state.pointCount <= budget) return state.records;
+      const step = Math.ceil(state.pointCount / budget);
+      const reduced = new Float32Array(Math.ceil(state.pointCount / step) * 5);
+      let w = 0;
+      for (let i = 0; i < state.records.length; i += step * 5) {
+        reduced[w++] = state.records[i];
+        reduced[w++] = state.records[i + 1];
+        reduced[w++] = state.records[i + 2];
+        reduced[w++] = state.records[i + 3];
+        reduced[w++] = state.records[i + 4];
+      }
+      return reduced.subarray(0, w);
+    }
+
+    function clearCanvas(ctx, canvas) {
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    function setSceneCanvasSize(pixelWidth, pixelHeight, cssWidth, cssHeight) {
+      els.previewCanvas.width = pixelWidth;
+      els.previewCanvas.height = pixelHeight;
+      els.maskCanvas.width = pixelWidth;
+      els.maskCanvas.height = pixelHeight;
+      const cssW = `${cssWidth}px`;
+      const cssH = `${cssHeight}px`;
+      els.sceneWrap.style.width = cssW;
+      els.sceneWrap.style.height = cssH;
+      els.previewCanvas.style.width = cssW;
+      els.previewCanvas.style.height = cssH;
+      els.maskCanvas.style.width = cssW;
+      els.maskCanvas.style.height = cssH;
+    }
+
+    function drawLayerPoints(ctx, records, scale, margin, color, opacity, kind, token, batchSize, sizeScale = 1) {
+      return new Promise(async (resolve) => {
+        if (!records || !records.length || opacity <= 0) return resolve(true);
+        ctx.fillStyle = hexToRgba(color, opacity);
+        let i = 0;
+        while (i < records.length) {
+          if (token != null && token !== state.renderToken) return resolve(false);
+          const end = Math.min(records.length, i + batchSize * 5);
+          ctx.beginPath();
+          for (; i < end; i += 5) {
+            const x = records[i] * scale + margin;
+            const y = records[i + 1] * scale + margin;
+            const r = records[i + 2] * scale * sizeScale;
+            const density = records[i + 3];
+            const edge = records[i + 4];
+            if (kind === 'edge' && edge < state.config.edgeThreshold) continue;
+            if (kind === 'accent' && density < state.config.accentThreshold) continue;
+            if (r < 0.2) continue;
+            if (r < 0.75) {
+              ctx.rect(x - r, y - r, r * 2, r * 2);
+            } else {
+              ctx.moveTo(x + r, y);
+              ctx.arc(x, y, r, 0, Math.PI * 2);
+            }
+          }
+          ctx.fill();
+          if (token != null) await new Promise(requestAnimationFrame);
+        }
+        resolve(true);
+      });
+    }
+
+    async function renderSceneToCanvas(targetCanvas, options = {}) {
+      const records = options.records || state.records;
+      if (!state.source || !records || !records.length) return null;
+      const scale = options.scale || 1;
+      const fit = options.fit || null;
+      const dpr = options.dpr || 1;
+      const spec = computeRenderSpec(scale);
+      const ctx = targetCanvas.getContext('2d', { alpha: true });
+      if (!ctx) throw new Error('2D canvas context unavailable.');
+      let cssWidth = spec.width;
+      let cssHeight = spec.height;
+      if (fit) {
+        cssWidth = fit.width;
+        cssHeight = fit.height;
+        targetCanvas.width = Math.max(1, Math.floor(cssWidth * dpr));
+        targetCanvas.height = Math.max(1, Math.floor(cssHeight * dpr));
+        targetCanvas.style.width = `${cssWidth}px`;
+        targetCanvas.style.height = `${cssHeight}px`;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      } else {
+        targetCanvas.width = spec.width;
+        targetCanvas.height = spec.height;
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+      }
+      ctx.clearRect(0, 0, targetCanvas.width, targetCanvas.height);
+      const renderScale = fit ? ((cssWidth / spec.width) * scale) : scale;
+      const margin = (state.config.marginPx || 0) * (fit ? (cssWidth / spec.width) : scale);
+      if (!state.config.transparentBackground) {
+        ctx.fillStyle = state.config.backgroundColor;
+        ctx.fillRect(0, 0, fit ? cssWidth : spec.width, fit ? cssHeight : spec.height);
+      }
+      const token = options.token;
+      if (state.config.baseLayer) {
+        const ok = await drawLayerPoints(ctx, records, renderScale, margin, state.config.color, state.config.baseOpacity / 100, 'base', token, fit ? PREVIEW_BATCH : EXPORT_BATCH, 1);
+        if (!ok) return null;
+      }
+      if (state.config.edgeLayer) {
+        const ok = await drawLayerPoints(ctx, records, renderScale, margin, state.config.edgeColor, state.config.edgeOpacity / 100, 'edge', token, fit ? PREVIEW_BATCH : EXPORT_BATCH, 1);
+        if (!ok) return null;
+      }
+      if (state.config.accentLayer) {
+        const ok = await drawLayerPoints(ctx, records, renderScale, margin, state.config.accentColor, state.config.accentOpacity / 100, 'accent', token, fit ? PREVIEW_BATCH : EXPORT_BATCH, state.config.accentScale);
+        if (!ok) return null;
+      }
+      return targetCanvas;
+    }
+
+    async function renderPreview() {
+      clearCanvas(previewCtx, els.previewCanvas);
+      if (!state.source || !state.records || !state.pointCount) {
+        updateMaskCanvas();
+        return;
+      }
+      const spec = computeRenderSpec(1);
+      const fit = fitPreviewSize(spec.width, spec.height);
+      state.fit = { ...fit, specWidth: spec.width, specHeight: spec.height };
+      const dpr = Math.max(1, Math.min(window.devicePixelRatio || 1, 2));
+      setSceneCanvasSize(Math.max(1, Math.floor(fit.width * dpr)), Math.max(1, Math.floor(fit.height * dpr)), fit.width, fit.height);
+      const token = ++state.renderToken;
+      const selected = selectPreviewRecords();
+      const singleCanvas = document.createElement('canvas');
+      const rendered = await renderSceneToCanvas(singleCanvas, { records: selected, scale: 1, fit, dpr, token });
+      if (!rendered) return;
+      clearCanvas(previewCtx, els.previewCanvas);
+      previewCtx.setTransform(1, 0, 0, 1, 0, 0);
+      previewCtx.drawImage(rendered, 0, 0, els.previewCanvas.width, els.previewCanvas.height);
+      state.previewRaster = rendered;
+      if (state.config.previewMode !== 'single' && (state.compareA || state.compareB)) {
+        await renderCompareOverlay();
+      }
+      updateMaskCanvas();
+      updateCompareSplitUi();
+    }
+
+    async function renderCompareOverlay() {
+      if (!state.fit) return;
+      if (state.config.previewMode === 'single') return;
+      const ctx = previewCtx;
+      clearCanvas(ctx, els.previewCanvas);
+      const base = state.compareA?.canvas || state.previewRaster;
+      const alt = state.compareB?.canvas || state.previewRaster;
+      if (!base && !alt) return;
+      if (state.config.previewMode === 'overlay') {
+        if (base) ctx.drawImage(base, 0, 0, els.previewCanvas.width, els.previewCanvas.height);
+        ctx.save();
+        ctx.globalAlpha = state.config.compareMix / 100;
+        if (alt) ctx.drawImage(alt, 0, 0, els.previewCanvas.width, els.previewCanvas.height);
+        ctx.restore();
+      } else if (state.config.previewMode === 'split') {
+        const splitPx = Math.round((state.config.compareMix / 100) * els.previewCanvas.width);
+        if (base) {
+          ctx.save();
+          ctx.beginPath();
+          ctx.rect(0, 0, splitPx, els.previewCanvas.height);
+          ctx.clip();
+          ctx.drawImage(base, 0, 0, els.previewCanvas.width, els.previewCanvas.height);
+          ctx.restore();
+        }
+        if (alt) {
+          ctx.save();
+          ctx.beginPath();
+          ctx.rect(splitPx, 0, els.previewCanvas.width - splitPx, els.previewCanvas.height);
+          ctx.clip();
+          ctx.drawImage(alt, 0, 0, els.previewCanvas.width, els.previewCanvas.height);
+          ctx.restore();
+        }
+      }
+      if (state.previewRaster && !state.compareA && !state.compareB) {
+        ctx.drawImage(state.previewRaster, 0, 0, els.previewCanvas.width, els.previewCanvas.height);
+      }
+    }
+
+    function updateCompareSplitUi() {
+      if (state.config.previewMode !== 'split' || !state.fit) {
+        els.compareSplit.style.left = '-9999px';
+        return;
+      }
+      const cssW = parseFloat(els.sceneWrap.style.width) || 0;
+      els.compareSplit.style.left = `${cssW * (state.config.compareMix / 100)}px`;
+    }
+
+    function sourceToPreview(x, y) {
+      if (!state.fit || !state.source) return { x: 0, y: 0 };
+      const spec = computeRenderSpec(1);
+      const scale = state.fit.width / spec.width;
+      const margin = state.config.marginPx * scale;
+      return { x: x * scale + margin, y: y * scale + margin };
+    }
+
+    function previewToSource(clientX, clientY) {
+      if (!state.fit || !state.source) return null;
+      const rect = els.sceneWrap.getBoundingClientRect();
+      const px = clamp(clientX - rect.left, 0, rect.width);
+      const py = clamp(clientY - rect.top, 0, rect.height);
+      const spec = computeRenderSpec(1);
+      const scale = rect.width / spec.width;
+      const margin = state.config.marginPx * scale;
+      const x = (px - margin) / Math.max(scale, 1e-6);
+      const y = (py - margin) / Math.max(scale, 1e-6);
+      return { x: clamp(x, 0, state.source.width - 1), y: clamp(y, 0, state.source.height - 1) };
+    }
+
+    function updateMaskCanvas(pointerPreview = null) {
+      clearCanvas(maskCtx, els.maskCanvas);
+      if (!state.source || !state.fit) return;
+      const rect = els.sceneWrap.getBoundingClientRect();
+      if (!rect.width || !rect.height) return;
+      maskCtx.setTransform(1, 0, 0, 1, 0, 0);
+      if (state.maskData && state.config.maskOpacity > 0) {
+        const width = els.maskCanvas.width;
+        const height = els.maskCanvas.height;
+        const image = maskCtx.createImageData(width, height);
+        const data = image.data;
+        const spec = computeRenderSpec(1);
+        const scale = rect.width / spec.width;
+        const margin = state.config.marginPx * scale;
+        const stepX = state.source.width / Math.max(1, width - margin * 2);
+        const stepY = state.source.height / Math.max(1, height - margin * 2);
+        const alphaMul = state.config.maskOpacity / 100;
+        for (let py = 0; py < height; py += 2) {
+          const sy = clamp(Math.floor((py - margin) * stepY), 0, state.source.height - 1);
+          for (let px = 0; px < width; px += 2) {
+            const sx = clamp(Math.floor((px - margin) * stepX), 0, state.source.width - 1);
+            const m = state.maskData[sy * state.source.width + sx];
+            let r = 0, g = 0, b = 0, a = 0;
+            if (m < 100) { r = 255; g = 95; b = 109; a = (100 - m) * 2.1 * alphaMul; }
+            else if (m > 100) { r = 96; g = 165; b = 250; a = (m - 100) * 1.8 * alphaMul; }
+            const idx = (py * width + px) * 4;
+            for (let oy = 0; oy < 2; oy++) {
+              for (let ox = 0; ox < 2; ox++) {
+                const ii = idx + (oy * width + ox) * 4;
+                data[ii] = r; data[ii + 1] = g; data[ii + 2] = b; data[ii + 3] = clamp(Math.round(a), 0, 255);
+              }
+            }
+          }
+        }
+        maskCtx.putImageData(image, 0, 0);
+      }
+      if (pointerPreview && state.config.maskMode !== 'off') {
+        maskCtx.save();
+        maskCtx.strokeStyle = 'rgba(255,255,255,0.92)';
+        maskCtx.lineWidth = 1.5;
+        const scale = rect.width / computeRenderSpec(1).width;
+        const radius = state.config.brushSize * scale;
+        maskCtx.beginPath();
+        maskCtx.arc(pointerPreview.x, pointerPreview.y, radius, 0, Math.PI * 2);
+        maskCtx.stroke();
+        maskCtx.restore();
+      }
+    }
+
+    function applyMaskStroke(sourcePoint) {
+      if (!state.source || !state.maskData) return;
+      const { x, y } = sourcePoint;
+      const width = state.source.width;
+      const height = state.source.height;
+      const radius = state.config.brushSize;
+      const softness = state.config.brushSoftness / 100;
+      const minX = Math.max(0, Math.floor(x - radius - 1));
+      const maxX = Math.min(width - 1, Math.ceil(x + radius + 1));
+      const minY = Math.max(0, Math.floor(y - radius - 1));
+      const maxY = Math.min(height - 1, Math.ceil(y + radius + 1));
+      for (let yy = minY; yy <= maxY; yy++) {
+        for (let xx = minX; xx <= maxX; xx++) {
+          const dx = xx - x;
+          const dy = yy - y;
+          const dist = Math.hypot(dx, dy);
+          if (dist > radius) continue;
+          const t = clamp(1 - dist / Math.max(1, radius), 0, 1);
+          const falloff = softness > 0 ? Math.pow(t, lerp(4, 1, softness)) : 1;
+          const idx = yy * width + xx;
+          const current = state.maskData[idx];
+          let target = current;
+          switch (state.config.maskMode) {
+            case 'erase': target = lerp(current, 0, falloff); break;
+            case 'keep': target = lerp(current, 100, falloff); break;
+            case 'boost': target = lerp(current, 170, falloff); break;
+            case 'smooth': {
+              let sum = 0, count = 0;
+              for (let oy = -1; oy <= 1; oy++) for (let ox = -1; ox <= 1; ox++) {
+                const sx = clamp(xx + ox, 0, width - 1), sy = clamp(yy + oy, 0, height - 1);
+                sum += state.maskData[sy * width + sx]; count++;
+              }
+              target = lerp(current, sum / count, falloff); break;
+            }
+            default: break;
+          }
+          state.maskData[idx] = clamp(Math.round(target), 0, 175);
+        }
+      }
+      state.maskDirty = true;
+    }
+
+    function beginMaskStroke(event) {
+      if (!state.source || state.config.maskMode === 'off') return;
+      const sourcePoint = previewToSource(event.clientX, event.clientY);
+      if (!sourcePoint) return;
+      pushHistory('mask-stroke');
+      state.currentPointer = { preview: { x: event.clientX, y: event.clientY } };
+      applyMaskStroke(sourcePoint);
+      updateMaskCanvas(sourceToPreview(sourcePoint.x, sourcePoint.y));
+      els.sceneWrap.setPointerCapture?.(event.pointerId);
+      event.preventDefault();
+    }
+
+    function moveMaskStroke(event) {
+      if (!state.source || state.config.maskMode === 'off') return;
+      const sourcePoint = previewToSource(event.clientX, event.clientY);
+      if (!sourcePoint) return;
+      if (state.currentPointer) {
+        applyMaskStroke(sourcePoint);
+      }
+      updateMaskCanvas(sourceToPreview(sourcePoint.x, sourcePoint.y));
+    }
+
+    function endMaskStroke() {
+      if (!state.currentPointer) return;
+      state.currentPointer = null;
+      updateMaskCanvas();
+      scheduleProcess(20);
+    }
+
+    function captureCompare(slot) {
+      if (!state.previewRaster || !state.fit || !state.source) return;
+      const canvas = document.createElement('canvas');
+      canvas.width = els.previewCanvas.width;
+      canvas.height = els.previewCanvas.height;
+      const ctx = canvas.getContext('2d', { alpha: true });
+      ctx.drawImage(state.previewRaster, 0, 0, canvas.width, canvas.height);
+      const payload = {
+        canvas,
+        config: serializeConfig(),
+        count: state.pointCount,
+        label: slot.toUpperCase(),
+        createdAt: Date.now()
+      };
+      if (slot === 'a') state.compareA = payload;
+      else state.compareB = payload;
+      if (state.config.previewMode === 'single') state.config.previewMode = 'split';
+      refreshUi();
+      renderPreview();
+    }
+
+    async function exportViewPng() {
+      if (!state.previewRaster) return;
+      setExportBusy(true, 'Exporting View');
+      try {
+        const finalCanvas = document.createElement('canvas');
+        finalCanvas.width = els.previewCanvas.width;
+        finalCanvas.height = els.previewCanvas.height;
+        const ctx = finalCanvas.getContext('2d', { alpha: true });
+        ctx.drawImage(els.previewCanvas, 0, 0);
+        const blob = await new Promise((resolve) => finalCanvas.toBlob(resolve, 'image/png'));
+        downloadBlob(blob, `${safeFileName(state.source.name)}-preview-view.png`);
+        setMessage('Preview-exact PNG exported.');
+      } catch (error) {
+        setMessage(`Preview export failed: ${error && error.message ? error.message : String(error)}`);
+      } finally {
+        setExportBusy(false, 'Idle');
+      }
+    }
+
+    async function exportPng() {
+      if (!state.source || !state.records || !state.pointCount) return;
+      setExportBusy(true, 'Exporting PNG');
+      try {
+        const actualScale = getActualPngScale();
+        const canvas = document.createElement('canvas');
+        let note = getRequestedScale() !== actualScale ? ` Requested ${getRequestedScale()}x was clamped to safe PNG scale ${actualScale}x.` : '';
+        const compareActive = state.config.previewMode !== 'single' && (state.compareA || state.compareB) && state.config.asSeenExport;
+        if (compareActive && els.previewCanvas.width && els.previewCanvas.height) {
+          const spec = computeRenderSpec(actualScale);
+          canvas.width = spec.width;
+          canvas.height = spec.height;
+          const ctx = canvas.getContext('2d', { alpha: true });
+          if (!ctx) throw new Error('2D canvas context unavailable.');
+          ctx.imageSmoothingEnabled = true;
+          ctx.drawImage(els.previewCanvas, 0, 0, canvas.width, canvas.height);
+          note += ' Compare composite was exported exactly as preview.';
+        } else {
+          await renderSceneToCanvas(canvas, { records: state.records, scale: actualScale });
+        }
+        const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
+        downloadBlob(blob, `${safeFileName(state.source.name)}-${canvas.width}x${canvas.height}.png`);
+        setMessage(`PNG exported.${note}`);
+      } catch (error) {
+        setMessage(`PNG export failed: ${error && error.message ? error.message : String(error)}`);
+      } finally {
+        setExportBusy(false, 'Idle');
+      }
+    }
+
+    function quant(n, dp) {
+      return Number(n.toFixed(dp));
+    }
+
+    function buildSvgMarkup() {
+      if (!state.source || !state.records || !state.pointCount) throw new Error('No points to export.');
+      const scale = getRequestedScale();
+      const spec = computeRenderSpec(scale);
+      const dp = state.config.svgPrecision;
+      const parts = [
+        `<?xml version="1.0" encoding="UTF-8"?>`,
+        `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${spec.width} ${spec.height}" width="${spec.width}" height="${spec.height}">`
+      ];
+      if (!state.config.transparentBackground) {
+        parts.push(`<rect width="100%" height="100%" fill="${state.config.backgroundColor}"/>`);
+      }
+      const addLayer = (enabled, kind, color, opacity, sizeScale = 1) => {
+        if (!enabled || opacity <= 0) return;
+        const seen = state.config.optimizeSvg ? new Set() : null;
+        parts.push(`<g fill="${color}" fill-opacity="${quant(opacity, Math.min(dp + 1, 4))}">`);
+        for (let i = 0; i < state.records.length; i += 5) {
+          const density = state.records[i + 3];
+          const edge = state.records[i + 4];
+          if (kind === 'edge' && edge < state.config.edgeThreshold) continue;
+          if (kind === 'accent' && density < state.config.accentThreshold) continue;
+          const x = state.records[i] * scale + state.config.marginPx * scale;
+          const y = state.records[i + 1] * scale + state.config.marginPx * scale;
+          const r = state.records[i + 2] * scale * sizeScale;
+          if (r <= 0.2) continue;
+          const qx = quant(x, dp), qy = quant(y, dp), qr = quant(r, dp);
+          const key = `${kind}|${qx}|${qy}|${qr}`;
+          if (seen && seen.has(key)) continue;
+          if (seen) seen.add(key);
+          if (qr < 0.75) {
+            const s = quant(qr * 2, dp);
+            parts.push(`<rect x="${quant(qx - qr, dp)}" y="${quant(qy - qr, dp)}" width="${s}" height="${s}"/>`);
+          } else {
+            parts.push(`<circle cx="${qx}" cy="${qy}" r="${qr}"/>`);
+          }
+        }
+        parts.push(`</g>`);
+      };
+      addLayer(state.config.baseLayer, 'base', state.config.color, state.config.baseOpacity / 100, 1);
+      addLayer(state.config.edgeLayer, 'edge', state.config.edgeColor, state.config.edgeOpacity / 100, 1);
+      addLayer(state.config.accentLayer, 'accent', state.config.accentColor, state.config.accentOpacity / 100, state.config.accentScale);
+      parts.push('</svg>');
+      return parts.join('');
+    }
+
+    function exportSvg() {
+      if (!state.source || !state.records || !state.pointCount) return;
+      setExportBusy(true, 'Exporting SVG');
+      try {
+        const svg = buildSvgMarkup();
+        const blob = new Blob([svg], { type: 'image/svg+xml;charset=utf-8' });
+        const spec = computeRenderSpec(getRequestedScale());
+        downloadBlob(blob, `${safeFileName(state.source.name)}-${spec.width}x${spec.height}.svg`);
+        setMessage(`SVG exported at logical scale ${getRequestedScale()}x.`);
+      } catch (error) {
+        setMessage(`SVG export failed: ${error && error.message ? error.message : String(error)}`);
+      } finally {
+        setExportBusy(false, 'Idle');
+      }
+    }
+
+    function clearAll() {
+      state.source = null;
+      state.records = null;
+      state.pointCount = 0;
+      state.pointMeta = null;
+      state.lastProcessMs = null;
+      state.compareA = null;
+      state.compareB = null;
+      state.maskData = null;
+      state.fit = null;
+      state.historyUndo.length = 0;
+      state.historyRedo.length = 0;
+      state.renderToken++;
+      clearCanvas(previewCtx, els.previewCanvas);
+      clearCanvas(maskCtx, els.maskCanvas);
+      setMessage('Cleared.');
+      refreshUi();
+    }
+
+    function bindRange(id, key, parse = Number, options = {}) {
+      const input = els[id];
+      input.addEventListener('input', () => {
+        state.config[key] = parse(input.value);
+        sanitizeConfig();
+        updateInputsFromConfig();
+        if (options.previewOnly) {
+          renderPreview();
+        } else if (state.source) {
+          scheduleProcess(options.delay ?? 60);
+        }
+      });
+      input.addEventListener('change', () => pushHistory(`change-${key}`));
+    }
+
+    function bindColor(id, key, redrawOnly = false) {
+      els[id].addEventListener('input', () => {
+        state.config[key] = els[id].value;
+        updateInputsFromConfig();
+        if (redrawOnly) renderPreview(); else if (state.source) scheduleProcess(40);
+      });
+      els[id].addEventListener('change', () => pushHistory(`color-${key}`));
+    }
+
+    bindRange('minDotSize', 'minDotSize');
+    bindRange('maxDotSize', 'maxDotSize');
+    bindRange('spacing', 'spacing');
+    bindRange('contrast', 'contrast');
+    bindRange('threshold', 'threshold');
+    bindRange('shadowBoost', 'shadowBoost');
+    bindRange('highlightBoost', 'highlightBoost');
+    bindRange('edgeBoost', 'edgeBoost');
+    bindRange('marginPx', 'marginPx', Number, { previewOnly: false });
+    bindRange('previewBudget', 'previewBudget', Number, { previewOnly: true });
+    bindRange('curveShadow', 'curveShadow');
+    bindRange('curveMid', 'curveMid');
+    bindRange('curveHigh', 'curveHigh');
+    bindRange('baseOpacity', 'baseOpacity', Number, { previewOnly: true });
+    bindRange('edgeOpacity', 'edgeOpacity', Number, { previewOnly: true });
+    bindRange('accentOpacity', 'accentOpacity', Number, { previewOnly: true });
+    bindRange('edgeThreshold', 'edgeThreshold', Number, { previewOnly: true });
+    bindRange('accentThreshold', 'accentThreshold', Number, { previewOnly: true });
+    bindRange('accentScale', 'accentScale', Number, { previewOnly: true });
+    bindRange('svgPrecision', 'svgPrecision', Number, { previewOnly: true });
+    bindRange('compareMix', 'compareMix', Number, { previewOnly: true });
+    bindRange('brushSize', 'brushSize', Number, { previewOnly: true });
+    bindRange('brushSoftness', 'brushSoftness', Number, { previewOnly: true });
+    bindRange('maskOpacity', 'maskOpacity', Number, { previewOnly: true });
+
+    bindColor('inkColor', 'color', true);
+    bindColor('paperColor', 'backgroundColor', true);
+    bindColor('accentColor', 'accentColor', true);
+    bindColor('edgeColor', 'edgeColor', true);
+
+    els.seedInput.addEventListener('change', () => {
+      state.config.seed = Math.max(0, Math.floor(Number(els.seedInput.value) || 1));
+      sanitizeConfig();
+      updateInputsFromConfig();
+      pushHistory('seed');
+      if (state.source) scheduleProcess(20);
+    });
+
+    function bindToggle(el, key, redrawOnly = false) {
+      el.addEventListener('click', () => {
+        pushHistory(`toggle-${key}`);
+        state.config[key] = !state.config[key];
+        updateInputsFromConfig();
+        if (redrawOnly) renderPreview(); else if (state.source) scheduleProcess(20);
+      });
+    }
+
+    bindToggle(els.invertBtn, 'invert');
+    bindToggle(els.transparentBtn, 'transparentBackground', true);
+    bindToggle(els.autoQualityBtn, 'autoQuality', true);
+    bindToggle(els.optimizeSvgBtn, 'optimizeSvg', true);
+    bindToggle(els.baseLayerBtn, 'baseLayer', true);
+    bindToggle(els.edgeLayerBtn, 'edgeLayer', true);
+    bindToggle(els.accentLayerBtn, 'accentLayer', true);
+    bindToggle(els.asSeenExportBtn, 'asSeenExport', true);
+
+    els.modeRow.addEventListener('click', (event) => {
+      const button = event.target.closest('[data-mode]');
+      if (!button) return;
+      pushHistory('mode');
+      state.config.mode = button.dataset.mode;
+      sanitizeConfig();
+      updateInputsFromConfig();
+      if (state.source) scheduleProcess(20);
+    });
+
+    els.scaleRow.addEventListener('click', (event) => {
+      const button = event.target.closest('[data-scale]');
+      if (!button || button.disabled) return;
+      pushHistory('scale');
+      state.config.exportScale = Number(button.dataset.scale);
+      sanitizeConfig();
+      updateInputsFromConfig();
+      refreshUi();
+    });
+
+    els.previewModeRow.addEventListener('click', (event) => {
+      const button = event.target.closest('[data-preview-mode]');
+      if (!button) return;
+      pushHistory('preview-mode');
+      state.config.previewMode = button.dataset.previewMode;
+      sanitizeConfig();
+      updateInputsFromConfig();
+      renderPreview();
+    });
+
+    function setMaskMode(mode) {
+      pushHistory('mask-mode');
+      state.config.maskMode = mode;
+      sanitizeConfig();
+      updateInputsFromConfig();
+      updateMaskCanvas();
+    }
+
+    document.querySelectorAll('[data-mask-mode]').forEach((btn) => {
+      btn.addEventListener('click', () => setMaskMode(btn.dataset.maskMode));
+    });
+
+    els.clearMaskBtn.addEventListener('click', () => {
+      if (!state.source) return;
+      pushHistory('clear-mask');
+      clearMaskData();
+    });
+
+    els.fileInput.addEventListener('change', (event) => {
+      const file = event.target.files && event.target.files[0];
+      loadImage(file);
+    });
+    els.uploadDrop.addEventListener('click', () => els.fileInput.click());
+    els.uploadDrop.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); els.fileInput.click(); }
+    });
+    ['dragenter', 'dragover'].forEach((type) => els.uploadDrop.addEventListener(type, (event) => { event.preventDefault(); els.uploadDrop.classList.add('drag'); }));
+    ['dragleave', 'drop'].forEach((type) => els.uploadDrop.addEventListener(type, (event) => { event.preventDefault(); els.uploadDrop.classList.remove('drag'); }));
+    els.uploadDrop.addEventListener('drop', (event) => {
+      const file = event.dataTransfer?.files?.[0];
+      if (file) loadImage(file);
+    });
+
+    els.reprocessBtn.addEventListener('click', () => state.source && scheduleProcess(20));
+    els.undoBtn.addEventListener('click', undo);
+    els.redoBtn.addEventListener('click', redo);
+    els.clearBtn.addEventListener('click', clearAll);
+    els.exportPngBtn.addEventListener('click', exportPng);
+    els.exportViewBtn.addEventListener('click', exportViewPng);
+    els.exportSvgBtn.addEventListener('click', exportSvg);
+    els.captureABtn.addEventListener('click', () => captureCompare('a'));
+    els.captureBBtn.addEventListener('click', () => captureCompare('b'));
+    els.swapCompareBtn.addEventListener('click', () => {
+      const a = state.compareA; state.compareA = state.compareB; state.compareB = a; refreshUi(); renderPreview();
+    });
+    els.clearCompareBtn.addEventListener('click', () => { state.compareA = null; state.compareB = null; refreshUi(); renderPreview(); });
+    els.collapseBtn.addEventListener('click', () => { state.uiCollapsed = !state.uiCollapsed; refreshUi(); });
+
+    els.sceneWrap.addEventListener('pointerdown', beginMaskStroke);
+    els.sceneWrap.addEventListener('pointermove', moveMaskStroke);
+    els.sceneWrap.addEventListener('pointerup', endMaskStroke);
+    els.sceneWrap.addEventListener('pointerleave', () => updateMaskCanvas());
+    els.sceneWrap.addEventListener('pointercancel', endMaskStroke);
+
+    els.curveCanvas.addEventListener('pointerdown', (event) => {
+      pushHistory('curve-drag');
+      updateCurveFromPointer(event);
+      const move = (ev) => updateCurveFromPointer(ev);
+      const up = () => {
+        window.removeEventListener('pointermove', move);
+        window.removeEventListener('pointerup', up);
+      };
+      window.addEventListener('pointermove', move);
+      window.addEventListener('pointerup', up);
+    });
+
+    function renderPresetList() {
+      els.presetList.innerHTML = '';
+      state.localPresets = loadStorageArray(STORAGE_PRESETS);
+      state.localPresets.forEach((item, index) => {
+        const use = document.createElement('button');
+        use.textContent = item.name || `Preset ${index + 1}`;
+        use.addEventListener('click', () => {
+          pushHistory('preset-load');
+          state.config = { ...DEFAULTS, ...(item.config || {}) };
+          sanitizeConfig();
+          updateInputsFromConfig();
+          if (state.source) scheduleProcess(20); else refreshUi();
+        });
+        const del = document.createElement('button');
+        del.textContent = '×';
+        del.title = 'Delete preset';
+        del.addEventListener('click', (event) => {
+          event.stopPropagation();
+          const next = loadStorageArray(STORAGE_PRESETS);
+          next.splice(index, 1);
+          saveStorageArray(STORAGE_PRESETS, next);
+          refreshUi();
+        });
+        const wrap = document.createElement('div');
+        wrap.className = 'inline-row';
+        wrap.append(use, del);
+        els.presetList.appendChild(wrap);
+      });
+      els.presetCountValue.textContent = String(state.localPresets.length);
+    }
+
+    function renderSeedList() {
+      els.seedList.innerHTML = '';
+      state.seedLibrary = loadStorageArray(STORAGE_SEEDS);
+      state.seedLibrary.forEach((item, index) => {
+        const btn = document.createElement('button');
+        btn.textContent = `${item.name || 'Seed'} · ${item.value}`;
+        btn.addEventListener('click', () => {
+          pushHistory('seed-library');
+          state.config.seed = Math.max(0, Math.floor(Number(item.value) || 1));
+          updateInputsFromConfig();
+          if (state.source) scheduleProcess(20);
+        });
+        const del = document.createElement('button');
+        del.textContent = '×';
+        del.title = 'Delete seed';
+        del.addEventListener('click', (event) => {
+          event.stopPropagation();
+          const next = loadStorageArray(STORAGE_SEEDS);
+          next.splice(index, 1);
+          saveStorageArray(STORAGE_SEEDS, next);
+          refreshUi();
+        });
+        const wrap = document.createElement('div');
+        wrap.className = 'inline-row';
+        wrap.append(btn, del);
+        els.seedList.appendChild(wrap);
+      });
+      els.seedCountValue.textContent = String(state.seedLibrary.length);
+    }
+
+    els.savePresetBtn.addEventListener('click', () => {
+      const name = (els.presetName.value || '').trim() || `Preset ${new Date().toISOString().slice(0, 16).replace('T', ' ')}`;
+      const presets = loadStorageArray(STORAGE_PRESETS);
+      const existing = presets.find((p) => p.name === name);
+      const payload = { name, config: serializeConfig() };
+      if (existing) Object.assign(existing, payload); else presets.unshift(payload);
+      saveStorageArray(STORAGE_PRESETS, presets.slice(0, 24));
+      els.presetName.value = '';
+      refreshUi();
+      setMessage(`Preset saved: ${name}`);
+    });
+
+    els.exportPresetBtn.addEventListener('click', async () => {
+      const text = JSON.stringify(serializeConfig(), null, 2);
+      try { await navigator.clipboard.writeText(text); setMessage('Preset JSON copied to clipboard.'); }
+      catch { prompt('Copy preset JSON', text); }
+    });
+
+    els.importPresetBtn.addEventListener('click', async () => {
+      let text = '';
+      try { text = await navigator.clipboard.readText(); } catch {}
+      text = prompt('Paste preset JSON', text || '');
+      if (!text) return;
+      try {
+        const parsed = JSON.parse(text);
+        pushHistory('preset-import');
+        state.config = { ...DEFAULTS, ...parsed };
+        sanitizeConfig();
+        updateInputsFromConfig();
+        if (state.source) scheduleProcess(20); else refreshUi();
+      } catch (error) {
+        setMessage(`Preset import failed: ${error && error.message ? error.message : String(error)}`);
+      }
+    });
+
+    els.saveSeedBtn.addEventListener('click', () => {
+      const seeds = loadStorageArray(STORAGE_SEEDS);
+      const name = (els.seedName.value || '').trim() || `Seed ${state.config.seed}`;
+      const existing = seeds.find((s) => s.name === name);
+      const payload = { name, value: state.config.seed };
+      if (existing) Object.assign(existing, payload); else seeds.unshift(payload);
+      saveStorageArray(STORAGE_SEEDS, seeds.slice(0, 40));
+      els.seedName.value = '';
+      refreshUi();
+      setMessage(`Seed saved: ${name}`);
+    });
+
+    els.randomSeedBtn.addEventListener('click', () => {
+      pushHistory('seed-random');
+      state.config.seed = Math.floor(Math.random() * 2147483647);
+      updateInputsFromConfig();
+      if (state.source) scheduleProcess(20);
+    });
+
+    els.applySeedBtn.addEventListener('click', () => {
+      pushHistory('seed-apply');
+      state.config.seed = Math.max(0, Math.floor(Number(els.seedInput.value) || state.config.seed));
+      updateInputsFromConfig();
+      if (state.source) scheduleProcess(20);
+    });
+
+    window.addEventListener('resize', () => {
+      updateCompareSplitUi();
+      renderPreview();
+    });
+
+    sanitizeConfig();
+    refreshUi();
+    updateMaskCanvas();
+    renderPresetList();
+    renderSeedList();
+    drawCurveEditor();
+  })();
+  </script>
+</body>
+</html>
