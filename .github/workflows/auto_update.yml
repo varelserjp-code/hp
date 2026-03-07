@@ -2,9 +2,9 @@ name: Daily Nursing News Update
 
 on:
   schedule:
-    - cron: '0 22 * * *'  # JST 07:00
-    - cron: '0 3 * * *'   # JST 12:00
-    - cron: '0 8 * * *'   # JST 17:00
+    - cron: '0 22 * * *'
+    - cron: '0 3 * * *'
+    - cron: '0 8 * * *'
   workflow_dispatch:
 
 jobs:
