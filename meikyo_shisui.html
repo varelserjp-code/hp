@@ -1,0 +1,355 @@
+// MEIKYOSHISUI v25.7 //
+MEIKYOSHISUI
+ambient · drone · psychedelic · dark ambient · space
+⬡ Engine Control
+ALL ON MINIMAL CHAOS ALL OFF SERIAL XENAKIS SWARM ORGANIC SACRED
+
+
+
+Chord Input
+— コードを入力してください —
+
+EXTENDED / EXOTIC
+
+MIDI INPUT RECEIVE
+Web MIDI からノート/CC を受信し、和音認識と主要パラメーター操作へ接続
+
+
+Genre / Texture
+
+
+CC Automation MIDI CC LANES v23.0
+CC AUTOMATION
+Modulation / Filter / Reverb などを波形・テンションで自動生成
+
+PRESETS
+
+LANES
+
+CC AUTOMATION — 無効
+
+Attractor Sequencer STRANGE ATTRACTOR v22.0
+Enable Attractor Sequencer
+Lorenz · Rössler · Thomas のストレンジアトラクターを x/y/z → Pitch / Velocity / Duration / Gate / Density に自由マッピング
+
+
+Scale Mutation MODAL INTERCHANGE v21.0
+Enable Scale Mutation Mode
+Dorian → Phrygian → Lydian など バー単位でスケールが変化 — Modal Interchange / Modulation をアンビエント的に表現
+
+
+Chord Progression MULTI-CHORD v20.0
+Enable Chord Progression Mode
+II-V-I · Am-G-F-E など複数コードを時系列に配置 — テンションカーブと連動してコード変化ごとに表情を生成
+
+
+Conductor Track TIMELINE v25.7
+CONDUCTOR VIZ
+テンポ / テンションカーブをタイムラインで可視化。EDIT モードでクリック&ドラッグして手動編集
+
+EDIT MODE
+RESET
+CONDUCTOR VIZ — 無効
+
+Rhythmic Canons TILING v25.6
+RHYTHMIC CANONS
+Vuza / Tiling Canon — A⊕B=Zn の完全タイリングリズム。Euclidean の代替ゲートとして Pad / Arp に適用
+
+MODE
+VUZA
+TILING
+MESSIAEN
+POLYMETER
+PRESETS (n=24)
+
+STEPS (n)
+
+24
+VOICES
+
+2
+GATE PATTERN
+RHYTHMIC CANONS — 無効
+
+Just Intonation JI TUNING v25.5
+JUST INTONATION
+純正律チューニング — MPE モード有効時に各音に PitchBend を適用 (5-limit / 7-limit / 11-limit / Harmonic / Utonal)
+
+MODE
+5-LIMIT
+7-LIMIT
+11-LIMIT
+HARMONIC
+UTONAL
+BLEND
+
+100%
+DEVIATION FROM 12-TET (¢)
+JUST INTONATION — 無効 (MPE モードで有効になります)
+
+Neo-Riemannian TONNETZ v25.3
+P / R / L 変換 — Tonnetz 格子
+Parallel · Relative · Leading-tone 変換でコードを進行に追加 — BFS で最短パス探索 — Tonnetz Canvas でリアルタイム可視化
+NR PRESETS
+
+TRANSFORM (現在コード)
+P R L PL LR RL PLP RESET
+— コードを入力してください —
+TONNETZ
+PATH FINDER (BFS)
+→ FIND PATH
+— 起点と終点を入力して FIND PATH —
+現在変換コードを進行に追加
+＋ ADD CHORD
+
+Negative Harmony ERNST LEVY
+Key (調性)
+Chord Progression — コード進行
+
+＋ コードを追加
+▲ Original Progression
+コードを追加してください
+
+対称軸 · Axis = E♭/E
+
+
+▼ Shadow (Negative Harmony)
+Algorithm: 調性の主音 R に対し、対称軸 axis = R + 3.5 (半音) を設定。 各構成音 n を n' = (2 × axis − n) mod 12 で反転。 例：C Major の G7 [G,B,D,F] → [C, A♭, F, D] = Fm6。
+
+Swarm Intelligence — Boids REYNOLDS v18.0
+Enable Boids Swarm
+Craig Reynolds 1986 — Separation · Alignment · Cohesion — レイヤー間の相互干渉アンサンブルをシミュレート
+
+
+Lorenz Attractor STRANGE ATTRACTOR RK4 LEGACY
+▸ Attractor Sequencer (v22.0) が有効な場合、このパネルは無効です。以下のパラメータは Attractor Sequencer OFF 時のフォールバックとして機能します。
+Lorenz Attractor Parameters
+σ(sigma) · ρ(rho) · β(beta) · dt · Warmup — velocity / gate / note-index を混沌軌道で変調 (Drone · Pad · Arp · Melody · Texture · Lead)
+
+PRESETS
+
+LORENZ EQUATION
+σ (sigma)10.0
+ρ (rho)28.0
+β (beta)2.67
+INTEGRATION
+dt (step)0.020
+Warmup1000
+x: — · y: — · z: —
+x → velocity 変調 (±15)  |  y → note index オフセット (±2)  |  z → gate長変調 (0.85〜1.15)
+ρ < 24.06: 安定螺旋  |  ρ ≈ 28: 典型カオス  |  ρ > 36: 完全カオス
+
+Cellular Automaton WOLFRAM 1D ECA
+Cellular Automaton Parameters
+Rule 0–255 · Seed · Override — ゲートマトリクスでノートの発音をセル状態で制御 (Drone · Pad · Arp · Melody · Texture · Lead)
+
+RULE SELECT MODE AUTO (ジャンル連動)
+
+INITIAL SEED
+
+Rule = Wolfram Elementary CA ルール番号 (0–255)  |  Auto = ジャンルに応じて自動選択 (Ambient→30 / Drone→90 / Psychedelic→54 …)
+Gate Matrix: CA の各行をサンプリングし、ノートの発音可否をビット列で制御
+
+Xenakis Sieve Theory XENAKIS v17.0
+Enable Sieve Theory
+モジュロ演算 × 集合論 — 複数の篩（残差類）を AND · OR · NOT で結合し、非対称スケールとポリリズムを生成
+
+
+Euclidean Rhythm BJÖRKLUND
+Enable Euclidean Rhythm
+ARP · MELODY · TEXTURE · LEAD に適用 — 数理的パルス配置 E(k,n)
+
+
+Humanizer Noise 1/f + PERLIN v14.0
+Enable Humanizer-Noise
+velocity / micro-timing / CC modulation を 1/f ピンクノイズ + Perlin FBM で置き換え — 既存の Math.random() ホワイトノイズを廃止
+
+
+Integral Serialism BOULEZ · STOCKHAUSEN v16.0
+Enable Integral Serialism
+Duration · Velocity · Gate を12音マトリクスで完全決定論的制御 — Lorenz/Humanizer の確率的揺らぎを数学的支配で上書き (Arp · Melody · Lead)
+
+
+Markov Chain Melody v13.0
+Enable Markov Layer
+確率的遷移行列によるメロディ生成 — MELODY / ARP に重ねる独立MIDI ch8トラック
+
+
+L-System LINDENMAYER v19.0
+Enable L-System Phrase Growth
+フラクタル文法でフレーズを自己増殖 — 短いモチーフが世代を経て有機的に成長し回帰する。独立MIDI ch10トラック
+
+
+Rubato Engine BOUNCING BALL TEMPORAL
+Temporal Distortion — Rubato
+物理バウンスモデルによる非線形タイミング変調 — e · t₀ · Notes · Direction — Arp · Melody · Lead のステップ長を変調
+
+PRESETS
+
+PHYSICS
+e (elasticity)0.80
+t₀ (init interval)1.00
+SEQUENCE
+Notes16
+DIRECTION
+FORWARD
+加速→収束
+REVERSE
+収束→加速
+BOUNCE
+加速⇄減速
+ratio: — · range: —
+TIMING CURVE
+tₙ = t₀ × eⁿ — バウンスボール物理モデル  |  e 大 = 緩やかな変化  |  e 小 = 急速な収束
+Arp 35% · Melody 45% · Lead 40% のブレンドでステップ長を変調
+
+Spectral Analysis HARMONIC SERIES v1.0
+Harmonic Spectrum Shaping
+倍音列をFFT風に可視化 — 音色プロファイルでオーバートーン速度・テクスチャ密度・協和度ゲートをリアルタイム整形
+
+TIMBRE PRESET
+SAW
+SQUARE
+TRIANGLE
+SINE
+CLARINET
+BRASS
+STRINGS
+ORGAN
+BELL
+FLUTE
+SPECTRUM
+Harmonics12
+Rolloff1.0
+Threshold0.05
+SHAPING
+Brightness Boost0.0
+Consonance Gate0.50
+Vel Shape
+
+Tex Filter
+
+HARMONIC SPECTRUM
+CONSONANCE —
+BRIGHTNESS —
+DENSITY —
+RESONANT PITCH CLASSES
+— chord not yet analyzed —
+倍音列: 音根 × 整数比 1–N → ピッチクラス投影  |  Vel Shape = オーバートーン層の速度を音色プロファイルで整形
+Tex Filter = 非共鳴PCをテクスチャから抑制  |  Consonance Gate = 協和度閾値以下の音程を抑制
+
+Solfeggio Frequencies SACRED TONES v1.0
+Enable Solfeggio Layer
+古代ソルフェジオ周波数・バイノーラルビート・シューマン共鳴 — 独立MIDI ch12トラックとして生成
+
+
+Binaural Beat Engine
+Enable Binaural Beat Layer
+左右チャンネルに異なる周波数を出力し脳波を誘導 — Ch13(L) / Ch14(R) として生成
+DAWでCh13→Pan L100% / Ch14→Pan R100% に設定してください
+
+
+Compensation Tuning MICRO
+Enable Compensation Tuning
+基準ピッチ補正・音律テンプラメント・インターバルマイクロチューニング — 全トラックにPitch Bend後処理として適用
+
+
+Macro Structure SECTIONS + TEMPO MOD + CHAIN
+Enable Macro Structure
+TENSION → VEL/DENSITY/DISSONANCE + SECTION MARKERS + TEMPO DRIFT
+
+
+Theory Framework EXPANDED
+Modal / Diatonic
+Harmonic / Altered
+Symmetric / Exotic
+World / Non-Western
+Spectral / Micro
+
+
+Theory Analysis
+Root
+—
+Chord
+—
+—
+Chord Tones
+—
+—
+Scale
+—
+—
+Characteristic
+—
+Tension Notes
+—
+
+PC Set Similarity Map FORTE v23.1
+
+Enable PC Set Similarity Map
+選択中のコード/スケールのIVベクトルに近いForteセットをCanvas上にプロット。類似度が高いほど中心に配置。
+
+Octave Range Control MULTI-OCTAVE
+Playable Range
+
+Root OctC3
+Oct Spread±1 oct
+Oct BiasCenter
+
+Synthesis Parameters
+BPM58 BPM
+Bars16
+Density40%
+Velocity72
+Humanize35%
+Drift30%
+Dissonance20%
+Polyrhythm10%
+GATE TIME / ARTICULATION NEW
+Gate Ratio0.85
+Gate Hum20%
+NEUTRAL — natural phrasing
+DISSONANCE RESOLUTION v12.1
+Resolve Thr0.65
+Resolve Steps2
+IDLE — waiting
+MPE Microtonal
+PER-NOTE PITCH BEND · QUARTER-TONE · SPECTRAL
+
+
+Layers
+
+💾 PRESETS LOCAL STORAGE
+SAVE AUTO EXPORT IMPORT
+No saved presets
+⬡ GENERATE MIDI↓ DOWNLOAD .MID
+⬡ GEN A/B
+SEED — LOCK COPY
+
+Multi-File Export STEM
+各レイヤーを個別 MIDI ファイルとして一括出力 — DAW stem import に最適
+FILE PREFIX
+void
+番号付加 (01_, 02_...)
+
+ON
+Conductor Track 含める
+
+ON
+LAYER SELECT — GENERATE後にレイヤーが表示されます
+ALL
+NONE
+⇣ EXPORT STEMS
+
+GENERATEしてからエクスポートしてください
+OSC BRIDGE — WebSocket binary bundle / JSON fallback
+OSC BINARY
+JSON FALLBACK
+ws://127.0.0.1:7000
+⇢ SEND OSC
+GENERATEしてから送信してください
+MUSICXML — score-partwise export
+⇣ EXPORT MUSICXML
+GENERATEしてからエクスポートしてください
+// MEIKYOSHISUI v25.7 READY — BROWSER-BASED GENERATIVE MIDI SYSTEM //
+MEIKYOSHISUI v25.7 — GENERATIVE MIDI SYSTEM — ALL PROCESSING IN BROWSER
