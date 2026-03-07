@@ -46,7 +46,7 @@
     article:last-child{border-bottom:none;}
     .meta{font-size:12px;color:var(--muted);margin-bottom:8px;}
     .article-title{font-size:17px;font-weight:700;line-height:1.5;margin-bottom:16px;}
-    .summary{font-size:15px;color:#222;line-height:1.9;margin-bottom:18px;}
+    .summary{font-size:15px;color:#222;line-height:1.9;margin-bottom:18px;white-space:normal;}
     .source-box{background:var(--sidebar-bg);border:1px solid var(--border);border-radius:8px;padding:12px 16px;font-size:13px;color:#555;line-height:1.7;}
     .source-box strong{color:var(--fg);display:block;margin-bottom:4px;}
     .source-box a{color:var(--accent);word-break:break-all;}
@@ -60,10 +60,12 @@
         <p class="sidebar-title">日付</p>
         <div class="date-group">
   <button class="date-btn" onclick="toggleDate('2026-03-07')">
-    <span>2026年3月7日</span><span class="count">1</span>
+    <span>2026年3月7日</span><span class="count">8</span>
   </button>
   <div class="genre-list" id="genres-2026-03-07">
-    <a href="#" class="genre-sublink" onclick="showDate('2026-03-07'); return false;">公衆衛生<span class="count">1</span></a>
+    <a href="#" class="genre-sublink" onclick="showDate('2026-03-07'); return false;">精神<span class="count">2</span></a>
+    <a href="#" class="genre-sublink" onclick="showDate('2026-03-07'); return false;">公衆衛生<span class="count">2</span></a>
+    <a href="#" class="genre-sublink" onclick="showDate('2026-03-07'); return false;">感染症<span class="count">4</span></a>
   </div>
 </div>
 
@@ -71,7 +73,9 @@
       <hr class="sidebar-divider">
       <div class="sidebar-section">
         <p class="sidebar-title">ジャンル</p>
-        <a href="#" class="genre-link" onclick="showGenre('公衆衛生'); return false;">公衆衛生<span class="count">1</span></a>
+        <a href="#" class="genre-link" onclick="showGenre('公衆衛生'); return false;">公衆衛生<span class="count">2</span></a>
+<a href="#" class="genre-link" onclick="showGenre('精神'); return false;">精神<span class="count">2</span></a>
+<a href="#" class="genre-link" onclick="showGenre('感染症'); return false;">感染症<span class="count">4</span></a>
 
       </div>
     </nav>
@@ -79,13 +83,45 @@
       <a href="/hp/" class="back-link">← ホームに戻る</a>
       <p class="page-title">最新の医療・看護ニュース</p>
       <p class="page-desc">海外の最新医療ニュースをAIで要約し、定期配信しています。</p>
-      <div class="view active" id="view-date">
-        <div class="date-section" id="2026-03-07">
+      <div class="view active" id="view-date"><div class="date-section" id="2026-03-07">
 <h2 class="date-heading">2026年3月7日</h2>
+<div class="genre-section">
+<h3 class="genre-heading">精神</h3>
+  <article data-genre="精神">
+    <p class="meta">WHO (World Health Organization)　Thu, 05 Feb 2026 13:51:04 Z</p>
+    <h4 class="article-title">Over four million girls still at risk of female genital mutilation: UN leaders call for sustained commitment and investment to end FGM</h4>
+    <div class="summary">【概要】WHO (World Health Organization) の記事「Over four million girls still at risk of female genital mutilation: UN leaders call for sustained commitment and investment to end FGM」です。<br><br>AI 要約に失敗したため、原文から取得できた内容を簡易表示しています。<br><br>【原文抜粋】In 2026 alone, an estimated 4.5 million girls – many under the age of five – are at risk of undergoing female genital mutilation (FGM). Currently, more than 230 million girls and women are living with its lifelong consequences. Today, on the International Day of Zero Tolerance for Female Genital Mutilation, we reaffirm our commitment to end female genital mutilation for every girl and every woman at risk, and to cont</div>
+    <div class="source-box">
+      <strong>ソース・引用元</strong><br>
+      配信元：WHO (World Health Organization)<br>
+      原文URL：<a href="https://www.who.int/news/item/05-02-2026-over-four-million-girls-still-at-risk-of-female-genital-mutilation--un-leaders-call-for-sustained-commitment-and-investment-to-end-fgm" target="_blank" rel="noopener">https://www.who.int/news/item/05-02-2026-over-four-million-girls-still-at-risk-of-female-genital-mutilation--un-leaders-call-for-sustained-commitment-and-investment-to-end-fgm</a>
+    </div>
+  </article>
+  <article data-genre="精神">
+    <p class="meta">WHO (World Health Organization)　Tue, 10 Feb 2026 23:30:33 Z</p>
+    <h4 class="article-title">One in two people facing cataract blindness need access to life-changing surgery</h4>
+    <div class="summary">【概要】WHO (World Health Organization) の記事「One in two people facing cataract blindness need access to life-changing surgery」です。<br><br>AI 要約に失敗したため、原文から取得できた内容を簡易表示しています。<br><br>【原文抜粋】The World Health Organization (WHO) is urging countries to accelerate efforts to ensure that millions of people living with cataract can access simple, sight‑restoring surgery – one of the most effective and affordable interventions to prevent avoidable blindness. A new study published today in The Lancet Global Health highlights the scale of the challenge: nearly half of all people across the world facing cataract‑r</div>
+    <div class="source-box">
+      <strong>ソース・引用元</strong><br>
+      配信元：WHO (World Health Organization)<br>
+      原文URL：<a href="https://www.who.int/news/item/11-02-2026-one-in-two-people-facing-cataract-blindness-need-access-to-life-changing-surgery" target="_blank" rel="noopener">https://www.who.int/news/item/11-02-2026-one-in-two-people-facing-cataract-blindness-need-access-to-life-changing-surgery</a>
+    </div>
+  </article>
+</div>
 <div class="genre-section">
 <h3 class="genre-heading">公衆衛生</h3>
   <article data-genre="公衆衛生">
-    <p class="meta">WHO (World Health Organization)　WHO (World Health Organization)　Thu, 26 Feb 2026 17:17:17 Z</p>
+    <p class="meta">WHO (World Health Organization)　Fri, 13 Feb 2026 18:18:53 Z</p>
+    <h4 class="article-title">Statement on the planned hepatitis B birth dose vaccine trial in Guinea-Bissau</h4>
+    <div class="summary">【B型肝炎出生時投与ワクチンの重要性】<br>世界保健機関（WHO）は、B型肝炎の出生時投与ワクチンが、母子感染を阻止し、生命を脅かす肝疾患を防ぐ、効果的で不可欠な公衆衛生介入であることを強調しています。このワクチンは30年以上にわたり世界中で使用され、115カ国以上で国の予防接種計画に組み込まれてきました。新生児を適切に保護することは、個人の健康に寄与するだけでなく、国内および世界的なB型肝炎排除の取り組みにおいても極めて重要な役割を担っています。<br><br>【ギニアビサウでの治験計画に対するWHOの懸念】<br>WHOは最近、メディアからの問い合わせに応じ、ギニアビサウで計画されているB型肝炎出生時投与ワクチンに関する無作為化比較試験（RCT）について声明を発表しました。WHOは、公開情報と関連専門家との協議に基づき、この研究の科学的根拠、倫理的保護、および人道研究における確立された原則との整合性に関して重大な懸念を抱いています。現状では、この治験は確立された倫理的・科学的原則に矛盾すると判断されています。これを受け、ギニアビサウ政府は、さらなる技術的レビューのために、この研究を一時停止しました。<br><br>【WHOの支援と今後の展望】<br>WHOは、ギニアビサウが今後の進め方を検討し、出生時投与ワクチンの導入を加速し、実施を強化するにあたり、全面的に支援する用意があります。WHOは、ギニアビサウおよび世界中のすべての新生児が、B型肝炎から適時かつ科学的根拠に基づいた保護を受けられるよう、またこの分野で行われる研究が最高の倫理的・科学的基準を満たすよう、各国当局、研究者、パートナーと協力し続けることを約束しています。<br><br>【B型肝炎の現状と予防の重要性】<br>B型肝炎は世界中で年間数十万人もの命を奪い、特に開発途上国での負担が大きいです。出生時の感染は、肝硬変や肝がんのリスクが高い慢性キャリアとなる最も一般的な経路です。ギニアビサウでは、成人の12%以上、5歳未満の子どもの約2%が慢性B型肝炎に罹患しており、これはWHOが定める世界目標（0.1%以下）を大幅に上回る深刻な状況です。このような背景から、ギニアビサウは2024年にB型肝炎出生時投与ワクチンを国家予防接種計画に追加することを正式に決定し、2028年までに導入を計画しています。この政策決定は、ワクチンの価値を再確認するものであり、新生児から適時の保護を拒否してはならないという倫理的義務を改めて強調しています。</div>
+    <div class="source-box">
+      <strong>ソース・引用元</strong><br>
+      配信元：WHO (World Health Organization)<br>
+      原文URL：<a href="https://www.who.int/news/item/13-02-2026-statement-on-the-planned-hepatitis-b-birth-dose-vaccine-trial-in-guinea-bissau" target="_blank" rel="noopener">https://www.who.int/news/item/13-02-2026-statement-on-the-planned-hepatitis-b-birth-dose-vaccine-trial-in-guinea-bissau</a>
+    </div>
+  </article>
+  <article data-genre="公衆衛生">
+    <p class="meta">WHO (World Health Organization)　WHO (World Health Organization) Thu, 26 Feb 2026 17:17:17 Z</p>
     <h4 class="article-title">Denmark becomes first country in the European Union to eliminate mother-to-child transmission of HIV and syphilis</h4>
     <div class="summary">【デンマーク、HIV・梅毒母子感染排除を達成 EU初の快挙】<br><br>世界保健機関（WHO）は、デンマークがヒト免疫不全ウイルス（HIV）および梅毒の母子感染排除（EMTCT）を達成したと認定しました。これは欧州連合（EU）加盟国として初の快挙であり、すべての新生児がこれらの感染症から解放されて生まれることを確保するデンマークの持続的な取り組みが高く評価されたものです。<br><br>WHOのテドロス事務局長は、これをデンマークにとって公衆衛生上の大きな成果と述べ、強力な政治的コミットメントと、プライマリケアおよび統合された母子保健サービスへの継続的な投資が、この目標達成に不可欠であったと強調しました。<br><br>認定は、WHOの地域およびグローバル検証委員会による厳格な評価を経て行われました。デンマークは2021年から2024年にかけ、低い感染率と妊婦への検査および治療の高いカバー率（妊婦の少なくとも95％が検査と治療を受け、新たな乳児感染が年間出生10万件あたり50件未満に保たれること）を含むすべての必要目標を満たしました。</div>
     <div class="source-box">
@@ -95,9 +131,51 @@
     </div>
   </article>
 </div>
+<div class="genre-section">
+<h3 class="genre-heading">感染症</h3>
+  <article data-genre="感染症">
+    <p class="meta">WHO (World Health Organization)　Tue, 17 Feb 2026 09:24:36 Z</p>
+    <h4 class="article-title">Global commitment on display as countries negotiate key annex to the Pandemic Agreement</h4>
+    <div class="summary">【概要】WHO (World Health Organization) の記事「Global commitment on display as countries negotiate key annex to the Pandemic Agreement」です。<br><br>AI 要約に失敗したため、原文から取得できた内容を簡易表示しています。<br><br>【原文抜粋】Member States of the World Health Organization (WHO) concluded a weeklong round of negotiations on draft annex for Pathogen Access and Benefit Sharing (PABS) – a key component of the WHO Pandemic Agreement. The fifth meeting of the Intergovernmental Working Group on the WHO Pandemic Agreement (IGWG) – set up by the World Health Assembly (WHA) last year to negotiate the PABS annex – wrapped up over the weekend after p</div>
+    <div class="source-box">
+      <strong>ソース・引用元</strong><br>
+      配信元：WHO (World Health Organization)<br>
+      原文URL：<a href="https://www.who.int/news/item/17-02-2026-global-commitment-on-display-as-countries-negotiate-key-annex-to-the-pandemic-agreement" target="_blank" rel="noopener">https://www.who.int/news/item/17-02-2026-global-commitment-on-display-as-countries-negotiate-key-annex-to-the-pandemic-agreement</a>
+    </div>
+  </article>
+  <article data-genre="感染症">
+    <p class="meta">WHO (World Health Organization)　Wed, 18 Feb 2026 14:24:32 Z</p>
+    <h4 class="article-title">WHO validates elimination of trachoma as a public health problem in Libya</h4>
+    <div class="summary">【概要】WHO (World Health Organization) の記事「WHO validates elimination of trachoma as a public health problem in Libya」です。<br><br>AI 要約に失敗したため、原文から取得できた内容を簡易表示しています。<br><br>【原文抜粋】The World Health Organization (WHO) today announced that Libya has eliminated trachoma as a public health problem, a landmark victory for public health in WHO’s Eastern Mediterranean Region. This hard-won achievement protects future generations from preventable blindness and provides a powerful reminder that countries can overcome neglected tropical diseases despite persisting challenges. “This milestone reflects Lib</div>
+    <div class="source-box">
+      <strong>ソース・引用元</strong><br>
+      配信元：WHO (World Health Organization)<br>
+      原文URL：<a href="https://www.who.int/news/item/18-02-2026-who-validates-elimination-of-trachoma-as-a-public-health-problem-in-libya" target="_blank" rel="noopener">https://www.who.int/news/item/18-02-2026-who-validates-elimination-of-trachoma-as-a-public-health-problem-in-libya</a>
+    </div>
+  </article>
+  <article data-genre="感染症">
+    <p class="meta">WHO (World Health Organization)　Mon, 23 Feb 2026 16:14:35 Z</p>
+    <h4 class="article-title">Attacks on Ukraine’s health care increased by 20% in 2025</h4>
+    <div class="summary">【概要】WHO (World Health Organization) の記事「Attacks on Ukraine’s health care increased by 20% in 2025」です。<br><br>AI 要約に失敗したため、原文から取得できた内容を簡易表示しています。<br><br>【原文抜粋】As Ukraine enters the fifth year of full-scale war, its people have endured the highest number of attacks on their health care in 2025 – increasing by nearly 20% compared to 2024. Since the beginning of the full-scale war on 24 February 2022, WHO has documented at least 2881 attacks on health care in Ukraine, affecting health workers, facilities, ambulances, and medical warehouses. Health services are under intense p</div>
+    <div class="source-box">
+      <strong>ソース・引用元</strong><br>
+      配信元：WHO (World Health Organization)<br>
+      原文URL：<a href="https://www.who.int/news/item/23-02-2026-attacks-on-ukraine-s-health-care-increased-by-20-in-2025" target="_blank" rel="noopener">https://www.who.int/news/item/23-02-2026-attacks-on-ukraine-s-health-care-increased-by-20-in-2025</a>
+    </div>
+  </article>
+  <article data-genre="感染症">
+    <p class="meta">WHO (World Health Organization)　Wed, 25 Feb 2026 18:06:55 Z</p>
+    <h4 class="article-title">WHO Director-General visits Jordan to recognize strong collaboration on health system delivery, emergency relief and advancing mental health</h4>
+    <div class="summary">【概要】WHO (World Health Organization) の記事「WHO Director-General visits Jordan to recognize strong collaboration on health system delivery, emergency relief and advancing mental health」です。<br><br>AI 要約に失敗したため、原文から取得できた内容を簡易表示しています。<br><br>【原文抜粋】The Director-General of the World Health Organization, Dr Tedros Adhanom Ghebreyesus, today concluded the first day of his two-day State visit to the Hashemite Kingdom of Jordan, underscoring the strong partnership between WHO and Jordan across the areas of universal health coverage (UHC), mental health and humanitarian health action. A central moment of the visit was today’s meeting with His Majesty King Abdullah II</div>
+    <div class="source-box">
+      <strong>ソース・引用元</strong><br>
+      配信元：WHO (World Health Organization)<br>
+      原文URL：<a href="https://www.who.int/news/item/25-02-2026-who-director-general-visits-jordan-to-recognize-strong-collaboration-on-health-system-delivery--emergency-relief-and-advancing-mental-health" target="_blank" rel="noopener">https://www.who.int/news/item/25-02-2026-who-director-general-visits-jordan-to-recognize-strong-collaboration-on-health-system-delivery--emergency-relief-and-advancing-mental-health</a>
+    </div>
+  </article>
 </div>
-
-      </div>
+</div>
+</div>
       <div class="view" id="view-genre">
         <p class="genre-view-title">ジャンル：<span id="genre-view-label"></span></p>
         <div id="genre-articles"></div>
@@ -107,6 +185,7 @@
   <script>
     function toggleDate(date) {
       const list = document.getElementById('genres-' + date);
+      if (!list) return;
       const btn = list.previousElementSibling;
       list.classList.toggle('open');
       btn.classList.toggle('open');
