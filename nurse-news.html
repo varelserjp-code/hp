@@ -6,9 +6,13 @@
   <title>Nursing News | VARELSER</title>
   <style>
     :root {
-      --bg:#fff; --fg:#111; --muted:rgba(0,0,0,.5);
-      --border:#e8e8e8; --accent:#0056b3;
-      --sidebar-bg:#fafafa; --hover:rgba(0,0,0,.04);
+      --bg:#fff;
+      --fg:#111;
+      --muted:rgba(0,0,0,.5);
+      --border:#e8e8e8;
+      --accent:#0056b3;
+      --sidebar-bg:#fafafa;
+      --hover:rgba(0,0,0,.04);
     }
     *{box-sizing:border-box;margin:0;padding:0;}
     body{background:var(--bg);color:var(--fg);font-family:ui-sans-serif,system-ui,-apple-system,"Hiragino Kaku Gothic ProN","Noto Sans JP","Segoe UI",sans-serif;line-height:1.8;font-size:16px;}
@@ -79,11 +83,14 @@
 
       </div>
     </nav>
+
     <div class="main">
       <a href="/hp/" class="back-link">← ホームに戻る</a>
       <p class="page-title">最新の医療・看護ニュース</p>
       <p class="page-desc">海外の最新医療ニュースをAIで要約し、定期配信しています。</p>
-      <div class="view active" id="view-date"><div class="date-section" id="2026-03-07">
+
+      <div class="view active" id="view-date">
+        <div class="date-section" id="2026-03-07">
 <h2 class="date-heading">2026年3月7日</h2>
 <div class="genre-section">
 <h3 class="genre-heading">精神</h3>
@@ -175,13 +182,16 @@
   </article>
 </div>
 </div>
-</div>
+
+      </div>
+
       <div class="view" id="view-genre">
         <p class="genre-view-title">ジャンル：<span id="genre-view-label"></span></p>
         <div id="genre-articles"></div>
       </div>
     </div>
   </div>
+
   <script>
     function toggleDate(date) {
       const list = document.getElementById('genres-' + date);
@@ -190,29 +200,37 @@
       list.classList.toggle('open');
       btn.classList.toggle('open');
     }
+
     function showDate(date) {
       document.getElementById('view-date').classList.add('active');
       document.getElementById('view-genre').classList.remove('active');
       document.querySelectorAll('.genre-link').forEach(l => l.classList.remove('active'));
+
       setTimeout(() => {
         const el = document.getElementById(date);
         if (el) el.scrollIntoView({behavior:'smooth', block:'start'});
       }, 50);
     }
+
     function showGenre(genre) {
       document.querySelectorAll('.genre-link').forEach(l => {
         l.classList.toggle('active', l.textContent.trim().startsWith(genre));
       });
+
       document.getElementById('view-date').classList.remove('active');
       document.getElementById('view-genre').classList.add('active');
       document.getElementById('genre-view-label').textContent = genre;
+
       const container = document.getElementById('genre-articles');
       container.innerHTML = '';
+
       document.querySelectorAll(`article[data-genre="${genre}"]`).forEach(a => {
         container.appendChild(a.cloneNode(true));
       });
+
       window.scrollTo({top:0, behavior:'smooth'});
     }
+
     const firstBtn = document.querySelector('.date-btn');
     if (firstBtn) firstBtn.click();
   </script>
