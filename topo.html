@@ -3,1272 +3,1411 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Topographic Multi-Center Pro</title>
-  <script src="https://cdn.jsdelivr.net/npm/p5@1.9.4/lib/p5.min.js"></script>
+  <title>Topo — Multi Center Topographic Refined</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
   <style>
-    :root{
-      --bg:#ffffff;
-      --fg:#111111;
-      --muted:#666666;
-      --line:#dddddd;
-      --panel:#ffffff;
-      --accent:#111111;
-      --sel:#0b57d0;
-      --danger:#a33;
+    :root {
+      --bg: #050505;
+      --panel: #0d0d10;
+      --panel-2: #111114;
+      --line: #202028;
+      --line-2: #2a2a34;
+      --text: #f1f1f3;
+      --muted: #a1a1aa;
+      --muted-2: #71717a;
+      --accent: #ffffff;
+      --accent-soft: rgba(255,255,255,0.08);
+      --danger: #ef4444;
+      --ok: #22c55e;
+      --shadow: 0 20px 80px -20px rgba(0,0,0,0.65);
     }
-    *{box-sizing:border-box}
-    html,body{height:100%;margin:0;background:var(--bg);color:var(--fg);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif}
-    #app{height:100%;display:flex;flex-direction:column}
-    header{
-      padding:10px 14px;border-bottom:1px solid #e9e9e9;background:#fff;
-      display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap
+
+    * { box-sizing: border-box; }
+    html, body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      overflow: hidden;
     }
-    header h1{font-size:14px;margin:0;font-weight:700;letter-spacing:.03em}
-    header .sub{font-size:12px;color:var(--muted)}
-    .layout{flex:1;display:flex;min-height:0}
-    .sidebar{
-      width:380px;max-width:42vw;min-width:320px;border-right:1px solid #ececec;
-      background:var(--panel);overflow:auto;padding:14px
+
+    body {
+      display: grid;
+      grid-template-rows: 1fr auto;
     }
-    .canvasWrap{flex:1;min-width:0;min-height:0;display:flex;align-items:center;justify-content:center;position:relative;background:#fafafa}
-    .panel{border:1px solid #ececec;border-radius:12px;padding:12px;margin-bottom:12px;background:#fff}
-    .panel h2{font-size:13px;margin:0 0 10px;font-weight:700}
-    .row{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;margin:8px 0}
-    .row label{font-size:12px;color:#222}
-    .row .value{font-size:11px;color:var(--muted);min-width:54px;text-align:right}
-    input[type="range"]{width:100%}
-    input[type="number"], select{
-      width:100%;padding:8px 10px;border:1px solid #d8d8d8;border-radius:8px;background:#fff;color:#111
+
+    .stage {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at center, rgba(255,255,255,0.05) 1px, transparent 1px) 0 0 / 40px 40px,
+        linear-gradient(180deg, #0a0a0c 0%, #050505 100%);
     }
-    .rowFull{display:block;margin:8px 0}
-    .rowFull label{display:block;font-size:12px;margin-bottom:6px}
-    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-    .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
-    .btns{display:flex;gap:8px;flex-wrap:wrap}
-    button{
-      appearance:none;border:1px solid #d8d8d8;background:#fff;color:#111;
-      padding:8px 10px;border-radius:10px;cursor:pointer;font-size:12px
+
+    #canvas-wrap {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
     }
-    button:hover{background:#f6f6f6}
-    button.primary{border-color:#111;background:#111;color:#fff}
-    button.danger{border-color:#caa;color:#822}
-    .hint{font-size:11px;line-height:1.5;color:var(--muted)}
-    .centersList{
-      display:flex;flex-direction:column;gap:6px;max-height:190px;overflow:auto;border:1px solid #ededed;
-      padding:6px;border-radius:10px;background:#fcfcfc
+
+    #canvas-container {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+      max-width: 100%;
+      max-height: 100%;
+      overflow: hidden;
     }
-    .centerItem{
-      display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center;
-      padding:8px;border:1px solid #ececec;border-radius:10px;background:#fff;cursor:pointer
+
+    .brand {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      user-select: none;
+      font-size: clamp(40px, 8vw, 128px);
+      letter-spacing: 0.18em;
+      color: rgba(255,255,255,0.03);
+      text-transform: uppercase;
+      font-weight: 700;
     }
-    .centerItem.active{border-color:var(--sel);box-shadow:0 0 0 1px rgba(11,87,208,.15) inset}
-    .dot{
-      width:12px;height:12px;border-radius:999px;background:#111;display:inline-block
+
+    .topbar {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      right: 16px;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      pointer-events: none;
     }
-    .meta{font-size:11px;color:var(--muted)}
-    .stat{font-size:11px;color:var(--muted);display:flex;gap:10px;flex-wrap:wrap}
-    .footerNote{font-size:11px;color:#666;padding-top:4px}
-    .kbd{
-      display:inline-block;padding:1px 6px;border:1px solid #ddd;border-bottom-width:2px;border-radius:6px;font-size:11px;background:#fff
+
+    .pill {
+      pointer-events: auto;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      background: rgba(13,13,16,0.86);
+      backdrop-filter: blur(12px);
+      border-radius: 999px;
+      box-shadow: var(--shadow);
+      font-size: 12px;
+      color: var(--muted);
     }
-    canvas{display:block;border:1px solid #ececec;background:#fff}
-    @media (max-width: 980px){
-      .layout{flex-direction:column}
-      .sidebar{width:100%;max-width:none;min-width:0;border-right:none;border-bottom:1px solid #ececec}
+
+    .pill strong { color: var(--text); font-weight: 600; }
+
+    .controls {
+      position: relative;
+      z-index: 30;
+      border-top: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(13,13,16,0.96), rgba(9,9,11,0.98));
+      backdrop-filter: blur(16px);
+      box-shadow: 0 -20px 60px -20px rgba(0,0,0,0.65);
+    }
+
+    .controls-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 14px;
+    }
+
+    .controls-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .controls-title {
+      font-size: 12px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .controls-status {
+      font-size: 12px;
+      color: var(--muted-2);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .controls-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .toggle,
+    .btn,
+    .dir-btn,
+    .center-item {
+      appearance: none;
+      border: 1px solid var(--line-2);
+      background: var(--panel-2);
+      color: var(--text);
+      border-radius: 10px;
+      transition: 160ms ease;
+      cursor: pointer;
+    }
+
+    .toggle,
+    .btn {
+      height: 34px;
+      padding: 0 12px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+    }
+
+    .btn.subtle {
+      color: var(--muted);
+      border-color: var(--line);
+      background: rgba(255,255,255,0.02);
+    }
+
+    .btn.danger {
+      color: #fecaca;
+      border-color: rgba(239,68,68,0.25);
+      background: rgba(127,29,29,0.16);
+    }
+
+    .btn:hover, .toggle:hover, .dir-btn:hover, .center-item:hover { background: #1d1d22; }
+    .btn:active, .toggle:active, .dir-btn:active, .center-item:active { transform: translateY(1px); }
+
+    .controls-content {
+      overflow: hidden;
+      max-height: 0;
+      border-top: 1px solid transparent;
+      transition: max-height 260ms ease, border-color 260ms ease;
+    }
+
+    .controls-content.open {
+      max-height: min(58vh, 720px);
+      border-top-color: var(--line);
+    }
+
+    .controls-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(240px, 1fr));
+      gap: 12px;
+      padding: 12px 14px 14px;
+      overflow: auto;
+      max-height: min(58vh, 720px);
+    }
+
+    .panel {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 12px;
+      background: linear-gradient(180deg, rgba(17,17,20,0.96), rgba(11,11,14,0.96));
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+    }
+
+    .panel-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .field {
+      display: grid;
+      gap: 6px;
+    }
+
+    .field.two {
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      align-items: end;
+    }
+
+    .field-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .value {
+      font-variant-numeric: tabular-nums;
+      color: var(--text);
+      font-size: 12px;
+    }
+
+    label {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    input[type="number"],
+    input[type="text"] {
+      width: 100%;
+      height: 34px;
+      padding: 0 10px;
+      border-radius: 10px;
+      border: 1px solid var(--line-2);
+      background: #09090b;
+      color: var(--text);
+      outline: none;
+      font-size: 12px;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      margin: 0;
+      accent-color: #ffffff;
+      cursor: pointer;
+    }
+
+    .dir-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+    }
+
+    .dir-btn {
+      height: 34px;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--muted);
+    }
+
+    .dir-btn.active {
+      color: var(--text);
+      border-color: rgba(255,255,255,0.18);
+      background: rgba(255,255,255,0.08);
+    }
+
+    .center-list {
+      display: grid;
+      gap: 8px;
+      max-height: 180px;
+      overflow: auto;
+      padding-right: 2px;
+    }
+
+    .center-item {
+      display: grid;
+      gap: 3px;
+      width: 100%;
+      padding: 10px 12px;
+      text-align: left;
+      background: #0f0f12;
+      border-color: var(--line);
+    }
+
+    .center-item.active {
+      border-color: rgba(255,255,255,0.22);
+      background: rgba(255,255,255,0.08);
+    }
+
+    .center-item strong {
+      font-size: 12px;
+      color: var(--text);
+    }
+
+    .center-item span {
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    .hint {
+      font-size: 11px;
+      line-height: 1.5;
+      color: var(--muted-2);
+    }
+
+    canvas {
+      display: block;
+      max-width: 100%;
+      max-height: 100%;
+      width: auto !important;
+      height: auto !important;
+      object-fit: contain;
+      box-shadow: 0 0 0 1px #333, 0 20px 80px -10px rgba(0,0,0,0.8);
+      background: #fff;
+    }
+
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,0.12);
+      border-radius: 999px;
+    }
+
+    @media (max-width: 1280px) {
+      .controls-grid { grid-template-columns: repeat(2, minmax(240px, 1fr)); }
+    }
+    @media (max-width: 760px) {
+      .controls-grid { grid-template-columns: 1fr; }
+      .controls-header { flex-wrap: wrap; }
     }
   </style>
 </head>
 <body>
-<div id="app">
-  <header>
-    <div>
-      <h1>Topographic Multi-Center Pro</h1>
-      <div class="sub">複数中心・閉曲線優先・主曲線/計曲線/補助曲線・山谷干渉</div>
+  <div class="stage">
+    <div class="brand">Topo</div>
+
+    <div class="topbar">
+      <div class="pill"><strong>Topo</strong><span>Multi-center topographic refined</span></div>
+      <div class="pill" id="status-pill">ready</div>
     </div>
-    <div class="stat">
-      <span id="statusCenterCount">Centers: 0</span>
-      <span id="statusSegments">Paths: 0</span>
-      <span id="statusLevels">Levels: 0</span>
+
+    <div id="canvas-wrap">
+      <div id="canvas-container"></div>
     </div>
-  </header>
-
-  <div class="layout">
-    <aside class="sidebar">
-      <div class="panel">
-        <h2>全体</h2>
-        <div class="grid2">
-          <div class="rowFull">
-            <label for="canvasW">Canvas Width</label>
-            <input id="canvasW" type="number" min="400" max="2400" step="10" value="1100">
-          </div>
-          <div class="rowFull">
-            <label for="canvasH">Canvas Height</label>
-            <input id="canvasH" type="number" min="400" max="2400" step="10" value="760">
-          </div>
-        </div>
-
-        <div class="row">
-          <label for="gridStep">Grid Step</label>
-          <input id="gridStep" type="range" min="5" max="24" step="1" value="8">
-          <div class="value" id="gridStepVal">8</div>
-        </div>
-
-        <div class="row">
-          <label for="smoothIter">Smoothing</label>
-          <input id="smoothIter" type="range" min="0" max="4" step="1" value="2">
-          <div class="value" id="smoothIterVal">2</div>
-        </div>
-
-        <div class="row">
-          <label for="sampleStep">Marching Precision</label>
-          <input id="sampleStep" type="range" min="1" max="3" step="1" value="1">
-          <div class="value" id="sampleStepVal">1</div>
-        </div>
-
-        <div class="btns" style="margin-top:10px">
-          <button id="resizeBtn">Resize Canvas</button>
-          <button id="randomizeBtn">Randomize</button>
-          <button id="resetBtn">Reset</button>
-        </div>
-      </div>
-
-      <div class="panel">
-        <h2>等高線</h2>
-
-        <div class="row">
-          <label for="levelMin">Level Min</label>
-          <input id="levelMin" type="range" min="-2.5" max="0" step="0.05" value="-1.1">
-          <div class="value" id="levelMinVal">-1.10</div>
-        </div>
-
-        <div class="row">
-          <label for="levelMax">Level Max</label>
-          <input id="levelMax" type="range" min="0" max="2.5" step="0.05" value="1.8">
-          <div class="value" id="levelMaxVal">1.80</div>
-        </div>
-
-        <div class="row">
-          <label for="minorStep">補助曲線 Step</label>
-          <input id="minorStep" type="range" min="0.03" max="0.30" step="0.01" value="0.08">
-          <div class="value" id="minorStepVal">0.08</div>
-        </div>
-
-        <div class="row">
-          <label for="majorEvery">主曲線 Every</label>
-          <input id="majorEvery" type="range" min="2" max="8" step="1" value="3">
-          <div class="value" id="majorEveryVal">3</div>
-        </div>
-
-        <div class="row">
-          <label for="indexEvery">計曲線 Every</label>
-          <input id="indexEvery" type="range" min="2" max="6" step="1" value="5">
-          <div class="value" id="indexEveryVal">5</div>
-        </div>
-
-        <div class="row">
-          <label for="closedBias">Closed Loop Bias</label>
-          <input id="closedBias" type="range" min="0" max="1" step="0.01" value="0.40">
-          <div class="value" id="closedBiasVal">0.40</div>
-        </div>
-
-        <div class="row">
-          <label for="minPathLength">Min Path Length</label>
-          <input id="minPathLength" type="range" min="8" max="160" step="2" value="24">
-          <div class="value" id="minPathLengthVal">24</div>
-        </div>
-      </div>
-
-      <div class="panel">
-        <h2>地形場</h2>
-
-        <div class="row">
-          <label for="blendMode">Blend Mode</label>
-          <select id="blendMode">
-            <option value="sum">Sum</option>
-            <option value="softmax">Soft Max</option>
-            <option value="hybrid" selected>Hybrid</option>
-          </select>
-        </div>
-
-        <div class="row">
-          <label for="ridgeStrength">Ridge Strength</label>
-          <input id="ridgeStrength" type="range" min="0" max="1.8" step="0.01" value="0.55">
-          <div class="value" id="ridgeStrengthVal">0.55</div>
-        </div>
-
-        <div class="row">
-          <label for="saddleStrength">Saddle Strength</label>
-          <input id="saddleStrength" type="range" min="0" max="1.8" step="0.01" value="0.60">
-          <div class="value" id="saddleStrengthVal">0.60</div>
-        </div>
-
-        <div class="row">
-          <label for="interferenceAmp">Interference</label>
-          <input id="interferenceAmp" type="range" min="0" max="1.5" step="0.01" value="0.28">
-          <div class="value" id="interferenceAmpVal">0.28</div>
-        </div>
-
-        <div class="row">
-          <label for="interferenceFreq">Interference Freq</label>
-          <input id="interferenceFreq" type="range" min="0.002" max="0.060" step="0.001" value="0.017">
-          <div class="value" id="interferenceFreqVal">0.017</div>
-        </div>
-
-        <div class="row">
-          <label for="terraceStrength">Terrace</label>
-          <input id="terraceStrength" type="range" min="0" max="1" step="0.01" value="0.18">
-          <div class="value" id="terraceStrengthVal">0.18</div>
-        </div>
-
-        <div class="row">
-          <label for="terraceStep">Terrace Step</label>
-          <input id="terraceStep" type="range" min="0.04" max="0.40" step="0.01" value="0.12">
-          <div class="value" id="terraceStepVal">0.12</div>
-        </div>
-
-        <div class="row">
-          <label for="warpAmount">Warp Amount</label>
-          <input id="warpAmount" type="range" min="0" max="120" step="1" value="18">
-          <div class="value" id="warpAmountVal">18</div>
-        </div>
-
-        <div class="row">
-          <label for="warpScale">Warp Scale</label>
-          <input id="warpScale" type="range" min="0.001" max="0.050" step="0.001" value="0.010">
-          <div class="value" id="warpScaleVal">0.010</div>
-        </div>
-
-        <div class="row">
-          <label for="noiseAmount">Noise Amount</label>
-          <input id="noiseAmount" type="range" min="0" max="1" step="0.01" value="0.08">
-          <div class="value" id="noiseAmountVal">0.08</div>
-        </div>
-
-        <div class="row">
-          <label for="noiseScale">Noise Scale</label>
-          <input id="noiseScale" type="range" min="0.001" max="0.040" step="0.001" value="0.008">
-          <div class="value" id="noiseScaleVal">0.008</div>
-        </div>
-      </div>
-
-      <div class="panel">
-        <h2>中心点</h2>
-
-        <div class="btns" style="margin-bottom:8px">
-          <button id="addCenterBtn">Add</button>
-          <button id="removeCenterBtn" class="danger">Remove</button>
-          <button id="scatterBtn">Scatter</button>
-          <button id="mountainsBtn">Mountains</button>
-          <button id="basinsBtn">Basins</button>
-        </div>
-
-        <div class="centersList" id="centersList"></div>
-
-        <div style="margin-top:10px" class="grid2">
-          <div class="rowFull">
-            <label for="centerX">X</label>
-            <input id="centerX" type="number" min="0" max="99999" step="1">
-          </div>
-          <div class="rowFull">
-            <label for="centerY">Y</label>
-            <input id="centerY" type="number" min="0" max="99999" step="1">
-          </div>
-        </div>
-
-        <div class="grid2">
-          <div class="rowFull">
-            <label for="centerElevation">Elevation</label>
-            <input id="centerElevation" type="number" step="0.05">
-          </div>
-          <div class="rowFull">
-            <label for="centerRadius">Radius</label>
-            <input id="centerRadius" type="number" min="10" step="1">
-          </div>
-        </div>
-
-        <div class="grid2">
-          <div class="rowFull">
-            <label for="centerPhase">Phase</label>
-            <input id="centerPhase" type="number" step="0.1">
-          </div>
-          <div class="rowFull">
-            <label for="centerSharpness">Sharpness</label>
-            <input id="centerSharpness" type="number" min="0.2" max="6" step="0.1">
-          </div>
-        </div>
-
-        <div class="grid2">
-          <div class="rowFull">
-            <label for="centerPolarity">Type</label>
-            <select id="centerPolarity">
-              <option value="1">Mountain</option>
-              <option value="-1">Basin</option>
-            </select>
-          </div>
-          <div class="rowFull">
-            <label for="centerInterferenceWeight">Interf. Weight</label>
-            <input id="centerInterferenceWeight" type="number" step="0.05">
-          </div>
-        </div>
-
-        <div class="btns">
-          <button id="updateCenterBtn" class="primary">Update Center</button>
-          <button id="duplicateCenterBtn">Duplicate</button>
-        </div>
-
-        <div class="footerNote">
-          キャンバス操作:
-          <span class="kbd">Shift</span> + クリック = 追加　
-          <span class="kbd">Alt</span> + クリック = 削除　
-          ドラッグ = 移動
-        </div>
-      </div>
-
-      <div class="panel">
-        <h2>保存</h2>
-        <div class="btns">
-          <button id="pngBtn">Save PNG</button>
-          <button id="svgBtn">Save SVG</button>
-        </div>
-        <div class="hint" style="margin-top:8px">
-          SVGは輪郭を path として保存します。線数が多い設定ではファイルサイズが大きくなります。
-        </div>
-      </div>
-    </aside>
-
-    <main class="canvasWrap">
-      <div id="canvasHost"></div>
-    </main>
   </div>
-</div>
 
-<script>
-(() => {
-  "use strict";
+  <div class="controls">
+    <div class="controls-header">
+      <div class="controls-left">
+        <button id="toggle-btn" class="toggle" type="button">Controls</button>
+        <div class="controls-title">Bottom Dock</div>
+        <div class="controls-status" id="status-text">ready</div>
+      </div>
 
-  const params = {
-    canvasW: 1100,
-    canvasH: 760,
+      <div class="controls-actions">
+        <button id="btn-randomize" class="btn subtle" type="button">Randomize Seed</button>
+        <button id="btn-png" class="btn subtle" type="button">Save PNG</button>
+        <button id="btn-svg" class="btn subtle" type="button">Save SVG</button>
+      </div>
+    </div>
 
-    gridStep: 8,
-    smoothIter: 2,
-    sampleStep: 1,
+    <div id="controls-content" class="controls-content">
+      <div class="controls-grid">
+        <div class="panel">
+          <div class="panel-title"><span>Canvas</span><span>size / display</span></div>
 
-    levelMin: -1.10,
-    levelMax: 1.80,
-    minorStep: 0.08,
-    majorEvery: 3,
-    indexEvery: 5,
-    closedBias: 0.40,
-    minPathLength: 24,
+          <div class="field two">
+            <div class="field">
+              <label for="inp-width">Width</label>
+              <input id="inp-width" type="number" value="1800" min="128" step="1" />
+            </div>
+            <div class="field">
+              <label for="inp-height">Height</label>
+              <input id="inp-height" type="number" value="1800" min="128" step="1" />
+            </div>
+          </div>
 
-    blendMode: "hybrid",
-    ridgeStrength: 0.55,
-    saddleStrength: 0.60,
-    interferenceAmp: 0.28,
-    interferenceFreq: 0.017,
-    terraceStrength: 0.18,
-    terraceStep: 0.12,
-    warpAmount: 18,
-    warpScale: 0.010,
-    noiseAmount: 0.08,
-    noiseScale: 0.008,
+          <div class="field">
+            <div class="field-head"><label for="sl-seed">Seed</label><span class="value" id="val-seed">1200</span></div>
+            <input id="sl-seed" type="range" min="0" max="100000" step="1" value="1200" />
+          </div>
 
-    bg: "#ffffff",
-    fg: "#111111"
-  };
+          <div class="field">
+            <div class="field-head"><label for="sl-grid">Grid</label><span class="value" id="val-grid">8 px</span></div>
+            <input id="sl-grid" type="range" min="2" max="36" step="1" value="8" />
+          </div>
 
-  let centers = [];
-  let activeCenterIndex = 0;
-  let pInstance = null;
-  let needsRebuild = true;
-  let cachedContours = [];
-  let cachedLevels = [];
-  let draggingIndex = -1;
-  let dragOffsetX = 0;
-  let dragOffsetY = 0;
-  let hoveredIndex = -1;
+          <div class="field">
+            <div class="field-head"><label for="sl-handleSize">Handle Size</label><span class="value" id="val-handleSize">14 px</span></div>
+            <input id="sl-handleSize" type="range" min="4" max="40" step="1" value="14" />
+          </div>
 
-  const el = {};
+          <div class="field">
+            <div class="field-head"><label for="sl-centerMark">Center Mark</label><span class="value" id="val-centerMark">7 px</span></div>
+            <input id="sl-centerMark" type="range" min="0" max="24" step="1" value="7" />
+          </div>
 
-  function qs(id){ return document.getElementById(id); }
-
-  function bindElements(){
-    [
-      "canvasW","canvasH","gridStep","smoothIter","sampleStep",
-      "levelMin","levelMax","minorStep","majorEvery","indexEvery","closedBias","minPathLength",
-      "blendMode","ridgeStrength","saddleStrength","interferenceAmp","interferenceFreq",
-      "terraceStrength","terraceStep","warpAmount","warpScale","noiseAmount","noiseScale",
-      "gridStepVal","smoothIterVal","sampleStepVal","levelMinVal","levelMaxVal","minorStepVal",
-      "majorEveryVal","indexEveryVal","closedBiasVal","minPathLengthVal","ridgeStrengthVal",
-      "saddleStrengthVal","interferenceAmpVal","interferenceFreqVal","terraceStrengthVal",
-      "terraceStepVal","warpAmountVal","warpScaleVal","noiseAmountVal","noiseScaleVal",
-      "statusCenterCount","statusSegments","statusLevels",
-      "resizeBtn","randomizeBtn","resetBtn",
-      "addCenterBtn","removeCenterBtn","scatterBtn","mountainsBtn","basinsBtn",
-      "centersList","centerX","centerY","centerElevation","centerRadius","centerPhase",
-      "centerSharpness","centerPolarity","centerInterferenceWeight",
-      "updateCenterBtn","duplicateCenterBtn","pngBtn","svgBtn"
-    ].forEach(id => el[id] = qs(id));
-  }
-
-  function clamp(v, a, b){ return Math.max(a, Math.min(b, v)); }
-  function lerp(a,b,t){ return a + (b-a)*t; }
-  function dist2(ax, ay, bx, by){ const dx = ax-bx, dy = ay-by; return dx*dx + dy*dy; }
-  function fnum(v, n=2){ return Number(v).toFixed(n); }
-  function rand(a,b){ return a + Math.random()*(b-a); }
-  function pick(arr){ return arr[(Math.random()*arr.length)|0]; }
-
-  function makeCenter(x, y, polarity = 1){
-    return {
-      x, y,
-      elevation: rand(0.8, 1.6),
-      radius: rand(110, 240),
-      phase: rand(0, Math.PI * 2),
-      sharpness: rand(1.2, 3.2),
-      polarity,
-      interferenceWeight: rand(0.7, 1.3)
-    };
-  }
-
-  function defaultCenters(){
-    centers = [
-      {x: params.canvasW*0.28, y: params.canvasH*0.33, elevation: 1.45, radius: 160, phase: 0.0, sharpness: 2.2, polarity: 1, interferenceWeight: 1.00},
-      {x: params.canvasW*0.62, y: params.canvasH*0.43, elevation: 1.20, radius: 180, phase: 1.4, sharpness: 1.8, polarity: 1, interferenceWeight: 0.95},
-      {x: params.canvasW*0.48, y: params.canvasH*0.68, elevation: 1.05, radius: 150, phase: 2.1, sharpness: 2.5, polarity: -1, interferenceWeight: 1.10},
-      {x: params.canvasW*0.80, y: params.canvasH*0.60, elevation: 0.95, radius: 130, phase: 3.0, sharpness: 2.9, polarity: 1, interferenceWeight: 0.80}
-    ];
-    activeCenterIndex = 0;
-  }
-
-  function randomizeCenters(){
-    const count = Math.floor(rand(3, 8));
-    centers = [];
-    for(let i=0;i<count;i++){
-      const polarity = Math.random() < 0.72 ? 1 : -1;
-      centers.push(makeCenter(
-        rand(80, params.canvasW - 80),
-        rand(80, params.canvasH - 80),
-        polarity
-      ));
-    }
-    activeCenterIndex = 0;
-    refreshCenterList();
-    updateCenterInputs();
-    invalidate();
-  }
-
-  function resetAll(){
-    params.canvasW = 1100;
-    params.canvasH = 760;
-    params.gridStep = 8;
-    params.smoothIter = 2;
-    params.sampleStep = 1;
-
-    params.levelMin = -1.10;
-    params.levelMax = 1.80;
-    params.minorStep = 0.08;
-    params.majorEvery = 3;
-    params.indexEvery = 5;
-    params.closedBias = 0.40;
-    params.minPathLength = 24;
-
-    params.blendMode = "hybrid";
-    params.ridgeStrength = 0.55;
-    params.saddleStrength = 0.60;
-    params.interferenceAmp = 0.28;
-    params.interferenceFreq = 0.017;
-    params.terraceStrength = 0.18;
-    params.terraceStep = 0.12;
-    params.warpAmount = 18;
-    params.warpScale = 0.010;
-    params.noiseAmount = 0.08;
-    params.noiseScale = 0.008;
-
-    syncParamsToUI();
-    defaultCenters();
-    refreshCenterList();
-    updateCenterInputs();
-    resizeCanvasToParams();
-    invalidate();
-  }
-
-  function syncParamsToUI(){
-    el.canvasW.value = params.canvasW;
-    el.canvasH.value = params.canvasH;
-    [
-      "gridStep","smoothIter","sampleStep","levelMin","levelMax","minorStep","majorEvery",
-      "indexEvery","closedBias","minPathLength","ridgeStrength","saddleStrength",
-      "interferenceAmp","interferenceFreq","terraceStrength","terraceStep","warpAmount",
-      "warpScale","noiseAmount","noiseScale"
-    ].forEach(k => {
-      el[k].value = params[k];
-    });
-    el.blendMode.value = params.blendMode;
-    updateValueLabels();
-  }
-
-  function updateValueLabels(){
-    el.gridStepVal.textContent = params.gridStep;
-    el.smoothIterVal.textContent = params.smoothIter;
-    el.sampleStepVal.textContent = params.sampleStep;
-    el.levelMinVal.textContent = fnum(params.levelMin,2);
-    el.levelMaxVal.textContent = fnum(params.levelMax,2);
-    el.minorStepVal.textContent = fnum(params.minorStep,2);
-    el.majorEveryVal.textContent = params.majorEvery;
-    el.indexEveryVal.textContent = params.indexEvery;
-    el.closedBiasVal.textContent = fnum(params.closedBias,2);
-    el.minPathLengthVal.textContent = params.minPathLength;
-    el.ridgeStrengthVal.textContent = fnum(params.ridgeStrength,2);
-    el.saddleStrengthVal.textContent = fnum(params.saddleStrength,2);
-    el.interferenceAmpVal.textContent = fnum(params.interferenceAmp,2);
-    el.interferenceFreqVal.textContent = fnum(params.interferenceFreq,3);
-    el.terraceStrengthVal.textContent = fnum(params.terraceStrength,2);
-    el.terraceStepVal.textContent = fnum(params.terraceStep,2);
-    el.warpAmountVal.textContent = fnum(params.warpAmount,0);
-    el.warpScaleVal.textContent = fnum(params.warpScale,3);
-    el.noiseAmountVal.textContent = fnum(params.noiseAmount,2);
-    el.noiseScaleVal.textContent = fnum(params.noiseScale,3);
-  }
-
-  function setupUI(){
-    bindElements();
-    syncParamsToUI();
-
-    const rangeKeys = [
-      "gridStep","smoothIter","sampleStep","levelMin","levelMax","minorStep","majorEvery",
-      "indexEvery","closedBias","minPathLength","ridgeStrength","saddleStrength",
-      "interferenceAmp","interferenceFreq","terraceStrength","terraceStep","warpAmount",
-      "warpScale","noiseAmount","noiseScale"
-    ];
-
-    rangeKeys.forEach(key => {
-      el[key].addEventListener("input", () => {
-        let v = parseFloat(el[key].value);
-        if (["gridStep","smoothIter","sampleStep","majorEvery","indexEvery","minPathLength"].includes(key)) v = Math.round(v);
-        params[key] = v;
-        updateValueLabels();
-        invalidate();
-      });
-    });
-
-    el.blendMode.addEventListener("change", () => {
-      params.blendMode = el.blendMode.value;
-      invalidate();
-    });
-
-    el.resizeBtn.addEventListener("click", () => {
-      params.canvasW = clamp(parseInt(el.canvasW.value, 10) || 1100, 400, 2400);
-      params.canvasH = clamp(parseInt(el.canvasH.value, 10) || 760, 400, 2400);
-      resizeCanvasToParams();
-      constrainCentersInBounds();
-      refreshCenterList();
-      updateCenterInputs();
-      invalidate();
-    });
-
-    el.randomizeBtn.addEventListener("click", () => randomizeCenters());
-    el.resetBtn.addEventListener("click", () => resetAll());
-
-    el.addCenterBtn.addEventListener("click", () => {
-      centers.push(makeCenter(params.canvasW * 0.5, params.canvasH * 0.5, 1));
-      activeCenterIndex = centers.length - 1;
-      refreshCenterList();
-      updateCenterInputs();
-      invalidate();
-    });
-
-    el.removeCenterBtn.addEventListener("click", () => {
-      if (centers.length <= 1) return;
-      centers.splice(activeCenterIndex, 1);
-      activeCenterIndex = clamp(activeCenterIndex, 0, centers.length - 1);
-      refreshCenterList();
-      updateCenterInputs();
-      invalidate();
-    });
-
-    el.scatterBtn.addEventListener("click", () => {
-      centers.forEach(c => {
-        c.x = rand(80, params.canvasW - 80);
-        c.y = rand(80, params.canvasH - 80);
-      });
-      refreshCenterList();
-      updateCenterInputs();
-      invalidate();
-    });
-
-    el.mountainsBtn.addEventListener("click", () => {
-      centers.forEach(c => c.polarity = 1);
-      refreshCenterList();
-      updateCenterInputs();
-      invalidate();
-    });
-
-    el.basinsBtn.addEventListener("click", () => {
-      centers.forEach(c => c.polarity = -1);
-      refreshCenterList();
-      updateCenterInputs();
-      invalidate();
-    });
-
-    el.updateCenterBtn.addEventListener("click", () => {
-      const c = centers[activeCenterIndex];
-      if (!c) return;
-      c.x = clamp(parseFloat(el.centerX.value) || c.x, 0, params.canvasW);
-      c.y = clamp(parseFloat(el.centerY.value) || c.y, 0, params.canvasH);
-      c.elevation = parseFloat(el.centerElevation.value) || c.elevation;
-      c.radius = Math.max(10, parseFloat(el.centerRadius.value) || c.radius);
-      c.phase = parseFloat(el.centerPhase.value) || c.phase;
-      c.sharpness = clamp(parseFloat(el.centerSharpness.value) || c.sharpness, 0.2, 6);
-      c.polarity = parseInt(el.centerPolarity.value, 10) || 1;
-      c.interferenceWeight = parseFloat(el.centerInterferenceWeight.value) || c.interferenceWeight;
-      refreshCenterList();
-      updateCenterInputs();
-      invalidate();
-    });
-
-    el.duplicateCenterBtn.addEventListener("click", () => {
-      const c = centers[activeCenterIndex];
-      if (!c) return;
-      centers.push({
-        ...c,
-        x: clamp(c.x + 40, 0, params.canvasW),
-        y: clamp(c.y + 40, 0, params.canvasH),
-        phase: c.phase + 0.7
-      });
-      activeCenterIndex = centers.length - 1;
-      refreshCenterList();
-      updateCenterInputs();
-      invalidate();
-    });
-
-    el.pngBtn.addEventListener("click", savePNG);
-    el.svgBtn.addEventListener("click", saveSVG);
-  }
-
-  function refreshCenterList(){
-    el.centersList.innerHTML = "";
-    centers.forEach((c, i) => {
-      const div = document.createElement("div");
-      div.className = "centerItem" + (i === activeCenterIndex ? " active" : "");
-      div.innerHTML = `
-        <span class="dot" style="background:${c.polarity > 0 ? "#111" : "#777"}"></span>
-        <div>
-          <div style="font-size:12px;font-weight:600">${c.polarity > 0 ? "Mountain" : "Basin"} ${i+1}</div>
-          <div class="meta">z=${fnum(c.elevation,2)} / r=${fnum(c.radius,0)} / p=${fnum(c.phase,2)}</div>
+          <div class="hint">Shift+クリックで追加、Alt+クリックで削除、ドラッグで移動できます。</div>
         </div>
-        <div class="meta">${fnum(c.x,0)}, ${fnum(c.y,0)}</div>
-      `;
-      div.addEventListener("click", () => {
-        activeCenterIndex = i;
-        refreshCenterList();
-        updateCenterInputs();
-        invalidateLight();
+
+        <div class="panel">
+          <div class="panel-title"><span>Contours</span><span>topographic lines</span></div>
+
+          <div class="field">
+            <div class="field-head"><label for="sl-contourStep">Contour Step</label><span class="value" id="val-contourStep">0.10</span></div>
+            <input id="sl-contourStep" type="range" min="0.03" max="0.40" step="0.01" value="0.10" />
+          </div>
+
+          <div class="field">
+            <div class="field-head"><label for="sl-levelRange">Level Range</label><span class="value" id="val-levelRange">1.20</span></div>
+            <input id="sl-levelRange" type="range" min="0.2" max="3" step="0.01" value="1.20" />
+          </div>
+
+          <div class="field">
+            <div class="field-head"><label for="sl-boldEvery">Bold Every</label><span class="value" id="val-boldEvery">5</span></div>
+            <input id="sl-boldEvery" type="range" min="1" max="12" step="1" value="5" />
+          </div>
+
+          <div class="field">
+            <div class="field-head"><label for="sl-thinStroke">Thin Stroke</label><span class="value" id="val-thinStroke">0.80 px</span></div>
+            <input id="sl-thinStroke" type="range" min="0.2" max="4" step="0.05" value="0.80" />
+          </div>
+
+          <div class="field">
+            <div class="field-head"><label for="sl-boldStroke">Bold Stroke</label><span class="value" id="val-boldStroke">1.50 px</span></div>
+            <input id="sl-boldStroke" type="range" min="0.4" max="8" step="0.05" value="1.50" />
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title"><span>Field</span><span>terrain / interference</span></div>
+
+          <div class="field">
+            <div class="field-head"><label for="sl-noiseFreq">Noise Freq</label><span class="value" id="val-noiseFreq">0.48</span></div>
+            <input id="sl-noiseFreq" type="range" min="0.01" max="2" step="0.01" value="0.48" />
+          </div>
+
+          <div class="field">
+            <div class="field-head"><label for="sl-noiseAmp">Noise Amp</label><span class="value" id="val-noiseAmp">0.18</span></div>
+            <input id="sl-noiseAmp" type="range" min="0" max="2" step="0.01" value="0.18" />
+          </div>
+
+          <div class="field">
+            <div class="field-head"><label for="sl-octaves">Octaves</label><span class="value" id="val-octaves">4</span></div>
+            <input id="sl-octaves" type="range" min="1" max="8" step="1" value="4" />
+          </div>
+
+          <div class="field">
+            <div class="field-head"><label for="sl-roughness">Roughness</label><span class="value" id="val-roughness">0.52</span></div>
+            <input id="sl-roughness" type="range" min="0.1" max="0.95" step="0.01" value="0.52" />
+          </div>
+
+          <div class="field">
+            <div class="field-head"><label for="sl-waveFreq">Wave Freq</label><span class="value" id="val-waveFreq">0.065</span></div>
+            <input id="sl-waveFreq" type="range" min="0.001" max="0.22" step="0.001" value="0.065" />
+          </div>
+
+          <div class="field">
+            <div class="field-head"><label for="sl-waveAmp">Wave Amp</label><span class="value" id="val-waveAmp">0.38</span></div>
+            <input id="sl-waveAmp" type="range" min="0" max="2" step="0.01" value="0.38" />
+          </div>
+
+          <div class="field">
+            <div class="field-head"><label for="sl-collision">Collision</label><span class="value" id="val-collision">0.90</span></div>
+            <input id="sl-collision" type="range" min="0" max="3" step="0.01" value="0.90" />
+          </div>
+
+          <div class="field">
+            <div class="field-head"><label for="sl-ridgeMix">Ridge Mix</label><span class="value" id="val-ridgeMix">1.10</span></div>
+            <input id="sl-ridgeMix" type="range" min="0" max="3" step="0.01" value="1.10" />
+          </div>
+
+          <div class="field">
+            <div class="field-head"><label for="sl-minRadius">Min Radius</label><span class="value" id="val-minRadius">8 px</span></div>
+            <input id="sl-minRadius" type="range" min="0" max="80" step="1" value="8" />
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title"><span>Warp / Terrace</span><span>topographic shaping</span></div>
+
+          <div class="field">
+            <div class="field-head"><label for="sl-warpFreq">Warp Freq</label><span class="value" id="val-warpFreq">0.010</span></div>
+            <input id="sl-warpFreq" type="range" min="0.001" max="0.08" step="0.001" value="0.010" />
+          </div>
+
+          <div class="field">
+            <div class="field-head"><label for="sl-warpAmp">Warp Amp</label><span class="value" id="val-warpAmp">20 px</span></div>
+            <input id="sl-warpAmp" type="range" min="0" max="160" step="1" value="20" />
+          </div>
+
+          <div class="field">
+            <div class="field-head"><label for="sl-terraceStrength">Terrace Strength</label><span class="value" id="val-terraceStrength">0.12</span></div>
+            <input id="sl-terraceStrength" type="range" min="0" max="1" step="0.01" value="0.12" />
+          </div>
+
+          <div class="field">
+            <div class="field-head"><label for="sl-terraceStep">Terrace Step</label><span class="value" id="val-terraceStep">0.10</span></div>
+            <input id="sl-terraceStep" type="range" min="0.02" max="0.6" step="0.01" value="0.10" />
+          </div>
+
+          <div class="field">
+            <div class="field-head"><label>Freq Dirs</label><span class="value">anisotropy</span></div>
+            <div class="dir-row" id="freq-dirs"></div>
+          </div>
+
+          <div class="field">
+            <div class="field-head"><label>Amp Dirs</label><span class="value">anisotropy</span></div>
+            <div class="dir-row" id="amp-dirs"></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title"><span>Centers</span><span>selection / placement</span></div>
+
+          <div style="display:flex;align-items:center;gap:8px;">
+            <button id="btn-add-center" class="btn subtle" type="button">Add</button>
+            <button id="btn-remove-center" class="btn subtle" type="button">Remove</button>
+            <button id="btn-random-centers" class="btn subtle" type="button">Scatter</button>
+          </div>
+
+          <div id="center-list" class="center-list"></div>
+
+          <div class="field">
+            <div class="field-head"><label for="sl-centerX">X</label><span class="value" id="val-centerX">50.0 %</span></div>
+            <input id="sl-centerX" type="range" min="0" max="100" step="0.1" value="50" />
+          </div>
+
+          <div class="field">
+            <div class="field-head"><label for="sl-centerY">Y</label><span class="value" id="val-centerY">50.0 %</span></div>
+            <input id="sl-centerY" type="range" min="0" max="100" step="0.1" value="50" />
+          </div>
+
+          <div class="field">
+            <div class="field-head"><label for="sl-centerPhase">Phase</label><span class="value" id="val-centerPhase">0.00</span></div>
+            <input id="sl-centerPhase" type="range" min="-3.1416" max="3.1416" step="0.01" value="0" />
+          </div>
+
+          <div class="field">
+            <div class="field-head"><label for="sl-centerWeight">Weight</label><span class="value" id="val-centerWeight">1.00</span></div>
+            <input id="sl-centerWeight" type="range" min="0.1" max="3" step="0.05" value="1.0" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const params = {
+      width: 1800,
+      height: 1800,
+      seed: 1200,
+
+      grid: 8,
+      contourStep: 0.10,
+      levelRange: 1.20,
+      boldEvery: 5,
+      thinStroke: 0.80,
+      boldStroke: 1.50,
+
+      noiseFreq: 0.48,
+      noiseAmp: 0.18,
+      octaves: 4,
+      roughness: 0.52,
+
+      waveFreq: 0.065,
+      waveAmp: 0.38,
+      collision: 0.90,
+      ridgeMix: 1.10,
+      minRadius: 8,
+
+      warpFreq: 0.010,
+      warpAmp: 20,
+      terraceStrength: 0.12,
+      terraceStep: 0.10,
+
+      handleSize: 14,
+      centerMark: 7,
+
+      freqDirs: { top: true, right: true, bottom: true, left: true },
+      ampDirs: { top: true, right: true, bottom: true, left: true },
+
+      centers: [
+        { x: 0.28, y: 0.35, phase: 0.00, weight: 1.10 },
+        { x: 0.56, y: 0.42, phase: 1.25, weight: 1.35 },
+        { x: 0.72, y: 0.62, phase: -0.85, weight: 0.95 }
+      ],
+
+      theme: 'light'
+    };
+
+    let p5Instance = null;
+    let drawingData = [];
+    let selectedCenterIndex = 0;
+    let controlsOpen = false;
+    let dragCenterIndex = -1;
+    let isRendering = false;
+
+    const centerListEl = document.getElementById('center-list');
+    const statusTextEl = document.getElementById('status-text');
+    const statusPillEl = document.getElementById('status-pill');
+
+    function clamp(v, min, max) {
+      return Math.max(min, Math.min(max, v));
+    }
+
+    function setStatus(text) {
+      statusTextEl.textContent = text;
+      statusPillEl.textContent = text;
+    }
+
+    function getColors() {
+      return {
+        bg: '#ffffff',
+        fg: '#000000'
+      };
+    }
+
+    function safeFileName(ext) {
+      return `topo-refined-${params.seed}.${ext}`;
+    }
+
+    function downloadBlob(blob, filename) {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 0);
+    }
+
+    function savePNG() {
+      if (p5Instance) p5Instance.saveCanvas(`topo-refined-${params.seed}`, 'png');
+    }
+
+    function saveSVG() {
+      if (!drawingData.length) return;
+      const colors = getColors();
+      let svg = `<?xml version="1.0" encoding="UTF-8"?>`;
+      svg += `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${params.width} ${params.height}" width="${params.width}" height="${params.height}">`;
+      svg += `<rect width="100%" height="100%" fill="${colors.bg}"/>`;
+      for (const el of drawingData) {
+        if (el.type === 'path') {
+          const d = el.points.map((pt, idx) => `${idx === 0 ? 'M' : 'L'} ${pt.x.toFixed(2)} ${pt.y.toFixed(2)}`).join(' ');
+          svg += `<path d="${d}${el.closed ? ' Z' : ''}" fill="none" stroke="${colors.fg}" stroke-width="${el.strokeWidth.toFixed(2)}" stroke-linecap="round" stroke-linejoin="round"/>`;
+        } else if (el.type === 'circle') {
+          svg += `<circle cx="${el.cx.toFixed(2)}" cy="${el.cy.toFixed(2)}" r="${(el.d / 2).toFixed(2)}" fill="${el.fill}" fill-opacity="${el.fillOpacity}" stroke="${el.stroke}" stroke-width="${el.strokeWidth.toFixed(2)}"/>`;
+        }
+      }
+      svg += `</svg>`;
+      downloadBlob(new Blob([svg], { type: 'image/svg+xml;charset=utf-8' }), safeFileName('svg'));
+    }
+
+    function getDirFactor(dirs, dx, dy, dist) {
+      if (dist <= 1e-6) return 1;
+      const nx = dx / dist;
+      const ny = dy / dist;
+      const wx = (dirs.right && nx > 0 ? nx : 0) + (dirs.left && nx < 0 ? -nx : 0);
+      const wy = (dirs.bottom && ny > 0 ? ny : 0) + (dirs.top && ny < 0 ? -ny : 0);
+      const sum = wx + wy;
+      return sum > 0 ? sum : 1;
+    }
+
+    function fractalNoise(p, x, y) {
+      let value = 0;
+      let amp = 1;
+      let freq = Math.max(0.0001, params.noiseFreq) * 0.01;
+      for (let i = 0; i < params.octaves; i++) {
+        value += (p.noise(x * freq + params.seed * 0.001, y * freq + params.seed * 0.002) - 0.5) * 2 * amp;
+        amp *= params.roughness;
+        freq *= 2;
+      }
+      return value;
+    }
+
+    function quantizePointKey(pt, tol) {
+      return `${Math.round(pt.x / tol)},${Math.round(pt.y / tol)}`;
+    }
+
+    function pointDistance(a, b) {
+      return Math.hypot(a.x - b.x, a.y - b.y);
+    }
+
+    function dedupePath(points, tol) {
+      if (!points.length) return points;
+      const out = [points[0]];
+      const minDist = tol * 0.18;
+      for (let i = 1; i < points.length; i++) {
+        if (pointDistance(out[out.length - 1], points[i]) > minDist) out.push(points[i]);
+      }
+      return out;
+    }
+
+    function mergeSegmentsToPolylines(segments, tol) {
+      if (!segments.length) return [];
+
+      const nodeTol = Math.max(0.5, tol * 0.55);
+      const nodeMap = new Map();
+      const nodes = [];
+
+      function getNodeIndex(pt) {
+        const key = quantizePointKey(pt, nodeTol);
+        if (!nodeMap.has(key)) nodeMap.set(key, []);
+        const bucket = nodeMap.get(key);
+        for (const idx of bucket) {
+          if (pointDistance(nodes[idx], pt) <= nodeTol) return idx;
+        }
+        const idx = nodes.length;
+        nodes.push({ x: pt.x, y: pt.y });
+        bucket.push(idx);
+        return idx;
+      }
+
+      const adjacency = new Map();
+      const normSegments = [];
+
+      function addAdj(a, b, segIdx) {
+        if (!adjacency.has(a)) adjacency.set(a, []);
+        adjacency.get(a).push({ node: b, segIdx });
+      }
+
+      for (let i = 0; i < segments.length; i++) {
+        const aIdx = getNodeIndex(segments[i].a);
+        const bIdx = getNodeIndex(segments[i].b);
+        if (aIdx === bIdx) continue;
+        const segIdx = normSegments.length;
+        normSegments.push({ aIdx, bIdx });
+        addAdj(aIdx, bIdx, segIdx);
+        addAdj(bIdx, aIdx, segIdx);
+      }
+
+      const used = new Array(normSegments.length).fill(false);
+      const polylines = [];
+
+      function traceFrom(startSegIdx, startNode, nextNode) {
+        const pathNodes = [startNode, nextNode];
+        used[startSegIdx] = true;
+        let prev = startNode;
+        let curr = nextNode;
+
+        while (true) {
+          const candidates = (adjacency.get(curr) || []).filter(e => !used[e.segIdx] && e.node !== prev);
+          if (!candidates.length) break;
+
+          let best = candidates[0];
+          if (candidates.length > 1) {
+            const inVec = { x: nodes[curr].x - nodes[prev].x, y: nodes[curr].y - nodes[prev].y };
+            let bestScore = -Infinity;
+            for (const cand of candidates) {
+              const outVec = { x: nodes[cand.node].x - nodes[curr].x, y: nodes[cand.node].y - nodes[curr].y };
+              const inLen = Math.hypot(inVec.x, inVec.y) || 1;
+              const outLen = Math.hypot(outVec.x, outVec.y) || 1;
+              const dot = (inVec.x * outVec.x + inVec.y * outVec.y) / (inLen * outLen);
+              const score = dot - outLen * 1e-6;
+              if (score > bestScore) {
+                bestScore = score;
+                best = cand;
+              }
+            }
+          }
+
+          used[best.segIdx] = true;
+          prev = curr;
+          curr = best.node;
+          pathNodes.push(curr);
+          if (curr === pathNodes[0]) break;
+        }
+
+        return dedupePath(pathNodes.map(idx => ({ x: nodes[idx].x, y: nodes[idx].y })), tol);
+      }
+
+      for (let nodeIdx = 0; nodeIdx < nodes.length; nodeIdx++) {
+        const degree = (adjacency.get(nodeIdx) || []).length;
+        if (degree !== 2) {
+          for (const edge of (adjacency.get(nodeIdx) || [])) {
+            if (used[edge.segIdx]) continue;
+            const path = traceFrom(edge.segIdx, nodeIdx, edge.node);
+            if (path.length >= 2) polylines.push(path);
+          }
+        }
+      }
+
+      for (let segIdx = 0; segIdx < normSegments.length; segIdx++) {
+        if (used[segIdx]) continue;
+        const seg = normSegments[segIdx];
+        const path = traceFrom(segIdx, seg.aIdx, seg.bIdx);
+        if (path.length >= 2) polylines.push(path);
+      }
+
+      return polylines;
+    }
+
+    function smoothPolyline(points, iterations, closed) {
+      let pts = points.slice();
+      if (pts.length < 3) return pts;
+      for (let iter = 0; iter < iterations; iter++) {
+        const next = [];
+        if (!closed) next.push(pts[0]);
+        const limit = closed ? pts.length : pts.length - 1;
+        for (let i = 0; i < limit; i++) {
+          const a = pts[i];
+          const b = pts[(i + 1) % pts.length];
+          if (!closed && i === pts.length - 1) break;
+          if (!b) break;
+          const q = { x: 0.75 * a.x + 0.25 * b.x, y: 0.75 * a.y + 0.25 * b.y };
+          const r = { x: 0.25 * a.x + 0.75 * b.x, y: 0.25 * a.y + 0.75 * b.y };
+          next.push(q, r);
+          if (!closed && i === pts.length - 2) break;
+        }
+        if (!closed) next.push(pts[pts.length - 1]);
+        pts = next;
+      }
+      return pts;
+    }
+
+    function drawPolyline(p, points, strokeW, closed) {
+      if (points.length < 2) return;
+      p.strokeWeight(strokeW);
+      p.noFill();
+      p.beginShape();
+      for (const pt of points) p.vertex(pt.x, pt.y);
+      p.endShape(closed ? p.CLOSE : p.OPEN);
+      drawingData.push({ type: 'path', points, strokeWidth: strokeW, closed: !!closed });
+    }
+
+    function applyTerrace(value) {
+      const step = Math.max(0.02, params.terraceStep);
+      const snapped = Math.round(value / step) * step;
+      return value * (1 - params.terraceStrength) + snapped * params.terraceStrength;
+    }
+
+    function sampleWarpedNoise(p, x, y, axis) {
+      const ox = axis === 'x' ? 37.21 : 91.73;
+      const oy = axis === 'x' ? 73.11 : 15.37;
+      return (p.noise(x * params.warpFreq + ox + params.seed * 0.0007, y * params.warpFreq + oy + params.seed * 0.0009) - 0.5) * 2;
+    }
+
+    function fieldAt(p, x, y) {
+      const warpX = sampleWarpedNoise(p, x, y, 'x') * params.warpAmp;
+      const warpY = sampleWarpedNoise(p, x, y, 'y') * params.warpAmp;
+      const sx = x + warpX;
+      const sy = y + warpY;
+      const noisePart = fractalNoise(p, sx, sy) * params.noiseAmp;
+      let moundSum = 0;
+      let ringSum = 0;
+      let pairSum = 0;
+      const sizeBase = Math.min(params.width, params.height);
+      const centersPx = params.centers.map(c => ({
+        x: c.x * params.width,
+        y: c.y * params.height,
+        phase: c.phase,
+        weight: c.weight,
+        radius: sizeBase * (0.10 + 0.12 * c.weight)
+      }));
+
+      for (let i = 0; i < centersPx.length; i++) {
+        const c = centersPx[i];
+        const dx = sx - c.x;
+        const dy = sy - c.y;
+        const rawDist = Math.hypot(dx, dy);
+        const dist = Math.max(params.minRadius, rawDist);
+        const dirFactor = getDirFactor(params.freqDirs, dx, dy, dist);
+        const sigma = c.radius;
+        const gaussian = Math.exp(-(dist * dist) / (2 * sigma * sigma));
+        const shoulder = Math.max(0, 1 - dist / (sigma * 2.6));
+        const ringEnvelope = Math.exp(-dist / (sigma * 1.9));
+        const ring = Math.sin(dist * params.waveFreq * dirFactor + c.phase) * ringEnvelope;
+        moundSum += c.weight * (1.18 * gaussian + 0.42 * shoulder);
+        ringSum += c.weight * ring;
+      }
+
+      for (let i = 0; i < centersPx.length; i++) {
+        for (let j = i + 1; j < centersPx.length; j++) {
+          const a = centersPx[i];
+          const b = centersPx[j];
+          const da = Math.max(params.minRadius, Math.hypot(sx - a.x, sy - a.y));
+          const db = Math.max(params.minRadius, Math.hypot(sx - b.x, sy - b.y));
+          const meanRadius = 0.5 * (a.radius + b.radius);
+          const corridor = Math.exp(-Math.abs(da - db) / (meanRadius * 0.52));
+          const fade = Math.exp(-(da + db) / (meanRadius * 2.25));
+          const phaseMix = 0.5 * (a.phase - b.phase);
+          const saddle = Math.cos((da - db) * params.waveFreq * 0.95 + phaseMix) * corridor * fade;
+          pairSum += saddle * Math.sqrt(a.weight * b.weight);
+        }
+      }
+
+      const combined = moundSum + ringSum * params.waveAmp + pairSum * params.collision * params.ridgeMix + noisePart;
+      return applyTerrace(combined);
+    }
+
+    function lerpPoint(a, b, va, vb, level) {
+      const denom = vb - va;
+      const t = Math.abs(denom) < 1e-9 ? 0.5 : (level - va) / denom;
+      return {
+        x: a.x + (b.x - a.x) * t,
+        y: a.y + (b.y - a.y) * t
+      };
+    }
+
+    function marchingSquaresSegments(corners, level) {
+      const { tl, tr, br, bl } = corners;
+      const idx =
+        (tl.v >= level ? 1 : 0) |
+        (tr.v >= level ? 2 : 0) |
+        (br.v >= level ? 4 : 0) |
+        (bl.v >= level ? 8 : 0);
+
+      if (idx === 0 || idx === 15) return [];
+
+      const top = lerpPoint(tl, tr, tl.v, tr.v, level);
+      const right = lerpPoint(tr, br, tr.v, br.v, level);
+      const bottom = lerpPoint(br, bl, br.v, bl.v, level);
+      const left = lerpPoint(bl, tl, bl.v, tl.v, level);
+      const center = (tl.v + tr.v + br.v + bl.v) * 0.25;
+
+      switch (idx) {
+        case 1: return [{ a: left, b: top }];
+        case 2: return [{ a: top, b: right }];
+        case 3: return [{ a: left, b: right }];
+        case 4: return [{ a: right, b: bottom }];
+        case 5:
+          return center >= level
+            ? [{ a: left, b: bottom }, { a: top, b: right }]
+            : [{ a: left, b: top }, { a: bottom, b: right }];
+        case 6: return [{ a: top, b: bottom }];
+        case 7: return [{ a: left, b: bottom }];
+        case 8: return [{ a: bottom, b: left }];
+        case 9: return [{ a: top, b: bottom }];
+        case 10:
+          return center >= level
+            ? [{ a: top, b: left }, { a: right, b: bottom }]
+            : [{ a: top, b: right }, { a: bottom, b: left }];
+        case 11: return [{ a: right, b: bottom }];
+        case 12: return [{ a: left, b: right }];
+        case 13: return [{ a: top, b: right }];
+        case 14: return [{ a: left, b: top }];
+        default: return [];
+      }
+    }
+
+    function redrawCanvas() {
+      if (p5Instance && !isRendering) p5Instance.redraw();
+    }
+
+    function randomizeSeed() {
+      params.seed = Math.floor(Math.random() * 100000);
+      document.getElementById('sl-seed').value = params.seed;
+      document.getElementById('val-seed').textContent = String(params.seed);
+      redrawCanvas();
+    }
+
+    function createDirectionControls(containerId, paramKey) {
+      const container = document.getElementById(containerId);
+      const dirs = [
+        { key: 'top', label: '↑' },
+        { key: 'right', label: '→' },
+        { key: 'bottom', label: '↓' },
+        { key: 'left', label: '←' }
+      ];
+      container.innerHTML = '';
+      dirs.forEach(({ key, label }) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'dir-btn';
+        btn.textContent = label;
+        const renderState = () => {
+          btn.classList.toggle('active', !!params[paramKey][key]);
+          btn.setAttribute('aria-pressed', String(!!params[paramKey][key]));
+        };
+        btn.addEventListener('click', () => {
+          params[paramKey][key] = !params[paramKey][key];
+          renderState();
+          redrawCanvas();
+        });
+        renderState();
+        container.appendChild(btn);
       });
-      el.centersList.appendChild(div);
-    });
-    el.statusCenterCount.textContent = `Centers: ${centers.length}`;
-  }
+    }
 
-  function updateCenterInputs(){
-    const c = centers[activeCenterIndex];
-    if (!c) return;
-    el.centerX.value = fnum(c.x,0);
-    el.centerY.value = fnum(c.y,0);
-    el.centerElevation.value = fnum(c.elevation,2);
-    el.centerRadius.value = fnum(c.radius,0);
-    el.centerPhase.value = fnum(c.phase,2);
-    el.centerSharpness.value = fnum(c.sharpness,2);
-    el.centerPolarity.value = String(c.polarity);
-    el.centerInterferenceWeight.value = fnum(c.interferenceWeight,2);
-  }
+    function bindRange(id, key, formatter = v => String(v)) {
+      const el = document.getElementById(id);
+      const valueEl = document.getElementById('val-' + key);
+      el.addEventListener('input', (e) => {
+        const raw = Number(e.target.value);
+        params[key] = raw;
+        valueEl.textContent = formatter(params[key]);
+        redrawCanvas();
+      });
+    }
 
-  function constrainCentersInBounds(){
-    centers.forEach(c => {
-      c.x = clamp(c.x, 0, params.canvasW);
-      c.y = clamp(c.y, 0, params.canvasH);
-    });
-  }
+    function resizeCanvasFromInputs() {
+      params.width = Math.max(128, Math.floor(Number(document.getElementById('inp-width').value) || params.width));
+      params.height = Math.max(128, Math.floor(Number(document.getElementById('inp-height').value) || params.height));
+      document.getElementById('inp-width').value = params.width;
+      document.getElementById('inp-height').value = params.height;
+      if (p5Instance) {
+        p5Instance.resizeCanvas(params.width, params.height);
+        redrawCanvas();
+      }
+    }
 
-  function invalidate(){
-    needsRebuild = true;
-    if (pInstance) pInstance.redraw();
-  }
+    function makeCenter(x = 0.5, y = 0.5) {
+      return {
+        x: clamp(x, 0, 1),
+        y: clamp(y, 0, 1),
+        phase: 0,
+        weight: 1
+      };
+    }
 
-  function invalidateLight(){
-    if (pInstance) pInstance.redraw();
-  }
+    function syncSelectedCenterControls() {
+      const center = params.centers[selectedCenterIndex] || params.centers[0];
+      if (!center) return;
+      document.getElementById('sl-centerX').value = (center.x * 100).toFixed(1);
+      document.getElementById('val-centerX').textContent = `${(center.x * 100).toFixed(1)} %`;
+      document.getElementById('sl-centerY').value = (center.y * 100).toFixed(1);
+      document.getElementById('val-centerY').textContent = `${(center.y * 100).toFixed(1)} %`;
+      document.getElementById('sl-centerPhase').value = center.phase.toFixed(2);
+      document.getElementById('val-centerPhase').textContent = center.phase.toFixed(2);
+      document.getElementById('sl-centerWeight').value = center.weight.toFixed(2);
+      document.getElementById('val-centerWeight').textContent = center.weight.toFixed(2);
+    }
 
-  function resizeCanvasToParams(){
-    if (!pInstance) return;
-    pInstance.resizeCanvas(params.canvasW, params.canvasH);
-    invalidate();
-  }
+    function renderCenterList() {
+      centerListEl.innerHTML = '';
+      params.centers.forEach((c, idx) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'center-item' + (idx === selectedCenterIndex ? ' active' : '');
+        btn.innerHTML = `<strong>Center ${idx + 1}</strong><span>x ${(c.x * 100).toFixed(1)}% / y ${(c.y * 100).toFixed(1)}%<br>phase ${c.phase.toFixed(2)} / weight ${c.weight.toFixed(2)}</span>`;
+        btn.addEventListener('click', () => {
+          selectedCenterIndex = idx;
+          renderCenterList();
+          syncSelectedCenterControls();
+          redrawCanvas();
+        });
+        centerListEl.appendChild(btn);
+      });
+    }
 
-  function createP5(){
+    function addCenter(x = Math.random() * 0.8 + 0.1, y = Math.random() * 0.8 + 0.1) {
+      params.centers.push(makeCenter(x, y));
+      selectedCenterIndex = params.centers.length - 1;
+      renderCenterList();
+      syncSelectedCenterControls();
+      redrawCanvas();
+    }
+
+    function removeSelectedCenter() {
+      if (params.centers.length <= 1) return;
+      params.centers.splice(selectedCenterIndex, 1);
+      selectedCenterIndex = clamp(selectedCenterIndex, 0, params.centers.length - 1);
+      renderCenterList();
+      syncSelectedCenterControls();
+      redrawCanvas();
+    }
+
+    function randomScatterCenters() {
+      params.centers = params.centers.map((c, idx) => ({
+        x: clamp(0.1 + Math.random() * 0.8, 0, 1),
+        y: clamp(0.1 + Math.random() * 0.8, 0, 1),
+        phase: idx % 2 === 0 ? 0 : Math.PI * 0.5,
+        weight: c.weight
+      }));
+      selectedCenterIndex = 0;
+      renderCenterList();
+      syncSelectedCenterControls();
+      redrawCanvas();
+    }
+
+    function updateSelectedCenter(partial) {
+      const center = params.centers[selectedCenterIndex];
+      if (!center) return;
+      Object.assign(center, partial);
+      center.x = clamp(center.x, 0, 1);
+      center.y = clamp(center.y, 0, 1);
+      center.weight = clamp(center.weight, 0.1, 3);
+      center.phase = clamp(center.phase, -Math.PI, Math.PI);
+      syncSelectedCenterControls();
+      renderCenterList();
+      redrawCanvas();
+    }
+
+    function initUI() {
+      const toggleBtn = document.getElementById('toggle-btn');
+      const content = document.getElementById('controls-content');
+
+      toggleBtn.addEventListener('click', () => {
+        controlsOpen = !controlsOpen;
+        content.classList.toggle('open', controlsOpen);
+      });
+
+      document.getElementById('btn-randomize').addEventListener('click', randomizeSeed);
+      document.getElementById('btn-png').addEventListener('click', savePNG);
+      document.getElementById('btn-svg').addEventListener('click', saveSVG);
+
+      document.getElementById('inp-width').addEventListener('change', resizeCanvasFromInputs);
+      document.getElementById('inp-height').addEventListener('change', resizeCanvasFromInputs);
+
+      bindRange('sl-seed', 'seed', v => `${Math.round(v)}`);
+      bindRange('sl-grid', 'grid', v => `${Math.round(v)} px`);
+      bindRange('sl-contourStep', 'contourStep', v => `${Number(v).toFixed(2)}`);
+      bindRange('sl-levelRange', 'levelRange', v => `${Number(v).toFixed(2)}`);
+      bindRange('sl-boldEvery', 'boldEvery', v => `${Math.round(v)}`);
+      bindRange('sl-thinStroke', 'thinStroke', v => `${Number(v).toFixed(2)} px`);
+      bindRange('sl-boldStroke', 'boldStroke', v => `${Number(v).toFixed(2)} px`);
+
+      bindRange('sl-noiseFreq', 'noiseFreq', v => `${Number(v).toFixed(2)}`);
+      bindRange('sl-noiseAmp', 'noiseAmp', v => `${Number(v).toFixed(2)}`);
+      bindRange('sl-octaves', 'octaves', v => `${Math.round(v)}`);
+      bindRange('sl-roughness', 'roughness', v => `${Number(v).toFixed(2)}`);
+
+      bindRange('sl-waveFreq', 'waveFreq', v => `${Number(v).toFixed(3)}`);
+      bindRange('sl-waveAmp', 'waveAmp', v => `${Number(v).toFixed(2)}`);
+      bindRange('sl-collision', 'collision', v => `${Number(v).toFixed(2)}`);
+      bindRange('sl-ridgeMix', 'ridgeMix', v => `${Number(v).toFixed(2)}`);
+      bindRange('sl-minRadius', 'minRadius', v => `${Math.round(v)} px`);
+
+      bindRange('sl-warpFreq', 'warpFreq', v => `${Number(v).toFixed(3)}`);
+      bindRange('sl-warpAmp', 'warpAmp', v => `${Math.round(v)} px`);
+      bindRange('sl-terraceStrength', 'terraceStrength', v => `${Number(v).toFixed(2)}`);
+      bindRange('sl-terraceStep', 'terraceStep', v => `${Number(v).toFixed(2)}`);
+
+      bindRange('sl-handleSize', 'handleSize', v => `${Math.round(v)} px`);
+      bindRange('sl-centerMark', 'centerMark', v => `${Math.round(v)} px`);
+
+      createDirectionControls('freq-dirs', 'freqDirs');
+      createDirectionControls('amp-dirs', 'ampDirs');
+
+      document.getElementById('btn-add-center').addEventListener('click', () => addCenter());
+      document.getElementById('btn-remove-center').addEventListener('click', removeSelectedCenter);
+      document.getElementById('btn-random-centers').addEventListener('click', randomScatterCenters);
+
+      document.getElementById('sl-centerX').addEventListener('input', e => updateSelectedCenter({ x: Number(e.target.value) / 100 }));
+      document.getElementById('sl-centerY').addEventListener('input', e => updateSelectedCenter({ y: Number(e.target.value) / 100 }));
+      document.getElementById('sl-centerPhase').addEventListener('input', e => updateSelectedCenter({ phase: Number(e.target.value) }));
+      document.getElementById('sl-centerWeight').addEventListener('input', e => updateSelectedCenter({ weight: Number(e.target.value) }));
+
+      document.getElementById('val-seed').textContent = String(params.seed);
+      document.getElementById('val-grid').textContent = `${params.grid} px`;
+      document.getElementById('val-contourStep').textContent = params.contourStep.toFixed(2);
+      document.getElementById('val-levelRange').textContent = params.levelRange.toFixed(2);
+      document.getElementById('val-boldEvery').textContent = String(params.boldEvery);
+      document.getElementById('val-thinStroke').textContent = `${params.thinStroke.toFixed(2)} px`;
+      document.getElementById('val-boldStroke').textContent = `${params.boldStroke.toFixed(2)} px`;
+      document.getElementById('val-noiseFreq').textContent = params.noiseFreq.toFixed(2);
+      document.getElementById('val-noiseAmp').textContent = params.noiseAmp.toFixed(2);
+      document.getElementById('val-octaves').textContent = String(params.octaves);
+      document.getElementById('val-roughness').textContent = params.roughness.toFixed(2);
+      document.getElementById('val-waveFreq').textContent = params.waveFreq.toFixed(3);
+      document.getElementById('val-waveAmp').textContent = params.waveAmp.toFixed(2);
+      document.getElementById('val-collision').textContent = params.collision.toFixed(2);
+      document.getElementById('val-ridgeMix').textContent = params.ridgeMix.toFixed(2);
+      document.getElementById('val-minRadius').textContent = `${params.minRadius} px`;
+      document.getElementById('val-warpFreq').textContent = params.warpFreq.toFixed(3);
+      document.getElementById('val-warpAmp').textContent = `${params.warpAmp} px`;
+      document.getElementById('val-terraceStrength').textContent = params.terraceStrength.toFixed(2);
+      document.getElementById('val-terraceStep').textContent = params.terraceStep.toFixed(2);
+      document.getElementById('val-handleSize').textContent = `${params.handleSize} px`;
+      document.getElementById('val-centerMark').textContent = `${params.centerMark} px`;
+
+      renderCenterList();
+      syncSelectedCenterControls();
+    }
+
     const sketch = (p) => {
       p.setup = () => {
-        const cnv = p.createCanvas(params.canvasW, params.canvasH);
-        cnv.parent("canvasHost");
-        p.noLoop();
+        const c = p.createCanvas(params.width, params.height);
+        c.parent('canvas-container');
+        c.style('max-width', '100%');
+        c.style('max-height', '100%');
+        c.style('width', 'auto');
+        c.style('height', 'auto');
+        c.style('object-fit', 'contain');
+        c.style('box-shadow', '0 0 0 1px #333, 0 20px 80px -10px rgba(0,0,0,0.8)');
+        c.style('background-color', 'white');
+
         p.pixelDensity(1);
+        p.noLoop();
+        p5Instance = p;
+
+        const canvasEl = c.elt;
+
+        canvasEl.addEventListener('pointerdown', (e) => {
+          const rect = canvasEl.getBoundingClientRect();
+          const sx = params.width / rect.width;
+          const sy = params.height / rect.height;
+          const mx = (e.clientX - rect.left) * sx;
+          const my = (e.clientY - rect.top) * sy;
+
+          if (e.shiftKey) {
+            addCenter(mx / params.width, my / params.height);
+            return;
+          }
+
+          if (e.altKey) {
+            if (params.centers.length <= 1) return;
+            let best = -1;
+            let bestD = Infinity;
+            params.centers.forEach((c, idx) => {
+              const cx = c.x * params.width;
+              const cy = c.y * params.height;
+              const d = Math.hypot(cx - mx, cy - my);
+              if (d < bestD) {
+                bestD = d;
+                best = idx;
+              }
+            });
+            if (best >= 0 && bestD <= Math.max(16, params.handleSize * 1.4)) {
+              selectedCenterIndex = best;
+              removeSelectedCenter();
+            }
+            return;
+          }
+
+          dragCenterIndex = -1;
+          let best = -1;
+          let bestD = Infinity;
+          params.centers.forEach((c, idx) => {
+            const cx = c.x * params.width;
+            const cy = c.y * params.height;
+            const d = Math.hypot(cx - mx, cy - my);
+            if (d < bestD) {
+              bestD = d;
+              best = idx;
+            }
+          });
+
+          if (best >= 0 && bestD <= Math.max(16, params.handleSize * 1.6)) {
+            dragCenterIndex = best;
+            selectedCenterIndex = best;
+            renderCenterList();
+            syncSelectedCenterControls();
+            redrawCanvas();
+          }
+        });
+
+        window.addEventListener('pointermove', (e) => {
+          if (dragCenterIndex < 0) return;
+          const rect = canvasEl.getBoundingClientRect();
+          const sx = params.width / rect.width;
+          const sy = params.height / rect.height;
+          const mx = (e.clientX - rect.left) * sx;
+          const my = (e.clientY - rect.top) * sy;
+          updateSelectedCenter({
+            x: mx / params.width,
+            y: my / params.height
+          });
+        });
+
+        window.addEventListener('pointerup', () => { dragCenterIndex = -1; });
+        redrawCanvas();
       };
 
       p.draw = () => {
-        p.background(params.bg);
+        isRendering = true;
+        setStatus('rendering');
+        const colors = getColors();
+        p.background(colors.bg);
+        p.stroke(colors.fg);
+        p.noFill();
+        drawingData = [];
 
-        if (needsRebuild) rebuildContours(p);
+        p.noiseSeed(params.seed);
+        p.noiseDetail(Math.max(1, Math.round(params.octaves)), params.roughness);
 
-        drawContours(p, cachedContours);
-        drawCenterHandles(p);
-      };
+        const grid = Math.max(2, Math.round(params.grid));
+        const cols = Math.floor(params.width / grid) + 1;
+        const rows = Math.floor(params.height / grid) + 1;
+        const field = new Array(rows);
 
-      p.mousePressed = () => {
-        if (!mouseInsideCanvas(p)) return;
-
-        if (p.keyIsDown(p.SHIFT)) {
-          centers.push(makeCenter(p.mouseX, p.mouseY, 1));
-          activeCenterIndex = centers.length - 1;
-          refreshCenterList();
-          updateCenterInputs();
-          invalidate();
-          return false;
-        }
-
-        if (p.keyIsDown(18)) { // Alt
-          const idx = findNearestCenter(p.mouseX, p.mouseY, 28);
-          if (idx >= 0 && centers.length > 1) {
-            centers.splice(idx, 1);
-            activeCenterIndex = clamp(activeCenterIndex, 0, centers.length - 1);
-            refreshCenterList();
-            updateCenterInputs();
-            invalidate();
+        for (let gy = 0; gy < rows; gy++) {
+          field[gy] = new Array(cols);
+          const y = Math.min(params.height, gy * grid);
+          for (let gx = 0; gx < cols; gx++) {
+            const x = Math.min(params.width, gx * grid);
+            field[gy][gx] = fieldAt(p, x, y);
           }
-          return false;
         }
 
-        const idx = findNearestCenter(p.mouseX, p.mouseY, 16);
-        if (idx >= 0) {
-          activeCenterIndex = idx;
-          draggingIndex = idx;
-          dragOffsetX = centers[idx].x - p.mouseX;
-          dragOffsetY = centers[idx].y - p.mouseY;
-          refreshCenterList();
-          updateCenterInputs();
-          invalidateLight();
-          return false;
+        const levels = [];
+        for (let level = -params.levelRange; level <= params.levelRange + 1e-9; level += params.contourStep) levels.push(level);
+
+        for (let li = 0; li < levels.length; li++) {
+          const level = levels[li];
+          const isBold = li % Math.max(1, Math.round(params.boldEvery)) === 0;
+          const strokeW = isBold ? params.boldStroke : params.thinStroke;
+          const segs = [];
+
+          for (let gy = 0; gy < rows - 1; gy++) {
+            const y0 = gy * grid;
+            const y1 = Math.min(params.height, (gy + 1) * grid);
+            for (let gx = 0; gx < cols - 1; gx++) {
+              const x0 = gx * grid;
+              const x1 = Math.min(params.width, (gx + 1) * grid);
+              segs.push(...marchingSquaresSegments({
+                tl: { x: x0, y: y0, v: field[gy][gx] },
+                tr: { x: x1, y: y0, v: field[gy][gx + 1] },
+                br: { x: x1, y: y1, v: field[gy + 1][gx + 1] },
+                bl: { x: x0, y: y1, v: field[gy + 1][gx] }
+              }, level));
+            }
+          }
+
+          const rawPaths = mergeSegmentsToPolylines(segs, Math.max(1, grid * 0.75));
+          for (const path of rawPaths) {
+            if (path.length < 3) continue;
+            const closed = pointDistance(path[0], path[path.length - 1]) <= grid * 1.1;
+            const prepared = closed ? (() => {
+              const copy = path.slice();
+              if (pointDistance(copy[0], copy[copy.length - 1]) > 0.001) copy.push({ ...copy[0] });
+              return copy;
+            })() : path;
+            const smoothed = smoothPolyline(prepared, closed ? 2 : 1, closed);
+            drawPolyline(p, smoothed, strokeW, closed);
+          }
         }
-      };
 
-      p.mouseDragged = () => {
-        if (draggingIndex >= 0) {
-          centers[draggingIndex].x = clamp(p.mouseX + dragOffsetX, 0, params.canvasW);
-          centers[draggingIndex].y = clamp(p.mouseY + dragOffsetY, 0, params.canvasH);
-          updateCenterInputs();
-          refreshCenterList();
-          invalidate();
-          return false;
-        }
-      };
+        const handleR = Math.max(3, params.handleSize * 0.5);
+        params.centers.forEach((c, idx) => {
+          const cx = c.x * params.width;
+          const cy = c.y * params.height;
+          const active = idx === selectedCenterIndex;
+          p.noStroke();
+          p.fill(colors.bg === '#000000' ? 255 : 0, active ? 80 : 35);
+          p.circle(cx, cy, params.handleSize + (active ? 6 : 0));
+          drawingData.push({
+            type: 'circle',
+            cx, cy,
+            d: params.handleSize + (active ? 6 : 0),
+            fill: colors.fg,
+            fillOpacity: active ? 0.32 : 0.14,
+            stroke: colors.fg,
+            strokeWidth: 0
+          });
+          if (params.centerMark > 0) {
+            p.fill(colors.fg);
+            p.circle(cx, cy, params.centerMark);
+            drawingData.push({
+              type: 'circle',
+              cx, cy,
+              d: params.centerMark,
+              fill: colors.fg,
+              fillOpacity: 1,
+              stroke: colors.fg,
+              strokeWidth: 0
+            });
+          }
+        });
 
-      p.mouseReleased = () => {
-        draggingIndex = -1;
-      };
-
-      p.mouseMoved = () => {
-        hoveredIndex = findNearestCenter(p.mouseX, p.mouseY, 16);
-        invalidateLight();
+        isRendering = false;
+        setStatus(`ready · ${params.centers.length} centers · ${drawingData.length} elements`);
       };
     };
 
-    pInstance = new p5(sketch);
-  }
-
-  function mouseInsideCanvas(p){
-    return p.mouseX >= 0 && p.mouseX <= p.width && p.mouseY >= 0 && p.mouseY <= p.height;
-  }
-
-  function findNearestCenter(x, y, radius){
-    const r2 = radius * radius;
-    let idx = -1;
-    let best = Infinity;
-    for (let i=0;i<centers.length;i++){
-      const d = dist2(x, y, centers[i].x, centers[i].y);
-      if (d < r2 && d < best){
-        best = d;
-        idx = i;
-      }
-    }
-    return idx;
-  }
-
-  function drawCenterHandles(p){
-    p.push();
-    for(let i=0;i<centers.length;i++){
-      const c = centers[i];
-      const active = i === activeCenterIndex;
-      const hover = i === hoveredIndex;
-      p.noFill();
-      p.stroke(active ? "#0b57d0" : hover ? "#666" : "#999");
-      p.strokeWeight(active ? 2 : 1);
-      p.circle(c.x, c.y, active ? 14 : 10);
-      p.stroke(c.polarity > 0 ? "#111" : "#888");
-      p.line(c.x - 6, c.y, c.x + 6, c.y);
-      if (c.polarity > 0) p.line(c.x, c.y - 6, c.x, c.y + 6);
-    }
-    p.pop();
-  }
-
-  function contourType(levelIndex){
-    if (levelIndex % params.indexEvery === 0) return "index";
-    if (levelIndex % params.majorEvery === 0) return "major";
-    return "minor";
-  }
-
-  function styleForType(type){
-    if (type === "index") return {sw: 2.2, alpha: 255};
-    if (type === "major") return {sw: 1.35, alpha: 230};
-    return {sw: 0.8, alpha: 160};
-  }
-
-  function rebuildContours(p){
-    cachedContours = [];
-    cachedLevels = [];
-
-    const step = params.gridStep;
-    const cols = Math.floor(params.canvasW / step) + 1;
-    const rows = Math.floor(params.canvasH / step) + 1;
-
-    const field = Array.from({length: rows}, () => new Float32Array(cols));
-
-    for(let j=0;j<rows;j++){
-      const y = j * step;
-      for(let i=0;i<cols;i++){
-        const x = i * step;
-        field[j][i] = terrainHeight(p, x, y);
-      }
-    }
-
-    const levels = [];
-    let li = 0;
-    for(let level = params.levelMin; level <= params.levelMax + 1e-9; level += params.minorStep){
-      levels.push({ value: +level.toFixed(6), index: li++, type: contourType(li - 1) });
-    }
-    cachedLevels = levels;
-
-    for (const lv of levels){
-      let segs = marchingSquaresSegments(field, cols, rows, step, lv.value);
-      let paths = connectSegmentsToPaths(segs, step * 0.75);
-      paths = paths
-        .map(path => smoothPath(path, params.smoothIter))
-        .map(path => maybeClosePath(path, step * lerp(1.2, 0.35, params.closedBias)))
-        .filter(path => pathLength(path) >= params.minPathLength);
-
-      for (const path of paths){
-        cachedContours.push({
-          level: lv.value,
-          levelIndex: lv.index,
-          type: lv.type,
-          closed: isClosed(path),
-          points: path
-        });
-      }
-    }
-
-    cachedContours.sort((a,b) => {
-      const ta = a.type === "index" ? 2 : a.type === "major" ? 1 : 0;
-      const tb = b.type === "index" ? 2 : b.type === "major" ? 1 : 0;
-      return ta - tb;
+    window.addEventListener('DOMContentLoaded', () => {
+      initUI();
+      new p5(sketch);
     });
-
-    el.statusSegments.textContent = `Paths: ${cachedContours.length}`;
-    el.statusLevels.textContent = `Levels: ${levels.length}`;
-    needsRebuild = false;
-  }
-
-  function terrainHeight(p, x, y){
-    let wx = x;
-    let wy = y;
-
-    if (params.warpAmount > 0.0001){
-      const nx = p.noise(wx * params.warpScale + 11.7, wy * params.warpScale + 29.1) - 0.5;
-      const ny = p.noise(wx * params.warpScale + 71.3, wy * params.warpScale + 7.6) - 0.5;
-      wx += nx * 2 * params.warpAmount;
-      wy += ny * 2 * params.warpAmount;
-    }
-
-    const contributions = [];
-    let sum = 0;
-    let maxv = -Infinity;
-    let minv = Infinity;
-
-    for (let i=0;i<centers.length;i++){
-      const c = centers[i];
-      const dx = wx - c.x;
-      const dy = wy - c.y;
-      const d = Math.sqrt(dx*dx + dy*dy) + 1e-6;
-
-      const rr = d / Math.max(1, c.radius);
-      const falloff = Math.exp(-Math.pow(rr, c.sharpness));
-      const base = c.polarity * c.elevation * falloff;
-
-      contributions.push({base, c, d, dx, dy});
-      sum += base;
-      if (base > maxv) maxv = base;
-      if (base < minv) minv = base;
-    }
-
-    let height = 0;
-
-    if (params.blendMode === "sum"){
-      height = sum;
-    } else if (params.blendMode === "softmax"){
-      const k = 2.4;
-      let acc = 0;
-      let denom = 0;
-      for (const item of contributions){
-        const w = Math.exp(item.base * k);
-        acc += item.base * w;
-        denom += w;
-      }
-      height = denom > 0 ? acc / denom : 0;
-    } else {
-      const k = 2.1;
-      let acc = 0;
-      let denom = 0;
-      for (const item of contributions){
-        const w = Math.exp(item.base * k);
-        acc += item.base * w;
-        denom += w;
-      }
-      const soft = denom > 0 ? acc / denom : 0;
-      height = sum * 0.68 + soft * 0.32;
-    }
-
-    if (centers.length >= 2){
-      for(let i=0;i<centers.length;i++){
-        for(let j=i+1;j<centers.length;j++){
-          const a = centers[i];
-          const b = centers[j];
-          const midx = (a.x + b.x) * 0.5;
-          const midy = (a.y + b.y) * 0.5;
-          const dab = Math.sqrt((a.x-b.x)*(a.x-b.x)+(a.y-b.y)*(a.y-b.y)) + 1e-6;
-
-          const da = Math.sqrt((wx-a.x)*(wx-a.x)+(wy-a.y)*(wy-a.y));
-          const db = Math.sqrt((wx-b.x)*(wx-b.x)+(wy-b.y)*(wy-b.y));
-          const dm = Math.sqrt((wx-midx)*(wx-midx)+(wy-midy)*(wy-midy));
-
-          const overlap = Math.exp(-Math.pow((da+db)/(dab*1.08), 2.3));
-          const ridge = Math.exp(-Math.pow(dm / (dab * 0.55), 2.0));
-          const polarityMix = (a.polarity === b.polarity) ? 1 : -1;
-
-          height += polarityMix * overlap * ridge * params.ridgeStrength * 0.45;
-
-          if (a.polarity !== b.polarity){
-            const sx = (wx - midx) / (dab * 0.5);
-            const sy = (wy - midy) / (dab * 0.5);
-            const saddle = (sx*sx - sy*sy) * Math.exp(-(sx*sx + sy*sy) * 1.8);
-            height += saddle * params.saddleStrength * 0.30;
-          }
-        }
-      }
-    }
-
-    if (params.interferenceAmp > 0.0001){
-      let wave = 0;
-      let norm = 0;
-      for (const item of contributions){
-        const w = item.c.interferenceWeight;
-        wave += Math.sin(item.d * params.interferenceFreq * Math.PI * 2 + item.c.phase) * Math.exp(-item.d / (item.c.radius * 1.25)) * w;
-        norm += Math.abs(w);
-      }
-      if (norm > 1e-6){
-        height += (wave / norm) * params.interferenceAmp;
-      }
-    }
-
-    if (params.noiseAmount > 0.0001){
-      const n = p.noise(wx * params.noiseScale + 103.1, wy * params.noiseScale + 21.7) - 0.5;
-      height += n * 2 * params.noiseAmount;
-    }
-
-    if (params.terraceStrength > 0.0001 && params.terraceStep > 1e-6){
-      const q = Math.round(height / params.terraceStep) * params.terraceStep;
-      height = lerp(height, q, params.terraceStrength);
-    }
-
-    return height;
-  }
-
-  function marchingSquaresSegments(field, cols, rows, step, level){
-    const segments = [];
-
-    for(let y=0; y<rows-1; y++){
-      for(let x=0; x<cols-1; x++){
-        const v0 = field[y][x];
-        const v1 = field[y][x+1];
-        const v2 = field[y+1][x+1];
-        const v3 = field[y+1][x];
-
-        const p0 = {x:x*step, y:y*step};
-        const p1 = {x:(x+1)*step, y:y*step};
-        const p2 = {x:(x+1)*step, y:(y+1)*step};
-        const p3 = {x:x*step, y:(y+1)*step};
-
-        const idx =
-          (v0 >= level ? 1 : 0) |
-          (v1 >= level ? 2 : 0) |
-          (v2 >= level ? 4 : 0) |
-          (v3 >= level ? 8 : 0);
-
-        if (idx === 0 || idx === 15) continue;
-
-        const e = [];
-        if ((v0 >= level) !== (v1 >= level)) e.push(interpPoint(p0, p1, v0, v1, level)); // top
-        if ((v1 >= level) !== (v2 >= level)) e.push(interpPoint(p1, p2, v1, v2, level)); // right
-        if ((v2 >= level) !== (v3 >= level)) e.push(interpPoint(p2, p3, v2, v3, level)); // bottom
-        if ((v3 >= level) !== (v0 >= level)) e.push(interpPoint(p3, p0, v3, v0, level)); // left
-
-        if (e.length === 2){
-          segments.push([e[0], e[1]]);
-        } else if (e.length === 4){
-          const avg = (v0 + v1 + v2 + v3) * 0.25;
-          if (idx === 5 || idx === 10){
-            if (avg >= level){
-              segments.push([e[0], e[3]]);
-              segments.push([e[1], e[2]]);
-            } else {
-              segments.push([e[0], e[1]]);
-              segments.push([e[2], e[3]]);
-            }
-          } else {
-            segments.push([e[0], e[1]]);
-            segments.push([e[2], e[3]]);
-          }
-        }
-      }
-    }
-    return segments;
-  }
-
-  function interpPoint(a, b, va, vb, level){
-    const denom = (vb - va);
-    const t = Math.abs(denom) < 1e-9 ? 0.5 : (level - va) / denom;
-    return { x: lerp(a.x, b.x, t), y: lerp(a.y, b.y, t) };
-  }
-
-  function connectSegmentsToPaths(segments, threshold){
-    const paths = [];
-    const used = new Array(segments.length).fill(false);
-
-    function near(p, q){
-      const dx = p.x - q.x;
-      const dy = p.y - q.y;
-      return dx*dx + dy*dy <= threshold*threshold;
-    }
-
-    for(let i=0;i<segments.length;i++){
-      if (used[i]) continue;
-      used[i] = true;
-
-      let path = [segments[i][0], segments[i][1]];
-      let extended = true;
-
-      while(extended){
-        extended = false;
-
-        for(let j=0;j<segments.length;j++){
-          if (used[j]) continue;
-          const s0 = segments[j][0];
-          const s1 = segments[j][1];
-          const head = path[0];
-          const tail = path[path.length - 1];
-
-          if (near(tail, s0)){
-            path.push(s1);
-            used[j] = true;
-            extended = true;
-          } else if (near(tail, s1)){
-            path.push(s0);
-            used[j] = true;
-            extended = true;
-          } else if (near(head, s1)){
-            path.unshift(s0);
-            used[j] = true;
-            extended = true;
-          } else if (near(head, s0)){
-            path.unshift(s1);
-            used[j] = true;
-            extended = true;
-          }
-        }
-      }
-
-      path = simplifySequentialDuplicates(path, threshold * 0.15);
-      if (path.length >= 2) paths.push(path);
-    }
-
-    return paths;
-  }
-
-  function simplifySequentialDuplicates(path, eps){
-    if (path.length <= 1) return path;
-    const out = [path[0]];
-    for(let i=1;i<path.length;i++){
-      const a = out[out.length-1];
-      const b = path[i];
-      const dx = a.x - b.x;
-      const dy = a.y - b.y;
-      if (dx*dx + dy*dy > eps*eps) out.push(b);
-    }
-    return out;
-  }
-
-  function smoothPath(path, iterations){
-    let current = path.slice();
-    for(let k=0;k<iterations;k++){
-      if (current.length < 3) break;
-      const closed = isClosed(current);
-      const next = [];
-
-      if (!closed) next.push(current[0]);
-
-      const n = current.length;
-      const limit = closed ? n : n - 1;
-      for(let i=0;i<limit-1;i++){
-        const a = current[i];
-        const b = current[i+1];
-        next.push({ x: a.x * 0.75 + b.x * 0.25, y: a.y * 0.75 + b.y * 0.25 });
-        next.push({ x: a.x * 0.25 + b.x * 0.75, y: a.y * 0.25 + b.y * 0.75 });
-      }
-
-      if (closed){
-        const a = current[n-1];
-        const b = current[0];
-        next.push({ x: a.x * 0.75 + b.x * 0.25, y: a.y * 0.75 + b.y * 0.25 });
-        next.push({ x: a.x * 0.25 + b.x * 0.75, y: a.y * 0.25 + b.y * 0.75 });
-      } else {
-        next.push(current[n-1]);
-      }
-
-      current = next;
-    }
-    return current;
-  }
-
-  function maybeClosePath(path, threshold){
-    if (path.length < 3) return path;
-    const a = path[0];
-    const b = path[path.length - 1];
-    const dx = a.x - b.x;
-    const dy = a.y - b.y;
-    if (dx*dx + dy*dy <= threshold*threshold){
-      const closed = path.slice();
-      closed[closed.length - 1] = {x:a.x, y:a.y};
-      return closed;
-    }
-    return path;
-  }
-
-  function isClosed(path){
-    if (path.length < 3) return false;
-    const a = path[0];
-    const b = path[path.length - 1];
-    return Math.abs(a.x - b.x) < 0.001 && Math.abs(a.y - b.y) < 0.001;
-  }
-
-  function pathLength(path){
-    let sum = 0;
-    for(let i=1;i<path.length;i++){
-      const dx = path[i].x - path[i-1].x;
-      const dy = path[i].y - path[i-1].y;
-      sum += Math.sqrt(dx*dx + dy*dy);
-    }
-    return sum;
-  }
-
-  function drawContours(p, contours){
-    p.push();
-    p.noFill();
-    p.strokeJoin(p.ROUND);
-    p.strokeCap(p.ROUND);
-
-    for(const c of contours){
-      const st = styleForType(c.type);
-      p.stroke(17, 17, 17, st.alpha);
-      p.strokeWeight(st.sw);
-
-      p.beginShape();
-      for(const pt of c.points){
-        p.vertex(pt.x, pt.y);
-      }
-      if (c.closed) p.endShape(p.CLOSE);
-      else p.endShape();
-    }
-
-    p.pop();
-  }
-
-  function savePNG(){
-    if (!pInstance) return;
-    pInstance.saveCanvas("topographic_multi_center_pro", "png");
-  }
-
-  function pathToSVGd(path, closed){
-    if (!path.length) return "";
-    let d = `M ${path[0].x.toFixed(2)} ${path[0].y.toFixed(2)}`;
-    for(let i=1;i<path.length;i++){
-      d += ` L ${path[i].x.toFixed(2)} ${path[i].y.toFixed(2)}`;
-    }
-    if (closed) d += " Z";
-    return d;
-  }
-
-  function saveSVG(){
-    if (needsRebuild && pInstance) rebuildContours(pInstance);
-
-    const w = params.canvasW;
-    const h = params.canvasH;
-
-    const parts = [];
-    parts.push(`<?xml version="1.0" encoding="UTF-8"?>`);
-    parts.push(`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">`);
-    parts.push(`<rect width="100%" height="100%" fill="#ffffff"/>`);
-
-    for(const c of cachedContours){
-      const st = styleForType(c.type);
-      const d = pathToSVGd(c.points, c.closed);
-      if (!d) continue;
-      const opacity = (st.alpha / 255).toFixed(4);
-      parts.push(
-        `<path d="${d}" fill="none" stroke="#111111" stroke-opacity="${opacity}" stroke-width="${st.sw.toFixed(2)}" stroke-linecap="round" stroke-linejoin="round"/>`
-      );
-    }
-
-    parts.push(`</svg>`);
-    const svg = parts.join("\n");
-    const blob = new Blob([svg], {type:"image/svg+xml;charset=utf-8"});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "topographic_multi_center_pro.svg";
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 0);
-  }
-
-  function init(){
-    setupUI();
-    defaultCenters();
-    refreshCenterList();
-    updateCenterInputs();
-    createP5();
-    invalidate();
-  }
-
-  window.addEventListener("load", init);
-})();
-</script>
+  </script>
 </body>
 </html>
