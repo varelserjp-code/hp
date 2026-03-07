@@ -6,6 +6,7 @@ from bs4 import BeautifulSoup
 import google.generativeai as genai
 from datetime import datetime
 
+# 1. RSSソース
 RSS_SOURCES = [
     {"name": "PubMed (Nursing Research)", "url": "https://pubmed.ncbi.nlm.nih.gov/rss/search/1/?limit=1&term=nursing"},
     {"name": "WHO (World Health Organization)", "url": "https://www.who.int/rss-feeds/news-english.xml"},
@@ -14,14 +15,16 @@ RSS_SOURCES = [
     {"name": "MedlinePlus (Health News)", "url": "https://medlineplus.gov/feeds/news_en.xml"}
 ]
 
+# 2. AI設定
 api_key = os.environ.get("GEMINI_API_KEY")
 if not api_key:
     print("Error: GEMINI_API_KEY is not set in GitHub Secrets.")
     exit(1)
 
 genai.configure(api_key=api_key)
-model = genai.GenerativeModel("gemini-2.5-flash")
+model = genai.GenerativeModel('gemini-2.5-flash')
 
+# 3. 取得済みURLを読み込む（重複スキップ用）
 SEEN_FILE = "seen_urls.json"
 if os.path.exists(SEEN_FILE):
     with open(SEEN_FILE, "r", encoding="utf-8") as f:
@@ -29,16 +32,19 @@ if os.path.exists(SEEN_FILE):
 else:
     seen_urls = set()
 
+# 4. 既存の記事HTMLを読み込む（蓄積用）
 EXISTING_FILE = "nurse-news.html"
 existing_articles = ""
 if os.path.exists(EXISTING_FILE):
     with open(EXISTING_FILE, "r", encoding="utf-8") as f:
         existing_html = f.read()
-    start = existing_html.find("<!-- ARTICLES_START -->")
-    end = existing_html.find("<!-- ARTICLES_END -->")
+    # 既存記事部分だけ抽出
+    start = existing_html.find('<!-- ARTICLES_START -->')
+    end = existing_html.find('<!-- ARTICLES_END -->')
     if start != -1 and end != -1:
-        existing_articles = existing_html[start + len("<!-- ARTICLES_START -->"):end]
+        existing_articles = existing_html[start + len('<!-- ARTICLES_START -->'):end]
 
+# 5. 新着記事を取得・要約
 new_articles_html = ""
 new_count = 0
 
@@ -46,43 +52,40 @@ for source in RSS_SOURCES:
     try:
         feed = feedparser.parse(source["url"])
         if not feed.entries:
-            print(f"No entries: {source['name']}")
             continue
 
+        # 全件処理（最大20件）
         for entry in feed.entries[:20]:
-            article_url = getattr(entry, "link", "").strip()
-            if not article_url:
-                continue
+            article_url = entry.link
 
+            # 取得済みはスキップ
             if article_url in seen_urls:
                 continue
 
             full_text = ""
             try:
-                headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
+                headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
                 response = requests.get(article_url, headers=headers, timeout=10)
-                response.raise_for_status()
-                soup = BeautifulSoup(response.text, "html.parser")
-                paragraphs = soup.find_all("p")
+                soup = BeautifulSoup(response.text, 'html.parser')
+                paragraphs = soup.find_all('p')
                 full_text = " ".join([p.get_text(strip=True) for p in paragraphs])
                 full_text = full_text[:10000]
             except Exception as scrape_error:
                 print(f"Scraping failed for {article_url}: {scrape_error}")
-                full_text = entry.summary if hasattr(entry, "summary") else ""
+                full_text = entry.summary if 'summary' in entry else ''
 
             if not full_text.strip():
-                print(f"Empty text: {article_url}")
                 continue
 
             prompt = f"""
-以下の英語の医療・看護系ニュースを、日本の現役看護師向けに1000文字以内でわかりやすく日本語に翻訳・要約してください。
+以下の英語の医療・看護系ニュースを、日本の現役看護師向けに【1000文字以内】でわかりやすく日本語に翻訳・要約してください。
 
-ルール:
-- Markdown記号は使わない
-- 箇条書き記号は使わない
-- 段落ごとに改行する
-- 専門用語は適切に使う
-- 自然な日本語で書く
+以下のルールを厳守してください：
+- 「#」「##」「###」などのMarkdown記号は一切使わない
+- 箇条書きの「-」「*」も使わない
+- 見出しをつけたい場合は「【見出し】」の形式を使う
+- 段落ごとに改行して読みやすくする
+- 専門用語は適切に使いつつ、論理的に解説する
 
 タイトル: {entry.title}
 元記事テキスト:
@@ -91,20 +94,15 @@ for source in RSS_SOURCES:
 
             try:
                 response = model.generate_content(prompt)
-                ai_summary = getattr(response, "text", "") or ""
-                ai_summary = ai_summary.strip()
-
-                print(f"AI raw length: {len(ai_summary)} / {entry.title}")
-
-                if not ai_summary:
-                    print(f"AI returned empty text: {article_url}")
-                    continue
-
+                ai_summary = response.text
             except Exception as ai_error:
-                print(f"AI error for {article_url}: {repr(ai_error)}")
+                print(f"AI error for {article_url}: {ai_error}")
                 continue
 
-            published = getattr(entry, "published", "")
+            # 日付
+            published = ""
+            if hasattr(entry, 'published'):
+                published = entry.published
 
             new_articles_html += f"""
           <article>
@@ -123,14 +121,16 @@ for source in RSS_SOURCES:
             print(f"Added: {entry.title}")
 
     except Exception as e:
-        print(f"Error processing {source['name']}: {repr(e)}")
+        print(f"Error processing {source['name']}: {e}")
         continue
 
 print(f"新着記事数: {new_count}")
 
+# 6. 取得済みURLを保存
 with open(SEEN_FILE, "w", encoding="utf-8") as f:
     json.dump(list(seen_urls), f, ensure_ascii=False, indent=2)
 
+# 7. HTMLを生成（新着を上に、既存を下に）
 all_articles = new_articles_html + existing_articles
 
 final_html = f"""<!doctype html>
