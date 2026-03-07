@@ -25,10 +25,18 @@ genai.configure(api_key=api_key)
 model = genai.GenerativeModel('gemini-2.5-flash')
 
 SEEN_FILE = "seen_urls.json"
-seen_urls = set(json.load(open(SEEN_FILE, encoding="utf-8"))) if os.path.exists(SEEN_FILE) else set()
+if os.path.exists(SEEN_FILE):
+    with open(SEEN_FILE, encoding="utf-8") as f:
+        seen_urls = set(json.load(f))
+else:
+    seen_urls = set()
 
 ARTICLES_FILE = "articles_data.json"
-all_articles_data = json.load(open(ARTICLES_FILE, encoding="utf-8")) if os.path.exists(ARTICLES_FILE) else []
+if os.path.exists(ARTICLES_FILE):
+    with open(ARTICLES_FILE, encoding="utf-8") as f:
+        all_articles_data = json.load(f)
+else:
+    all_articles_data = []
 
 new_count = 0
 today = datetime.now().strftime("%Y-%m-%d")
