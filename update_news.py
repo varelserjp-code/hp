@@ -219,30 +219,34 @@ def build_html(all_articles_data):
     sidebar_date_html = ""
     for date, genres in grouped_by_date.items():
         total = sum(len(v) for v in genres.values())
-        sidebar_date_html += f'''<div class="date-group">
+        sidebar_date_html += f"""<div class="date-group">
   <button class="date-btn" onclick="toggleDate('{date}')">
     <span>{fmt_date(date)}</span><span class="count">{total}</span>
   </button>
   <div class="genre-list" id="genres-{date}">
-'''
+"""
         for genre in genres:
-            sidebar_date_html += f'    <a href="#" class="genre-sublink" onclick="showDate(\\'{date}\\'); return false;">{genre}<span class="count">{len(genres[genre])}</span></a>\n'
-        sidebar_date_html += '  </div>\n</div>\n'
+            sidebar_date_html += f"""    <a href="#" class="genre-sublink" onclick="showDate('{date}'); return false;">{genre}<span class="count">{len(genres[genre])}</span></a>\n"""
+        sidebar_date_html += "  </div>\n</div>\n"
 
     sidebar_genre_html = ""
     for genre, articles in grouped_by_genre.items():
         if not articles:
             continue
-        sidebar_genre_html += f'<a href="#" class="genre-link" onclick="showGenre(\\'{genre}\\'); return false;">{genre}<span class="count">{len(articles)}</span></a>\n'
+        sidebar_genre_html += f"""<a href="#" class="genre-link" onclick="showGenre('{genre}'); return false;">{genre}<span class="count">{len(articles)}</span></a>\n"""
 
     date_view_html = ""
     for date, genres in grouped_by_date.items():
-        date_view_html += f'<div class="date-section" id="{date}">\n<h2 class="date-heading">{fmt_date(date)}</h2>\n'
+        date_view_html += f"""<div class="date-section" id="{date}">
+<h2 class="date-heading">{fmt_date(date)}</h2>
+"""
         for genre, articles in genres.items():
-            date_view_html += f'<div class="genre-section">\n<h3 class="genre-heading">{genre}</h3>\n'
+            date_view_html += f"""<div class="genre-section">
+<h3 class="genre-heading">{genre}</h3>
+"""
             for a in articles:
                 summary_html = (a["summary"] or "").replace("\n", "<br>")
-                date_view_html += f'''  <article data-genre="{a['genre']}">
+                date_view_html += f"""  <article data-genre="{a['genre']}">
     <p class="meta">{a["source"]}　{a["published"]}</p>
     <h4 class="article-title">{a["title"]}</h4>
     <div class="summary">{summary_html}</div>
@@ -252,9 +256,9 @@ def build_html(all_articles_data):
       原文URL：<a href="{a["url"]}" target="_blank" rel="noopener">{a["url"]}</a>
     </div>
   </article>
-'''
-            date_view_html += '</div>\n'
-        date_view_html += '</div>\n'
+"""
+            date_view_html += "</div>\n"
+        date_view_html += "</div>\n"
 
     return f"""<!doctype html>
 <html lang="ja">
@@ -346,29 +350,29 @@ def build_html(all_articles_data):
   </div>
 
   <script>
-    function toggleDate(date) {
+    function toggleDate(date) {{
       const list = document.getElementById('genres-' + date);
       if (!list) return;
       const btn = list.previousElementSibling;
       list.classList.toggle('open');
       btn.classList.toggle('open');
-    }
+    }}
 
-    function showDate(date) {
+    function showDate(date) {{
       document.getElementById('view-date').classList.add('active');
       document.getElementById('view-genre').classList.remove('active');
       document.querySelectorAll('.genre-link').forEach(l => l.classList.remove('active'));
 
-      setTimeout(() => {
+      setTimeout(() => {{
         const el = document.getElementById(date);
-        if (el) el.scrollIntoView({behavior:'smooth', block:'start'});
-      }, 50);
-    }
+        if (el) el.scrollIntoView({{behavior:'smooth', block:'start'}});
+      }}, 50);
+    }}
 
-    function showGenre(genre) {
-      document.querySelectorAll('.genre-link').forEach(l => {
+    function showGenre(genre) {{
+      document.querySelectorAll('.genre-link').forEach(l => {{
         l.classList.toggle('active', l.textContent.trim().startsWith(genre));
-      });
+      }});
 
       document.getElementById('view-date').classList.remove('active');
       document.getElementById('view-genre').classList.add('active');
@@ -377,12 +381,12 @@ def build_html(all_articles_data):
       const container = document.getElementById('genre-articles');
       container.innerHTML = '';
 
-      document.querySelectorAll(`article[data-genre="${genre}"]`).forEach(a => {
+      document.querySelectorAll(`article[data-genre="${{genre}}"]`).forEach(a => {{
         container.appendChild(a.cloneNode(true));
-      });
+      }});
 
-      window.scrollTo({top:0, behavior:'smooth'});
-    }
+      window.scrollTo({{top:0, behavior:'smooth'}});
+    }}
 
     const firstBtn = document.querySelector('.date-btn');
     if (firstBtn) firstBtn.click();
