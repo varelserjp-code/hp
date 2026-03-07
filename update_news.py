@@ -1,68 +1,125 @@
-import os
 import json
+import os
+import re
+from collections import OrderedDict
+from datetime import datetime, timezone, timedelta
+
 import feedparser
 import requests
 from bs4 import BeautifulSoup
-import google.generativeai as genai
-from datetime import datetime
-from collections import OrderedDict
+
+try:
+    import google.generativeai as genai
+except Exception:
+    genai = None
 
 RSS_SOURCES = [
-    {"name": "PubMed (Nursing Research)", "url": "https://pubmed.ncbi.nlm.nih.gov/rss/search/1/?limit=1&term=nursing"},
+    {"name": "PubMed (Nursing Research)", "url": "https://pubmed.ncbi.nlm.nih.gov/rss/search/1/?limit=10&term=nursing"},
     {"name": "WHO (World Health Organization)", "url": "https://www.who.int/rss-feeds/news-english.xml"},
     {"name": "NIH (National Institutes of Health)", "url": "https://www.nih.gov/news-events/news-releases/rss.xml"},
     {"name": "ScienceDaily (Nursing News)", "url": "https://www.sciencedaily.com/rss/health_medicine/nursing.xml"},
-    {"name": "MedlinePlus (Health News)", "url": "https://medlineplus.gov/feeds/news_en.xml"}
+    {"name": "MedlinePlus (Health News)", "url": "https://medlineplus.gov/feeds/news_en.xml"},
 ]
 
 GENRES = ["公衆衛生", "精神", "感染症", "急性期", "地域", "研究", "その他"]
-
-api_key = os.environ.get("GEMINI_API_KEY")
-if not api_key:
-    print("Error: GEMINI_API_KEY is not set.")
-    exit(1)
-genai.configure(api_key=api_key)
-model = genai.GenerativeModel('gemini-2.5-flash')
-
+JST = timezone(timedelta(hours=9))
+TODAY = datetime.now(JST).strftime("%Y-%m-%d")
 SEEN_FILE = "seen_urls.json"
-if os.path.exists(SEEN_FILE):
-    with open(SEEN_FILE, encoding="utf-8") as f:
-        seen_urls = set(json.load(f))
-else:
-    seen_urls = set()
-
 ARTICLES_FILE = "articles_data.json"
-if os.path.exists(ARTICLES_FILE):
-    with open(ARTICLES_FILE, encoding="utf-8") as f:
-        all_articles_data = json.load(f)
-else:
-    all_articles_data = []
+HTML_FILE = "nurse-news.html"
+MAX_PER_SOURCE = 10
+REQUEST_TIMEOUT = 20
 
-new_count = 0
-today = datetime.now().strftime("%Y-%m-%d")
 
-for source in RSS_SOURCES:
+def log(msg: str) -> None:
+    print(msg, flush=True)
+
+
+def load_json_file(path, default):
+    if not os.path.exists(path):
+        return default
     try:
-        feed = feedparser.parse(source["url"])
-        if not feed.entries:
-            continue
-        for entry in feed.entries[:20]:
-            article_url = entry.link
-            if article_url in seen_urls:
-                continue
-            full_text = ""
-            try:
-                headers = {'User-Agent': 'Mozilla/5.0'}
-                r = requests.get(article_url, headers=headers, timeout=10)
-                soup = BeautifulSoup(r.text, 'html.parser')
-                full_text = " ".join([p.get_text(strip=True) for p in soup.find_all('p')])[:10000]
-            except Exception as e:
-                print(f"Scraping failed: {e}")
-                full_text = getattr(entry, 'summary', '')
-            if not full_text.strip():
-                continue
+        with open(path, encoding="utf-8") as f:
+            return json.load(f)
+    except Exception as e:
+        log(f"[WARN] JSON 読み込み失敗 {path}: {e}")
+        return default
 
-            prompt = f"""
+
+def save_json_file(path, data):
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+
+
+def normalize_whitespace(text: str) -> str:
+    return re.sub(r"\s+", " ", (text or "")).strip()
+
+
+def clean_published(value: str) -> str:
+    text = normalize_whitespace(value)
+    text = text.replace("\u3000", " ")
+    return text if text else TODAY
+
+
+def fetch_article_text(article_url: str, fallback_summary: str) -> str:
+    headers = {
+        "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122 Safari/537.36"
+    }
+    try:
+        r = requests.get(article_url, headers=headers, timeout=REQUEST_TIMEOUT)
+        r.raise_for_status()
+        soup = BeautifulSoup(r.text, "html.parser")
+        paragraphs = [p.get_text(" ", strip=True) for p in soup.find_all("p")]
+        full_text = normalize_whitespace(" ".join(paragraphs))[:12000]
+        if full_text:
+            return full_text
+        log(f"[WARN] 本文抽出が空でした: {article_url}")
+    except Exception as e:
+        log(f"[WARN] スクレイピング失敗: {article_url} / {e}")
+
+    fallback = normalize_whitespace(fallback_summary)[:4000]
+    if fallback:
+        log(f"[INFO] RSS summary を代替使用: {article_url}")
+        return fallback
+    return ""
+
+
+def build_fallback_summary(title: str, full_text: str, source_name: str) -> str:
+    text = normalize_whitespace(full_text)
+    short = text[:420]
+    return (
+        f"【概要】{source_name} の記事「{title}」です。\n\n"
+        f"AI 要約に失敗したため、原文から取得できた内容を簡易表示しています。\n\n"
+        f"【原文抜粋】{short}"
+    )
+
+
+def infer_genre(text: str, title: str = "") -> str:
+    hay = f"{title} {text}".lower()
+    rules = [
+        ("感染症", ["infection", "infectious", "flu", "covid", "virus", "viral", "bacteria", "syphilis", "hiv", "tb"]),
+        ("精神", ["mental", "psychi", "depression", "anxiety", "suicide", "stress", "dementia"]),
+        ("急性期", ["icu", "critical care", "emergency", "acute", "trauma", "surgery", "hospitalized"]),
+        ("地域", ["community", "home care", "primary care", "local", "rural", "outpatient"]),
+        ("研究", ["study", "research", "trial", "analysis", "review", "meta-analysis", "cohort"]),
+        ("公衆衛生", ["public health", "vaccination", "prevention", "screening", "maternal", "population", "who"]),
+    ]
+    for genre, keywords in rules:
+        if any(k in hay for k in keywords):
+            return genre
+    return "その他"
+
+
+def summarize_with_gemini(title: str, full_text: str):
+    api_key = os.environ.get("GEMINI_API_KEY", "").strip()
+    if not api_key:
+        raise RuntimeError("GEMINI_API_KEY is not set")
+    if genai is None:
+        raise RuntimeError("google.generativeai could not be imported")
+
+    genai.configure(api_key=api_key)
+    model = genai.GenerativeModel("gemini-2.5-flash")
+    prompt = f"""
 以下の英語の医療・看護系ニュースについて2つのタスクを行ってください。
 
 【タスク1】日本の現役看護師向けに1000文字以内で日本語に翻訳・要約する。
@@ -80,118 +137,88 @@ SUMMARY:
 （要約本文）
 GENRE:（ジャンル名のみ）
 
-タイトル: {entry.title}
+タイトル: {title}
 元記事テキスト: {full_text}
 """
-            try:
-                ai_response = model.generate_content(prompt)
-                raw = ai_response.text.strip()
-                if "SUMMARY:" in raw and "GENRE:" in raw:
-                    ai_summary = raw.split("GENRE:")[0].replace("SUMMARY:", "").strip()
-                    genre_raw = raw.split("GENRE:")[-1].strip()
-                    genre = genre_raw if genre_raw in GENRES else "その他"
-                else:
-                    ai_summary = raw
-                    genre = "その他"
-            except Exception as e:
-                print(f"AI error: {e}")
-                continue
+    response = model.generate_content(prompt)
+    raw = (getattr(response, "text", "") or "").strip()
+    if not raw:
+        raise RuntimeError("Gemini response was empty")
 
-            all_articles_data.insert(0, {
-                "date": today,
-                "published": getattr(entry, 'published', today),
-                "source": source["name"],
-                "title": entry.title,
-                "summary": ai_summary,
-                "genre": genre,
-                "url": entry.link
-            })
-            seen_urls.add(article_url)
-            new_count += 1
-            print(f"Added [{genre}]: {entry.title}")
-    except Exception as e:
-        print(f"Error: {source['name']}: {e}")
+    if "SUMMARY:" in raw and "GENRE:" in raw:
+        ai_summary = raw.split("GENRE:")[0].replace("SUMMARY:", "").strip()
+        genre_raw = raw.split("GENRE:")[-1].strip()
+        genre = genre_raw if genre_raw in GENRES else infer_genre(ai_summary, title)
+    else:
+        ai_summary = raw
+        genre = infer_genre(raw, title)
+    return ai_summary, genre
 
-print(f"新着記事数: {new_count}")
 
-with open(SEEN_FILE, "w", encoding="utf-8") as f:
-    json.dump(list(seen_urls), f, ensure_ascii=False, indent=2)
-with open(ARTICLES_FILE, "w", encoding="utf-8") as f:
-    json.dump(all_articles_data, f, ensure_ascii=False, indent=2)
+def dedupe_articles(items):
+    seen = set()
+    out = []
+    for item in items:
+        key = item.get("url") or (item.get("title"), item.get("published"), item.get("source"))
+        if key in seen:
+            continue
+        seen.add(key)
+        item["published"] = clean_published(item.get("published", TODAY))
+        item["date"] = item.get("date") or TODAY
+        item["genre"] = item.get("genre") if item.get("genre") in GENRES else infer_genre(item.get("summary", ""), item.get("title", ""))
+        out.append(item)
+    return out
 
-# 日付×ジャンルでグループ化
-grouped_by_date = OrderedDict()
-for article in all_articles_data:
-    d = article["date"]
-    g = article.get("genre", "その他")
-    if d not in grouped_by_date:
-        grouped_by_date[d] = OrderedDict()
-    if g not in grouped_by_date[d]:
-        grouped_by_date[d][g] = []
-    grouped_by_date[d][g].append(article)
 
-# ジャンル横断でグループ化
-grouped_by_genre = OrderedDict()
-for g in GENRES:
-    grouped_by_genre[g] = []
-for article in all_articles_data:
-    g = article.get("genre", "その他")
-    if g in grouped_by_genre:
-        grouped_by_genre[g].append(article)
-
-def fmt_date(date):
+def fmt_date(date_str):
     try:
-        return datetime.strptime(date, "%Y-%m-%d").strftime("%Y年%-m月%-d日")
-    except:
-        return date
+        return datetime.strptime(date_str, "%Y-%m-%d").strftime("%Y年%-m月%-d日")
+    except Exception:
+        return date_str
 
-# サイドバー：日付セクション
-sidebar_date_html = ""
-for date, genres in grouped_by_date.items():
-    total = sum(len(v) for v in genres.values())
-    sidebar_date_html += f'''<div class="date-group">
-  <button class="date-btn" onclick="toggleDate('{date}')">
-    <span>{fmt_date(date)}</span><span class="count">{total}</span>
-  </button>
-  <div class="genre-list" id="genres-{date}">
-'''
-    for genre in genres:
-        sidebar_date_html += f'    <a href="#" class="genre-sublink" onclick="showDate(\'{date}\'); return false;">{genre}<span class="count">{len(genres[genre])}</span></a>\n'
-    sidebar_date_html += '  </div>\n</div>\n'
 
-# サイドバー：ジャンルセクション
-sidebar_genre_html = ""
-for genre, articles in grouped_by_genre.items():
-    if not articles:
-        continue
-    sidebar_genre_html += f'<a href="#" class="genre-link" onclick="showGenre(\'{genre}\'); return false;">{genre}<span class="count">{len(articles)}</span></a>\n'
+def build_html(all_articles_data):
+    grouped_by_date = OrderedDict()
+    for article in all_articles_data:
+        d = article["date"]
+        g = article.get("genre", "その他")
+        grouped_by_date.setdefault(d, OrderedDict()).setdefault(g, []).append(article)
 
-# 日付ビューの記事HTML
-date_view_html = ""
-for date, genres in grouped_by_date.items():
-    date_view_html += f'<div class="date-section" id="{date}">\n<h2 class="date-heading">{fmt_date(date)}</h2>\n'
-    for genre, articles in genres.items():
-        date_view_html += f'<div class="genre-section">\n<h3 class="genre-heading">{genre}</h3>\n'
-        for a in articles:
-            summary_html = a["summary"].replace('\n', '<br>')
-            date_view_html += f'''  <article data-genre="{a['genre']}">
-    <p class="meta">{a["source"]}　{a["published"]}</p>
-    <h4 class="article-title">{a["title"]}</h4>
-    <div class="summary">{summary_html}</div>
-    <div class="source-box">
-      <strong>ソース・引用元</strong><br>
-      配信元：{a["source"]}<br>
-      原文URL：<a href="{a["url"]}" target="_blank" rel="noopener">{a["url"]}</a>
-    </div>
-  </article>\n'''
+    grouped_by_genre = OrderedDict((g, []) for g in GENRES)
+    for article in all_articles_data:
+        g = article.get("genre", "その他")
+        grouped_by_genre.setdefault(g, []).append(article)
+
+    sidebar_date_html = ""
+    for date, genres in grouped_by_date.items():
+        total = sum(len(v) for v in genres.values())
+        sidebar_date_html += f'''<div class="date-group">\n  <button class="date-btn" onclick="toggleDate('{date}')">\n    <span>{fmt_date(date)}</span><span class="count">{total}</span>\n  </button>\n  <div class="genre-list" id="genres-{date}">\n'''
+        for genre in genres:
+            sidebar_date_html += f'    <a href="#" class="genre-sublink" onclick="showDate(\'{date}\'); return false;">{genre}<span class="count">{len(genres[genre])}</span></a>\n'
+        sidebar_date_html += '  </div>\n</div>\n'
+
+    sidebar_genre_html = ""
+    for genre, articles in grouped_by_genre.items():
+        if not articles:
+            continue
+        sidebar_genre_html += f'<a href="#" class="genre-link" onclick="showGenre(\'{genre}\'); return false;">{genre}<span class="count">{len(articles)}</span></a>\n'
+
+    date_view_html = ""
+    for date, genres in grouped_by_date.items():
+        date_view_html += f'<div class="date-section" id="{date}">\n<h2 class="date-heading">{fmt_date(date)}</h2>\n'
+        for genre, articles in genres.items():
+            date_view_html += f'<div class="genre-section">\n<h3 class="genre-heading">{genre}</h3>\n'
+            for a in articles:
+                summary_html = (a["summary"] or "").replace("\n", "<br>")
+                date_view_html += f'''  <article data-genre="{a['genre']}">\n    <p class="meta">{a["source"]}　{a["published"]}</p>\n    <h4 class="article-title">{a["title"]}</h4>\n    <div class="summary">{summary_html}</div>\n    <div class="source-box">\n      <strong>ソース・引用元</strong><br>\n      配信元：{a["source"]}<br>\n      原文URL：<a href="{a["url"]}" target="_blank" rel="noopener">{a["url"]}</a>\n    </div>\n  </article>\n'''
+            date_view_html += '</div>\n'
         date_view_html += '</div>\n'
-    date_view_html += '</div>\n'
 
-final_html = f"""<!doctype html>
-<html lang="ja">
+    return f"""<!doctype html>
+<html lang=\"ja\">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset=\"utf-8\" />
+  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />
   <title>Nursing News | VARELSER</title>
   <style>
     :root {{
@@ -235,7 +262,7 @@ final_html = f"""<!doctype html>
     article:last-child{{border-bottom:none;}}
     .meta{{font-size:12px;color:var(--muted);margin-bottom:8px;}}
     .article-title{{font-size:17px;font-weight:700;line-height:1.5;margin-bottom:16px;}}
-    .summary{{font-size:15px;color:#222;line-height:1.9;margin-bottom:18px;}}
+    .summary{{font-size:15px;color:#222;line-height:1.9;margin-bottom:18px;white-space:normal;}}
     .source-box{{background:var(--sidebar-bg);border:1px solid var(--border);border-radius:8px;padding:12px 16px;font-size:13px;color:#555;line-height:1.7;}}
     .source-box strong{{color:var(--fg);display:block;margin-bottom:4px;}}
     .source-box a{{color:var(--accent);word-break:break-all;}}
@@ -243,34 +270,33 @@ final_html = f"""<!doctype html>
   </style>
 </head>
 <body>
-  <div class="layout">
-    <nav class="sidebar">
-      <div class="sidebar-section">
-        <p class="sidebar-title">日付</p>
+  <div class=\"layout\">
+    <nav class=\"sidebar\">
+      <div class=\"sidebar-section\">
+        <p class=\"sidebar-title\">日付</p>
         {sidebar_date_html}
       </div>
-      <hr class="sidebar-divider">
-      <div class="sidebar-section">
-        <p class="sidebar-title">ジャンル</p>
+      <hr class=\"sidebar-divider\">
+      <div class=\"sidebar-section\">
+        <p class=\"sidebar-title\">ジャンル</p>
         {sidebar_genre_html}
       </div>
     </nav>
-    <div class="main">
-      <a href="/hp/" class="back-link">← ホームに戻る</a>
-      <p class="page-title">最新の医療・看護ニュース</p>
-      <p class="page-desc">海外の最新医療ニュースをAIで要約し、定期配信しています。</p>
-      <div class="view active" id="view-date">
-        {date_view_html}
-      </div>
-      <div class="view" id="view-genre">
-        <p class="genre-view-title">ジャンル：<span id="genre-view-label"></span></p>
-        <div id="genre-articles"></div>
+    <div class=\"main\">
+      <a href=\"/hp/\" class=\"back-link\">← ホームに戻る</a>
+      <p class=\"page-title\">最新の医療・看護ニュース</p>
+      <p class=\"page-desc\">海外の最新医療ニュースをAIで要約し、定期配信しています。</p>
+      <div class=\"view active\" id=\"view-date\">{date_view_html}</div>
+      <div class=\"view\" id=\"view-genre\">
+        <p class=\"genre-view-title\">ジャンル：<span id=\"genre-view-label\"></span></p>
+        <div id=\"genre-articles\"></div>
       </div>
     </div>
   </div>
   <script>
     function toggleDate(date) {{
       const list = document.getElementById('genres-' + date);
+      if (!list) return;
       const btn = list.previousElementSibling;
       list.classList.toggle('open');
       btn.classList.toggle('open');
@@ -304,6 +330,78 @@ final_html = f"""<!doctype html>
 </body>
 </html>"""
 
-with open("nurse-news.html", "w", encoding="utf-8") as f:
-    f.write(final_html)
-print("生成完了。")
+
+def main():
+    seen_urls = set(load_json_file(SEEN_FILE, []))
+    all_articles_data = load_json_file(ARTICLES_FILE, [])
+    all_articles_data = dedupe_articles(all_articles_data)
+
+    log(f"[INFO] 既知URL数: {len(seen_urls)}")
+    log(f"[INFO] 既存記事数: {len(all_articles_data)}")
+
+    new_count = 0
+
+    for source in RSS_SOURCES:
+        log(f"[INFO] フィード取得開始: {source['name']}")
+        try:
+            feed = feedparser.parse(source["url"])
+            entries = getattr(feed, "entries", []) or []
+            if getattr(feed, "bozo", 0):
+                log(f"[WARN] フィード解析警告: {source['name']} / {getattr(feed, 'bozo_exception', '')}")
+            if not entries:
+                log(f"[WARN] フィード記事なし: {source['name']}")
+                continue
+
+            for entry in entries[:MAX_PER_SOURCE]:
+                article_url = getattr(entry, "link", "").strip()
+                title = normalize_whitespace(getattr(entry, "title", "(no title)"))
+                summary = getattr(entry, "summary", "") or getattr(entry, "description", "") or ""
+                published = clean_published(getattr(entry, "published", TODAY))
+
+                if not article_url:
+                    log(f"[WARN] URLなしでスキップ: {title}")
+                    continue
+                if article_url in seen_urls:
+                    continue
+
+                full_text = fetch_article_text(article_url, summary)
+                if not full_text:
+                    log(f"[WARN] 本文も summary も取得できずスキップ: {article_url}")
+                    continue
+
+                try:
+                    ai_summary, genre = summarize_with_gemini(title, full_text)
+                    log(f"[INFO] AI要約成功: [{genre}] {title}")
+                except Exception as e:
+                    genre = infer_genre(full_text, title)
+                    ai_summary = build_fallback_summary(title, full_text, source["name"])
+                    log(f"[WARN] AI要約失敗のため簡易要約にフォールバック: {title} / {e}")
+
+                all_articles_data.insert(0, {
+                    "date": TODAY,
+                    "published": published,
+                    "source": source["name"],
+                    "title": title,
+                    "summary": ai_summary,
+                    "genre": genre,
+                    "url": article_url,
+                })
+                seen_urls.add(article_url)
+                new_count += 1
+        except Exception as e:
+            log(f"[ERROR] ソース処理失敗: {source['name']} / {e}")
+
+    all_articles_data = dedupe_articles(all_articles_data)
+    save_json_file(SEEN_FILE, sorted(seen_urls))
+    save_json_file(ARTICLES_FILE, all_articles_data)
+
+    final_html = build_html(all_articles_data)
+    with open(HTML_FILE, "w", encoding="utf-8") as f:
+        f.write(final_html)
+
+    log(f"[INFO] 新着記事数: {new_count}")
+    log(f"[INFO] 保存完了: {HTML_FILE}, {ARTICLES_FILE}, {SEEN_FILE}")
+
+
+if __name__ == "__main__":
+    main()
