@@ -1,0 +1,6 @@
+/* ═══ EUCLIDEAN ═══ */
+function bjorklund(k,n){if(k<=0)return new Array(n).fill(0);if(k>=n)return new Array(n).fill(1);let a=Array.from({length:k},()=>[1]),b=Array.from({length:n-k},()=>[0]);while(b.length>1){const m=Math.min(a.length,b.length),na=[],nb=[];for(let i=0;i<m;i++)na.push([...a[i],...b[i]]);for(let i=m;i<a.length;i++)nb.push(a[i]);for(let i=m;i<b.length;i++)nb.push(b[i]);a=na;b=nb;if(!b.length)break;}return[...a,...b].flat();}
+function rotatePattern(pat,r){if(!pat.length||r===0)return pat;const n=pat.length;const rot=((r%n)+n)%n;return[...pat.slice(rot),...pat.slice(0,rot)];}
+function euclideanPattern(k,n,rot){return rotatePattern(bjorklund(Math.min(k,n),n),rot);}
+const EUC_PRESETS=[{name:'Tresillo',k:3,n:8,r:0,desc:'Cuban 3+3+2'},{name:'Cinquillo',k:5,n:8,r:0,desc:'Afro-Cuban'},{name:'Aksak 7',k:5,n:7,r:0,desc:'Balkan 7-beat'},{name:'Aksak 9',k:4,n:9,r:0,desc:'Turkish 9-beat'},{name:'W.African Bell',k:7,n:12,r:0,desc:'West African bell'},{name:'Sparse Ambient',k:3,n:16,r:0,desc:'Wide spacing'},{name:'Dense Ritual',k:11,n:16,r:0,desc:'Dense hypnotic'},{name:'Fibonacci 13',k:5,n:13,r:0,desc:'Fibonacci meter'},{name:'Quintuplet',k:3,n:5,r:0,desc:'5-tuplet'},{name:'Septuplet',k:4,n:7,r:0,desc:'7-tuplet'}];
+
