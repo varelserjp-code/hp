@@ -1,0 +1,1675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Lien</title>
+  <style>
+    :root {
+      --bg: #000000;
+      --fg: #ffffff;
+      --muted: #a3a3a3;
+      --muted-2: #737373;
+      --border: #171717;
+      --panel-bg: rgba(0, 0, 0, 0.90);
+      --panel-header-bg: rgba(10, 10, 10, 0.50);
+      --panel-border: #262626;
+      --control-bg: #171717;
+      --control-bg-hover: #262626;
+      --option-active-bg: #f5f5f5;
+      --option-active-fg: #000000;
+      --option-active-border: #f5f5f5;
+      --option-inactive-fg: #737373;
+      --option-inactive-border: #262626;
+      --option-inactive-hover: #525252;
+      --overlay-bg: rgba(0, 0, 0, 0.72);
+      --overlay-fg: #ffffff;
+      --overlay-border: rgba(255, 255, 255, 0.15);
+      --toolbar-hover: rgba(255, 255, 255, 0.10);
+      --shadow: 0 25px 50px -12px rgba(0,0,0,0.75);
+      --backdrop: blur(20px);
+      --accent: #ffffff;
+    }
+
+    body[data-invert="true"] {
+      --bg: #ffffff;
+      --fg: #000000;
+      --muted: #525252;
+      --muted-2: #a3a3a3;
+      --border: #e5e5e5;
+      --panel-bg: rgba(255, 255, 255, 0.95);
+      --panel-header-bg: rgba(250, 250, 250, 0.50);
+      --panel-border: #e5e5e5;
+      --control-bg: #e5e5e5;
+      --control-bg-hover: #d4d4d4;
+      --option-active-bg: #262626;
+      --option-active-fg: #ffffff;
+      --option-active-border: #262626;
+      --option-inactive-fg: #737373;
+      --option-inactive-border: #d4d4d4;
+      --option-inactive-hover: #737373;
+      --overlay-bg: rgba(255, 255, 255, 0.88);
+      --overlay-fg: #000000;
+      --overlay-border: #d4d4d4;
+      --toolbar-hover: rgba(0, 0, 0, 0.06);
+      --shadow: 0 25px 50px -12px rgba(0,0,0,0.22);
+      --accent: #000000;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--fg);
+      overflow: hidden;
+      touch-action: none;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      transition: background-color 0.5s ease, color 0.5s ease;
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      background: none;
+      color: inherit;
+      padding: 0;
+      cursor: pointer;
+    }
+
+    button:disabled,
+    input:disabled {
+      opacity: 0.4;
+      cursor: default;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #333; border-radius: 2px; }
+    ::-webkit-scrollbar-thumb:hover { background: #555; }
+
+    @keyframes slideUpFade {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .app {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      height: 100vh;
+      overflow: hidden;
+      background: var(--bg);
+      transition: background-color 0.5s ease;
+      position: relative;
+    }
+
+    .app-header {
+      flex: 0 0 56px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+      z-index: 30;
+      user-select: none;
+      background: var(--bg);
+      transition: background-color 0.5s ease, border-color 0.5s ease;
+    }
+
+    .app-title {
+      font-size: 0.875rem;
+      line-height: 1.25rem;
+      letter-spacing: 0.2em;
+      font-weight: 300;
+      color: color-mix(in srgb, var(--fg) 78%, transparent);
+      margin: 0;
+    }
+
+    .canvas-wrap {
+      flex: 1 1 auto;
+      min-height: 0;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+      z-index: 0;
+    }
+
+    .view-canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      touch-action: none;
+      outline: none;
+      box-shadow: var(--shadow);
+    }
+
+    .export-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+    }
+
+    .export-overlay-card {
+      border: 1px solid var(--overlay-border);
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-size: 12px;
+      letter-spacing: 0.04em;
+      background: var(--overlay-bg);
+      color: var(--overlay-fg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    .app-footer {
+      flex: 0 0 auto;
+      position: relative;
+      z-index: 30;
+      background: var(--bg);
+      transition: background-color 0.5s ease;
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 24px;
+      border-top: 1px solid var(--border);
+      background: var(--bg);
+      transition: background-color 0.5s ease, border-color 0.5s ease;
+    }
+
+    .toolbar-left,
+    .toolbar-right {
+      display: flex;
+      align-items: center;
+    }
+
+    .toolbar-left {
+      gap: 16px;
+    }
+
+    .toolbar-right {
+      gap: 8px;
+    }
+
+    .toolbar-label-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      line-height: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-weight: 500;
+      transition: opacity 0.2s ease;
+    }
+
+    .toolbar-label-btn:hover {
+      opacity: 0.7;
+    }
+
+    .icon-btn {
+      width: 36px;
+      height: 36px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 9999px;
+      transition: background-color 0.2s ease;
+    }
+
+    .icon-btn:hover {
+      background: var(--toolbar-hover);
+    }
+
+    .icon {
+      width: 20px;
+      height: 20px;
+      display: block;
+      flex: 0 0 auto;
+    }
+
+    .floating-panel {
+      position: absolute;
+      z-index: 50;
+      animation: slideUpFade 0.2s ease-out forwards;
+    }
+
+    .floating-panel.save {
+      right: 16px;
+      bottom: 64px;
+      min-width: 220px;
+    }
+
+    .floating-panel.config {
+      left: 16px;
+      right: 16px;
+      bottom: 64px;
+    }
+
+    @media (min-width: 768px) {
+      .floating-panel.config {
+        left: auto;
+        right: 24px;
+        width: 320px;
+      }
+    }
+
+    .panel-shell {
+      border: 1px solid var(--panel-border);
+      border-radius: 12px;
+      overflow: hidden;
+      background: var(--panel-bg);
+      box-shadow: var(--shadow);
+      backdrop-filter: var(--backdrop);
+      -webkit-backdrop-filter: var(--backdrop);
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--panel-border);
+      background: var(--panel-header-bg);
+    }
+
+    .panel-title {
+      margin: 0;
+      font-size: 12px;
+      line-height: 1rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: color-mix(in srgb, var(--fg) 72%, transparent);
+    }
+
+    .panel-close {
+      color: color-mix(in srgb, var(--fg) 60%, transparent);
+      transition: color 0.2s ease;
+    }
+
+    .panel-close:hover {
+      color: var(--fg);
+    }
+
+    .panel-body {
+      padding: 20px;
+    }
+
+    .panel-body.tight {
+      padding: 12px;
+    }
+
+    .config-scroll {
+      max-height: 60vh;
+      overflow-y: auto;
+    }
+
+    .meta-note {
+      font-size: 10px;
+      line-height: 1.4;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+    }
+
+    .export-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .export-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .export-btn {
+      text-align: left;
+      font-size: 12px;
+      padding: 8px 12px;
+      border: 1px solid color-mix(in srgb, var(--fg) 22%, transparent);
+      border-radius: 8px;
+      color: color-mix(in srgb, var(--fg) 78%, transparent);
+      background: transparent;
+      transition: background-color 0.2s ease, border-color 0.2s ease;
+    }
+
+    .export-btn:hover {
+      background: color-mix(in srgb, var(--fg) 8%, transparent);
+    }
+
+    .group {
+      margin-bottom: 16px;
+    }
+
+    .group:last-child {
+      margin-bottom: 0;
+    }
+
+    .group-title {
+      margin: 0 0 8px;
+      font-size: 10px;
+      line-height: 0.875rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      font-weight: 500;
+      color: var(--muted);
+    }
+
+    .group-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .small-label {
+      font-size: 10px;
+      line-height: 0.875rem;
+      color: var(--muted);
+      margin: 0 0 4px;
+    }
+
+    .option-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .option-button {
+      flex: 1 1 50px;
+      min-width: 50px;
+      padding: 6px 10px;
+      font-size: 10px;
+      line-height: 0.875rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      border: 1px solid var(--option-inactive-border);
+      border-radius: 6px;
+      color: var(--option-inactive-fg);
+      transition: border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+    }
+
+    .option-button:hover {
+      border-color: var(--option-inactive-hover);
+    }
+
+    .option-button.is-active {
+      background: var(--option-active-bg);
+      color: var(--option-active-fg);
+      border-color: var(--option-active-border);
+    }
+
+    .slider-block {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .slider-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .slider-value {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      color: var(--muted-2);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .range-input {
+      width: 100%;
+      height: 4px;
+      margin: 0;
+      appearance: none;
+      border-radius: 9999px;
+      background: var(--control-bg);
+      cursor: pointer;
+      outline: none;
+      accent-color: var(--accent);
+      transition: background-color 0.2s ease;
+    }
+
+    .range-input:hover {
+      background: var(--control-bg-hover);
+    }
+
+    .range-input::-webkit-slider-thumb {
+      appearance: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 9999px;
+      background: var(--accent);
+      border: 0;
+    }
+
+    .range-input::-moz-range-thumb {
+      width: 14px;
+      height: 14px;
+      border-radius: 9999px;
+      background: var(--accent);
+      border: 0;
+    }
+
+    .dual-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      margin-bottom: 8px;
+    }
+
+    .color-block {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-bottom: 12px;
+    }
+
+    .color-input {
+      width: 100%;
+      height: 32px;
+      padding: 0;
+      border: 0;
+      outline: 0;
+      border-radius: 8px;
+      cursor: pointer;
+      background: var(--control-bg);
+    }
+
+    .checkbox-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 8px;
+      cursor: pointer;
+    }
+
+    .checkbox-row span {
+      transition: color 0.2s ease;
+    }
+
+    .checkbox-row:hover span {
+      color: var(--fg);
+    }
+
+    .checkbox-input {
+      accent-color: var(--accent);
+    }
+  </style>
+</head>
+<body data-invert="false">
+  <div id="app" class="app">
+    <header class="app-header">
+      <h1 class="app-title">Lien</h1>
+    </header>
+
+    <div id="wrapper" class="canvas-wrap">
+      <canvas id="viewCanvas" class="view-canvas"></canvas>
+      <div id="exportOverlay" class="export-overlay" hidden>
+        <div id="exportMessageCard" class="export-overlay-card">Exporting</div>
+      </div>
+    </div>
+
+    <footer class="app-footer">
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <button id="customizeBtn" class="toolbar-label-btn" data-disable-during-export="1" type="button" aria-haspopup="dialog" aria-expanded="false">
+            <span class="icon" aria-hidden="true">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="icon">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" />
+              </svg>
+            </span>
+            <span>Customize</span>
+          </button>
+        </div>
+        <div class="toolbar-right">
+          <button id="pauseBtn" class="icon-btn" data-disable-during-export="1" type="button" aria-label="Pause or play"></button>
+          <button id="resetBtn" class="icon-btn" data-disable-during-export="1" type="button" aria-label="Reset artwork">
+            <span class="icon" aria-hidden="true">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="icon">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+              </svg>
+            </span>
+          </button>
+          <button id="downloadBtn" class="icon-btn" data-disable-during-export="1" type="button" aria-haspopup="dialog" aria-expanded="false" aria-label="Export PNG">
+            <span class="icon" aria-hidden="true">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="icon">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+              </svg>
+            </span>
+          </button>
+        </div>
+      </div>
+    </footer>
+
+    <div id="savePanel" class="floating-panel save" hidden>
+      <div class="panel-shell">
+        <div class="panel-header">
+          <h2 class="panel-title">Export PNG</h2>
+          <button id="saveCloseBtn" class="panel-close" data-disable-during-export="1" type="button" aria-label="Close export panel">
+            <span class="icon" aria-hidden="true">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="icon">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+              </svg>
+            </span>
+          </button>
+        </div>
+        <div class="panel-body tight">
+          <div class="export-list">
+            <div class="meta-note">High quality rerender</div>
+            <div class="export-grid">
+              <button class="export-btn" data-export-transparent="0" data-export-scale="2" data-disable-during-export="1" type="button">Background 2×</button>
+              <button class="export-btn" data-export-transparent="1" data-export-scale="2" data-disable-during-export="1" type="button">Transparent 2×</button>
+            </div>
+            <div class="export-grid">
+              <button class="export-btn" data-export-transparent="0" data-export-scale="4" data-disable-during-export="1" type="button">Background 4×</button>
+              <button class="export-btn" data-export-transparent="1" data-export-scale="4" data-disable-during-export="1" type="button">Transparent 4×</button>
+            </div>
+            <div class="small-label" style="margin:0;color:var(--muted);">
+              Export recreates the current artwork from the active seed and frame state, then saves PNG at the selected scale.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="configPanel" class="floating-panel config" hidden>
+      <div class="panel-shell">
+        <div class="panel-header">
+          <h2 class="panel-title">Configuration</h2>
+          <button id="configCloseBtn" class="panel-close" data-disable-during-export="1" type="button" aria-label="Close configuration panel">
+            <span class="icon" aria-hidden="true">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="icon">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+              </svg>
+            </span>
+          </button>
+        </div>
+        <div class="panel-body config-scroll">
+          <section class="group">
+            <h3 class="group-title">Flow Dynamics</h3>
+            <div class="group-stack">
+              <div>
+                <div class="small-label">Direction</div>
+                <div id="flowDirectionButtons" class="option-row">
+                  <button class="option-button" data-config-key="flowDirection" data-config-value="omni" type="button">Omni</button>
+                  <button class="option-button" data-config-key="flowDirection" data-config-value="down" type="button">Down</button>
+                  <button class="option-button" data-config-key="flowDirection" data-config-value="left" type="button">Left</button>
+                  <button class="option-button" data-config-key="flowDirection" data-config-value="diagonal" type="button">Diag</button>
+                </div>
+              </div>
+
+              <div id="waveModeWrap">
+                <div class="small-label">Wave Mode</div>
+                <div id="waveModeButtons" class="option-row">
+                  <button class="option-button" data-config-key="waveMode" data-config-value="perlin" type="button">Perlin</button>
+                  <button class="option-button" data-config-key="waveMode" data-config-value="vortex" type="button">Vortex</button>
+                  <button class="option-button" data-config-key="waveMode" data-config-value="radial" type="button">Radial</button>
+                  <button class="option-button" data-config-key="waveMode" data-config-value="ridge" type="button">Ridge</button>
+                  <button class="option-button" data-config-key="waveMode" data-config-value="chaos" type="button">Chaos</button>
+                </div>
+              </div>
+
+              <div class="slider-block">
+                <div class="slider-head"><span>Seed</span><span id="seedValue" class="slider-value"></span></div>
+                <input id="seedInput" class="range-input" type="range" min="1" max="99999" step="1" />
+              </div>
+
+              <div class="slider-block">
+                <div class="slider-head"><span>Steps per Line</span><span id="stepsPerLineValue" class="slider-value"></span></div>
+                <input id="stepsPerLineInput" class="range-input" type="range" min="100" max="10000" step="100" />
+              </div>
+
+              <div class="slider-block">
+                <div class="slider-head"><span>Speed</span><span id="stepLengthValue" class="slider-value"></span></div>
+                <input id="stepLengthInput" class="range-input" type="range" min="0.5" max="50" step="0.5" />
+              </div>
+
+              <div class="slider-block">
+                <div class="slider-head"><span>Noise Frequency</span><span id="noiseFreqValue" class="slider-value"></span></div>
+                <input id="noiseFreqInput" class="range-input" type="range" min="0.0001" max="0.02" step="0.0001" />
+              </div>
+
+              <div class="slider-block">
+                <div class="slider-head"><span>Curl Strength</span><span id="curlStrengthValue" class="slider-value"></span></div>
+                <input id="curlStrengthInput" class="range-input" type="range" min="0.1" max="20" step="0.1" />
+              </div>
+            </div>
+          </section>
+
+          <section class="group">
+            <h3 class="group-title">Visuals</h3>
+            <div class="group-stack">
+              <div class="slider-block">
+                <div class="slider-head"><span>Line Count</span><span id="particleCountValue" class="slider-value"></span></div>
+                <input id="particleCountInput" class="range-input" type="range" min="100" max="100000" step="100" />
+              </div>
+
+              <div class="slider-block">
+                <div class="slider-head"><span>Density Map</span><span id="clusteringValue" class="slider-value"></span></div>
+                <input id="clusteringInput" class="range-input" type="range" min="0" max="0.99" step="0.01" />
+              </div>
+
+              <div class="slider-block">
+                <div class="slider-head"><span>Line Opacity</span><span id="opacityValue" class="slider-value"></span></div>
+                <input id="opacityInput" class="range-input" type="range" min="1" max="255" step="1" />
+              </div>
+
+              <div class="dual-grid">
+                <div class="slider-block">
+                  <div class="slider-head"><span>Min Width</span><span id="lineWidthMinValue" class="slider-value"></span></div>
+                  <input id="lineWidthMinInput" class="range-input" type="range" min="0.1" max="20" step="0.1" />
+                </div>
+                <div class="slider-block">
+                  <div class="slider-head"><span>Max Width</span><span id="lineWidthMaxValue" class="slider-value"></span></div>
+                  <input id="lineWidthMaxInput" class="range-input" type="range" min="0.1" max="20" step="0.1" />
+                </div>
+              </div>
+
+              <div class="color-block">
+                <div class="slider-head"><span>Line Color</span><span id="lineColorValue" class="slider-value"></span></div>
+                <input id="lineColorInput" class="color-input" type="color" />
+              </div>
+
+              <div class="slider-block">
+                <div class="slider-head"><span>Zoom</span><span id="zoomValue" class="slider-value"></span></div>
+                <input id="zoomInput" class="range-input" type="range" min="0.5" max="10" step="0.01" />
+              </div>
+
+              <label class="checkbox-row" for="colorInvertInput">
+                <span>Invert Background</span>
+                <input id="colorInvertInput" class="checkbox-input" type="checkbox" />
+              </label>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      'use strict';
+
+      class PerlinNoise {
+        constructor(seed) {
+          this.perm = this.buildPermutation(mulberry32(seed));
+        }
+        buildPermutation(rng) {
+          const PERM_SIZE = 256;
+          const p = new Uint8Array(PERM_SIZE);
+          for (let i = 0; i < PERM_SIZE; i++) p[i] = i;
+          for (let i = PERM_SIZE - 1; i > 0; i--) {
+            const j = (rng() * (i + 1)) | 0;
+            const tmp = p[i];
+            p[i] = p[j];
+            p[j] = tmp;
+          }
+          const perm = new Uint8Array(PERM_SIZE * 2);
+          for (let i = 0; i < PERM_SIZE * 2; i++) perm[i] = p[i & 255];
+          return perm;
+        }
+        fade(t) { return t * t * t * (t * (t * 6 - 15) + 10); }
+        lerp(a, b, t) { return a + t * (b - a); }
+        grad(hash, x, y, z) {
+          const hh = hash & 15;
+          const u = hh < 8 ? x : y;
+          const v = hh < 4 ? y : (hh === 12 || hh === 14 ? x : z);
+          return ((hh & 1) === 0 ? u : -u) + ((hh & 2) === 0 ? v : -v);
+        }
+        noise3(x, y, z) {
+          const X = Math.floor(x) & 255;
+          const Y = Math.floor(y) & 255;
+          const Z = Math.floor(z) & 255;
+          const xf = x - Math.floor(x);
+          const yf = y - Math.floor(y);
+          const zf = z - Math.floor(z);
+          const u = this.fade(xf);
+          const v = this.fade(yf);
+          const w = this.fade(zf);
+          const A = this.perm[X] + Y;
+          const AA = this.perm[A] + Z;
+          const AB = this.perm[A + 1] + Z;
+          const B = this.perm[X + 1] + Y;
+          const BA = this.perm[B] + Z;
+          const BB = this.perm[B + 1] + Z;
+          const g1 = this.grad(this.perm[AA], xf, yf, zf);
+          const g2 = this.grad(this.perm[BA], xf - 1, yf, zf);
+          const g3 = this.grad(this.perm[AB], xf, yf - 1, zf);
+          const g4 = this.grad(this.perm[BB], xf - 1, yf - 1, zf);
+          const g5 = this.grad(this.perm[AA + 1], xf, yf, zf - 1);
+          const g6 = this.grad(this.perm[BA + 1], xf - 1, yf, zf - 1);
+          const g7 = this.grad(this.perm[AB + 1], xf, yf - 1, zf - 1);
+          const g8 = this.grad(this.perm[BB + 1], xf - 1, yf - 1, zf - 1);
+          const x1 = this.lerp(g1, g2, u);
+          const x2 = this.lerp(g3, g4, u);
+          const y1 = this.lerp(x1, x2, v);
+          const x3 = this.lerp(g5, g6, u);
+          const x4 = this.lerp(g7, g8, u);
+          const y2 = this.lerp(x3, x4, v);
+          return (this.lerp(y1, y2, w) + 1) * 0.5;
+        }
+      }
+
+      const PRESET_DEFAULTS = {
+        particleCount: 6000,
+        stepsPerLine: 2000,
+        stepLength: 1.0,
+        noiseFreq: 0.0006,
+        curlStrength: 1.5,
+        lineWidthMin: 0.5,
+        lineWidthMax: 1.5,
+        opacity: 12,
+        clustering: 0.0,
+        waveMode: 'perlin',
+        flowDirection: 'omni',
+        seed: 1,
+        zoom: 1.0,
+        colorInvert: false,
+        lineColor: '#ffffff'
+      };
+
+      const CONFIG_RESET_KEYS = new Set([
+        'seed',
+        'stepsPerLine',
+        'stepLength',
+        'noiseFreq',
+        'curlStrength',
+        'clustering',
+        'waveMode',
+        'flowDirection',
+        'particleCount',
+        'lineWidthMin',
+        'lineWidthMax',
+        'opacity',
+        'colorInvert',
+        'lineColor'
+      ]);
+
+      const PLAY_ICON = '<span class="icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="icon"><path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 0 1 0 1.971l-11.54 6.347a1.125 1.125 0 0 1-1.667-.985V5.653Z" /></svg></span>';
+      const PAUSE_ICON = '<span class="icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="icon"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25v13.5m-7.5-13.5v13.5" /></svg></span>';
+
+      const state = {
+        config: { ...PRESET_DEFAULTS },
+        isPaused: false,
+        isExporting: false,
+        exportMessage: '',
+        isConfigOpen: false,
+        isSaveMenuOpen: false
+      };
+
+      const viewCanvas = document.getElementById('viewCanvas');
+      const wrapper = document.getElementById('wrapper');
+      const app = document.getElementById('app');
+      const exportOverlay = document.getElementById('exportOverlay');
+      const exportMessageCard = document.getElementById('exportMessageCard');
+      const customizeBtn = document.getElementById('customizeBtn');
+      const pauseBtn = document.getElementById('pauseBtn');
+      const resetBtn = document.getElementById('resetBtn');
+      const downloadBtn = document.getElementById('downloadBtn');
+      const configPanel = document.getElementById('configPanel');
+      const savePanel = document.getElementById('savePanel');
+      const configCloseBtn = document.getElementById('configCloseBtn');
+      const saveCloseBtn = document.getElementById('saveCloseBtn');
+      const waveModeWrap = document.getElementById('waveModeWrap');
+
+      const inputs = {
+        seed: document.getElementById('seedInput'),
+        stepsPerLine: document.getElementById('stepsPerLineInput'),
+        stepLength: document.getElementById('stepLengthInput'),
+        noiseFreq: document.getElementById('noiseFreqInput'),
+        curlStrength: document.getElementById('curlStrengthInput'),
+        particleCount: document.getElementById('particleCountInput'),
+        clustering: document.getElementById('clusteringInput'),
+        opacity: document.getElementById('opacityInput'),
+        lineWidthMin: document.getElementById('lineWidthMinInput'),
+        lineWidthMax: document.getElementById('lineWidthMaxInput'),
+        lineColor: document.getElementById('lineColorInput'),
+        zoom: document.getElementById('zoomInput'),
+        colorInvert: document.getElementById('colorInvertInput')
+      };
+
+      const valueEls = {
+        seed: document.getElementById('seedValue'),
+        stepsPerLine: document.getElementById('stepsPerLineValue'),
+        stepLength: document.getElementById('stepLengthValue'),
+        noiseFreq: document.getElementById('noiseFreqValue'),
+        curlStrength: document.getElementById('curlStrengthValue'),
+        particleCount: document.getElementById('particleCountValue'),
+        clustering: document.getElementById('clusteringValue'),
+        opacity: document.getElementById('opacityValue'),
+        lineWidthMin: document.getElementById('lineWidthMinValue'),
+        lineWidthMax: document.getElementById('lineWidthMaxValue'),
+        lineColor: document.getElementById('lineColorValue'),
+        zoom: document.getElementById('zoomValue')
+      };
+
+      const optionButtons = Array.from(document.querySelectorAll('.option-button'));
+      const exportButtons = Array.from(document.querySelectorAll('[data-export-scale]'));
+      const exportLockControls = Array.from(document.querySelectorAll('[data-disable-during-export="1"]'));
+
+      const artCanvas = document.createElement('canvas');
+      let viewCtx = null;
+      let artCtx = null;
+      let requestId = 0;
+      let loopEpoch = 0;
+      let mounted = false;
+      let resizeTimer = 0;
+
+      const particlesRef = { current: [] };
+      const noiseRef = { current: new PerlinNoise(1) };
+      const rngRef = { current: () => Math.random() };
+      const metricsRef = { current: { logicalWidth: 0, logicalHeight: 0, viewPixelRatio: 1, artPixelRatio: 1 } };
+      const rgbCacheRef = { current: { hex: '', rgb: { r: 255, g: 255, b: 255 } } };
+      const perfRef = { current: { lastViewComposite: 0, compositeIntervalMs: 16 } };
+
+      function mulberry32(seed) {
+        let t = seed >>> 0;
+        return function() {
+          t |= 0;
+          t = (t + 0x6D2B79F5) | 0;
+          let r = Math.imul(t ^ (t >>> 15), 1 | t);
+          r = (r + Math.imul(r ^ (r >>> 7), 61 | r)) ^ r;
+          return ((r ^ (r >>> 14)) >>> 0) / 4294967296;
+        };
+      }
+
+      function clamp(value, min, max) {
+        return Math.max(min, Math.min(max, value));
+      }
+
+      function nextFrame() {
+        return new Promise(resolve => requestAnimationFrame(resolve));
+      }
+
+      function hexToRgb(hex) {
+        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return result
+          ? { r: parseInt(result[1], 16), g: parseInt(result[2], 16), b: parseInt(result[3], 16) }
+          : { r: 255, g: 255, b: 255 };
+      }
+
+      function getBackgroundColor(cfg) {
+        return cfg.colorInvert ? '#ffffff' : '#000000';
+      }
+
+      function canvasToBlob(canvas) {
+        return new Promise((resolve, reject) => {
+          canvas.toBlob((blob) => {
+            if (blob) resolve(blob);
+            else reject(new Error('PNG blob generation failed.'));
+          }, 'image/png');
+        });
+      }
+
+      function triggerDownload(blob, filename) {
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.download = filename;
+        link.href = url;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+      }
+
+      function computeDirection(noise, x, y, cfg, cx, cy) {
+        const n = noise.noise3(x * cfg.noiseFreq, y * cfg.noiseFreq, 0);
+
+        if (cfg.flowDirection === 'omni') {
+          const dx = x - cx;
+          const dy = y - cy;
+          const baseAngle = Math.atan2(dy, dx);
+
+          switch (cfg.waveMode) {
+            case 'vortex':
+              return (baseAngle + Math.PI / 2) + ((n - 0.5) * Math.PI * cfg.curlStrength);
+            case 'radial':
+              return baseAngle + ((n - 0.5) * 0.5 * Math.PI * Math.abs(cfg.curlStrength));
+            case 'ridge': {
+              const n2 = noise.noise3((x + 100) * cfg.noiseFreq, (y + 100) * cfg.noiseFreq, 0);
+              return ((n - 0.5) * Math.PI * 2 * (1 - 1 / cfg.curlStrength)) + ((n2 - 0.5) * Math.PI * 2 * (1 / cfg.curlStrength));
+            }
+            case 'chaos':
+              return (n * Math.PI * 2) + ((noise.noise3((x + 777) * cfg.noiseFreq, (y - 333) * cfg.noiseFreq, 0) - 0.5) * Math.PI * 2 * (cfg.curlStrength - 1));
+            default:
+              return n * Math.PI * 2 * cfg.curlStrength;
+          }
+        }
+
+        let baseDir = 0;
+        if (cfg.flowDirection === 'down') baseDir = Math.PI / 2;
+        else if (cfg.flowDirection === 'left') baseDir = Math.PI;
+        else if (cfg.flowDirection === 'diagonal') baseDir = Math.PI / 4;
+
+        return baseDir + ((n - 0.5) * Math.PI * cfg.curlStrength * 0.25);
+      }
+
+      class FlowParticle {
+        constructor(w, h, steps, minW, maxW, rng, noise, clustering, freq) {
+          this.rng = rng;
+          this.maxLife = steps;
+          this.remainingLife = steps;
+          this.initPosition(w, h, noise, clustering, freq);
+          this.prevX = this.x;
+          this.prevY = this.y;
+          this.setWidth(minW, maxW);
+        }
+
+        setWidth(minW, maxW) {
+          const rawWidth = minW + this.rng() * (maxW - minW);
+          this.width = Math.round(rawWidth * 10) / 10;
+        }
+
+        initPosition(w, h, noise, clustering, freq) {
+          if (clustering <= 0.01) {
+            this.x = this.rng() * w;
+            this.y = this.rng() * h;
+            return;
+          }
+
+          let found = false;
+          let attempts = 0;
+          while (!found && attempts < 15) {
+            const cx = this.rng() * w;
+            const cy = this.rng() * h;
+            const density = noise.noise3(cx * freq * 0.7, cy * freq * 0.7, 50);
+            const threshold = clustering * 0.5;
+            if (density > threshold) {
+              this.x = cx;
+              this.y = cy;
+              found = true;
+            }
+            attempts += 1;
+          }
+
+          if (!found) {
+            this.x = this.rng() * w;
+            this.y = this.rng() * h;
+          }
+        }
+
+        reset(w, h, minW, maxW, noise, clustering, freq) {
+          this.initPosition(w, h, noise, clustering, freq);
+          this.prevX = this.x;
+          this.prevY = this.y;
+          this.remainingLife = this.maxLife;
+          this.setWidth(minW, maxW);
+        }
+      }
+
+      function createSimulationState(cfg, width, height) {
+        const rng = mulberry32(cfg.seed);
+        const noise = new PerlinNoise(cfg.seed);
+        const steps = Math.min(cfg.stepsPerLine, 10000);
+        const particles = [];
+
+        for (let i = 0; i < cfg.particleCount; i++) {
+          particles.push(new FlowParticle(
+            width,
+            height,
+            steps,
+            cfg.lineWidthMin,
+            cfg.lineWidthMax,
+            rng,
+            noise,
+            cfg.clustering,
+            cfg.noiseFreq
+          ));
+        }
+
+        return { rng, noise, particles, steps };
+      }
+
+      function clearCanvasWithBackground(ctx, width, height, cfg, transparent) {
+        ctx.clearRect(0, 0, width, height);
+        if (!transparent) {
+          ctx.fillStyle = getBackgroundColor(cfg);
+          ctx.fillRect(0, 0, width, height);
+        }
+      }
+
+      function resolveArtPixelRatio(logicalWidth, logicalHeight, particleCount) {
+        const dpr = window.devicePixelRatio || 1;
+        const megaPixels = (logicalWidth * logicalHeight) / 1000000;
+        let ratio = Math.max(1, Math.min(dpr, 2));
+
+        if (megaPixels >= 2.5 || particleCount >= 25000) ratio = Math.min(ratio, 1.5);
+        if (megaPixels >= 4.0 || particleCount >= 50000) ratio = 1;
+
+        return clamp(ratio, 1, 2);
+      }
+
+      function renderComposite(ctx, sourceCanvas, cfg, width, height, transparent) {
+        clearCanvasWithBackground(ctx, width, height, cfg, transparent);
+        if (!sourceCanvas) return;
+
+        const zoom = clamp(cfg.zoom, 0.5, 10);
+        ctx.save();
+        ctx.globalCompositeOperation = 'source-over';
+        ctx.imageSmoothingEnabled = true;
+        if ('imageSmoothingQuality' in ctx) ctx.imageSmoothingQuality = 'high';
+        ctx.translate(width / 2, height / 2);
+        ctx.scale(zoom, zoom);
+        ctx.translate(-width / 2, -height / 2);
+        ctx.drawImage(sourceCanvas, 0, 0, sourceCanvas.width, sourceCanvas.height, 0, 0, width, height);
+        ctx.restore();
+      }
+
+      function drawSimulationFrame(ctx, sim, cfg, width, height, rgbCache) {
+        const cx = width / 2;
+        const cy = height / 2;
+        const alpha = clamp(cfg.opacity, 1, 255) / 255;
+
+        if (cfg.lineColor !== rgbCache.current.hex) {
+          rgbCache.current = { hex: cfg.lineColor, rgb: hexToRgb(cfg.lineColor) };
+        }
+        const rgb = rgbCache.current.rgb;
+
+        ctx.strokeStyle = 'rgba(' + rgb.r + ', ' + rgb.g + ', ' + rgb.b + ', ' + alpha + ')';
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.globalCompositeOperation = 'source-over';
+
+        const batches = Object.create(null);
+
+        for (let i = 0; i < sim.particles.length; i++) {
+          const p = sim.particles[i];
+
+          if (p.remainingLife <= 0) {
+            p.reset(width, height, cfg.lineWidthMin, cfg.lineWidthMax, sim.noise, cfg.clustering, cfg.noiseFreq);
+          }
+
+          p.prevX = p.x;
+          p.prevY = p.y;
+
+          const angle = computeDirection(sim.noise, p.x, p.y, cfg, cx, cy);
+          p.x += Math.cos(angle) * cfg.stepLength;
+          p.y += Math.sin(angle) * cfg.stepLength;
+          p.remainingLife -= 1;
+
+          if (p.x < -100 || p.x > width + 100 || p.y < -100 || p.y > height + 100) {
+            p.reset(width, height, cfg.lineWidthMin, cfg.lineWidthMax, sim.noise, cfg.clustering, cfg.noiseFreq);
+            continue;
+          }
+
+          const wKey = p.width.toFixed(1);
+          if (!batches[wKey]) batches[wKey] = [];
+          batches[wKey].push(p.prevX, p.prevY, p.x, p.y);
+        }
+
+        for (const wKey in batches) {
+          const coords = batches[wKey];
+          ctx.lineWidth = parseFloat(wKey);
+          ctx.beginPath();
+          for (let i = 0; i < coords.length; i += 4) {
+            ctx.moveTo(coords[i], coords[i + 1]);
+            ctx.lineTo(coords[i + 2], coords[i + 3]);
+          }
+          ctx.stroke();
+        }
+      }
+
+      function formatValue(key, value) {
+        switch (key) {
+          case 'noiseFreq':
+            return Number(value).toFixed(4);
+          case 'curlStrength':
+          case 'lineWidthMin':
+          case 'lineWidthMax':
+            return Number(value).toFixed(1);
+          case 'clustering':
+            return (Number(value) * 100).toFixed(0) + '%';
+          case 'zoom':
+            return Number(value).toFixed(2) + 'x';
+          default:
+            return String(value);
+        }
+      }
+
+      function applyTheme() {
+        document.body.dataset.invert = state.config.colorInvert ? 'true' : 'false';
+      }
+
+      function updatePanels() {
+        configPanel.hidden = !state.isConfigOpen;
+        savePanel.hidden = !state.isSaveMenuOpen;
+        customizeBtn.setAttribute('aria-expanded', state.isConfigOpen ? 'true' : 'false');
+        downloadBtn.setAttribute('aria-expanded', state.isSaveMenuOpen ? 'true' : 'false');
+      }
+
+      function updatePauseButton() {
+        pauseBtn.innerHTML = state.isPaused ? PLAY_ICON : PAUSE_ICON;
+      }
+
+      function updateExportOverlay() {
+        exportOverlay.hidden = !state.isExporting;
+        exportMessageCard.textContent = state.exportMessage || 'Exporting';
+      }
+
+      function updateDisabledState() {
+        const disabled = !!state.isExporting;
+        for (let i = 0; i < exportLockControls.length; i++) {
+          exportLockControls[i].disabled = disabled;
+        }
+      }
+
+      function updateOptionButtons() {
+        for (let i = 0; i < optionButtons.length; i++) {
+          const btn = optionButtons[i];
+          const key = btn.getAttribute('data-config-key');
+          const value = btn.getAttribute('data-config-value');
+          btn.classList.toggle('is-active', String(state.config[key]) === value);
+        }
+        waveModeWrap.hidden = state.config.flowDirection !== 'omni';
+      }
+
+      function updateInputs() {
+        inputs.seed.value = String(state.config.seed);
+        inputs.stepsPerLine.value = String(state.config.stepsPerLine);
+        inputs.stepLength.value = String(state.config.stepLength);
+        inputs.noiseFreq.value = String(state.config.noiseFreq);
+        inputs.curlStrength.value = String(state.config.curlStrength);
+        inputs.particleCount.value = String(state.config.particleCount);
+        inputs.clustering.value = String(state.config.clustering);
+        inputs.opacity.value = String(state.config.opacity);
+        inputs.lineWidthMin.value = String(state.config.lineWidthMin);
+        inputs.lineWidthMax.value = String(state.config.lineWidthMax);
+        inputs.lineColor.value = state.config.lineColor;
+        inputs.zoom.value = String(state.config.zoom);
+        inputs.colorInvert.checked = !!state.config.colorInvert;
+
+        valueEls.seed.textContent = formatValue('seed', state.config.seed);
+        valueEls.stepsPerLine.textContent = formatValue('stepsPerLine', state.config.stepsPerLine);
+        valueEls.stepLength.textContent = formatValue('stepLength', state.config.stepLength);
+        valueEls.noiseFreq.textContent = formatValue('noiseFreq', state.config.noiseFreq);
+        valueEls.curlStrength.textContent = formatValue('curlStrength', state.config.curlStrength);
+        valueEls.particleCount.textContent = formatValue('particleCount', state.config.particleCount);
+        valueEls.clustering.textContent = formatValue('clustering', state.config.clustering);
+        valueEls.opacity.textContent = formatValue('opacity', state.config.opacity);
+        valueEls.lineWidthMin.textContent = formatValue('lineWidthMin', state.config.lineWidthMin);
+        valueEls.lineWidthMax.textContent = formatValue('lineWidthMax', state.config.lineWidthMax);
+        valueEls.lineColor.textContent = state.config.lineColor;
+        valueEls.zoom.textContent = formatValue('zoom', state.config.zoom);
+      }
+
+      function updateUI() {
+        applyTheme();
+        updatePanels();
+        updatePauseButton();
+        updateExportOverlay();
+        updateDisabledState();
+        updateOptionButtons();
+        updateInputs();
+      }
+
+      function renderView() {
+        const sourceCanvas = artCanvas;
+        const metrics = metricsRef.current;
+        if (!viewCanvas || !sourceCanvas || !metrics.logicalWidth || !metrics.logicalHeight) return;
+
+        if (!viewCtx) {
+          viewCtx = viewCanvas.getContext('2d', { alpha: true, desynchronized: true });
+        }
+        if (!viewCtx) return;
+
+        viewCtx.setTransform(metrics.viewPixelRatio, 0, 0, metrics.viewPixelRatio, 0, 0);
+        renderComposite(viewCtx, sourceCanvas, state.config, metrics.logicalWidth, metrics.logicalHeight, false);
+      }
+
+      function fullReset(preserveArtwork) {
+        if (!viewCanvas || !wrapper) return;
+
+        const rect = wrapper.getBoundingClientRect();
+        const logicalWidth = Math.max(1, Math.floor(rect.width));
+        const logicalHeight = Math.max(1, Math.floor(rect.height));
+        const viewPixelRatio = window.devicePixelRatio || 1;
+        const artPixelRatio = resolveArtPixelRatio(logicalWidth, logicalHeight, state.config.particleCount);
+
+        const previousMetrics = {
+          logicalWidth: metricsRef.current.logicalWidth,
+          logicalHeight: metricsRef.current.logicalHeight
+        };
+
+        const previousArtCanvas = document.createElement('canvas');
+        const hadPreviousArt = artCanvas.width > 0 && artCanvas.height > 0;
+
+        if (preserveArtwork && hadPreviousArt) {
+          previousArtCanvas.width = artCanvas.width;
+          previousArtCanvas.height = artCanvas.height;
+          const prevCtx = previousArtCanvas.getContext('2d', { alpha: true });
+          if (prevCtx) prevCtx.drawImage(artCanvas, 0, 0);
+        }
+
+        metricsRef.current = { logicalWidth, logicalHeight, viewPixelRatio, artPixelRatio };
+
+        viewCanvas.width = Math.max(1, Math.floor(logicalWidth * viewPixelRatio));
+        viewCanvas.height = Math.max(1, Math.floor(logicalHeight * viewPixelRatio));
+        viewCanvas.style.width = logicalWidth + 'px';
+        viewCanvas.style.height = logicalHeight + 'px';
+
+        artCanvas.width = Math.max(1, Math.floor(logicalWidth * artPixelRatio));
+        artCanvas.height = Math.max(1, Math.floor(logicalHeight * artPixelRatio));
+
+        viewCtx = viewCanvas.getContext('2d', { alpha: true, desynchronized: true });
+        artCtx = artCanvas.getContext('2d', { alpha: true, desynchronized: true });
+        if (!viewCtx || !artCtx) return;
+
+        artCtx.setTransform(artPixelRatio, 0, 0, artPixelRatio, 0, 0);
+        clearCanvasWithBackground(artCtx, logicalWidth, logicalHeight, state.config, true);
+
+        if (preserveArtwork && hadPreviousArt && previousMetrics.logicalWidth && previousMetrics.logicalHeight) {
+          artCtx.imageSmoothingEnabled = true;
+          if ('imageSmoothingQuality' in artCtx) artCtx.imageSmoothingQuality = 'high';
+          artCtx.drawImage(
+            previousArtCanvas,
+            0,
+            0,
+            previousArtCanvas.width,
+            previousArtCanvas.height,
+            0,
+            0,
+            logicalWidth,
+            logicalHeight
+          );
+
+          const sx = logicalWidth / previousMetrics.logicalWidth;
+          const sy = logicalHeight / previousMetrics.logicalHeight;
+          const particles = particlesRef.current;
+          if (particles && particles.length) {
+            for (let i = 0; i < particles.length; i++) {
+              const p = particles[i];
+              p.x *= sx;
+              p.y *= sy;
+              p.prevX *= sx;
+              p.prevY *= sy;
+            }
+          } else {
+            const sim = createSimulationState(state.config, logicalWidth, logicalHeight);
+            rngRef.current = sim.rng;
+            noiseRef.current = sim.noise;
+            particlesRef.current = sim.particles;
+          }
+        } else {
+          const sim = createSimulationState(state.config, logicalWidth, logicalHeight);
+          rngRef.current = sim.rng;
+          noiseRef.current = sim.noise;
+          particlesRef.current = sim.particles;
+        }
+
+        rgbCacheRef.current = { hex: '', rgb: hexToRgb(state.config.lineColor) };
+        perfRef.current.compositeIntervalMs = state.config.particleCount >= 50000 ? 33 : (state.config.particleCount >= 25000 ? 24 : 16);
+        perfRef.current.lastViewComposite = 0;
+        renderView();
+      }
+
+      function shouldAnimate() {
+        return mounted && !state.isPaused && !state.isExporting;
+      }
+
+      function stopAnimationLoop() {
+        loopEpoch += 1;
+        if (requestId) {
+          window.cancelAnimationFrame(requestId);
+          requestId = 0;
+        }
+      }
+
+      function queueAnimationFrame(epoch) {
+        requestId = window.requestAnimationFrame(function(timestamp) {
+          animate(timestamp, epoch);
+        });
+      }
+
+      function startAnimationLoop(resetCompositeTimer) {
+        if (resetCompositeTimer) {
+          perfRef.current.lastViewComposite = 0;
+        }
+        if (requestId || !shouldAnimate()) return;
+        const epoch = loopEpoch;
+        queueAnimationFrame(epoch);
+      }
+
+      function syncAnimationLoop(resetCompositeTimer) {
+        if (!shouldAnimate()) {
+          stopAnimationLoop();
+          return;
+        }
+        startAnimationLoop(resetCompositeTimer);
+      }
+
+      function animate(timestamp, epoch) {
+        requestId = 0;
+
+        if (epoch !== loopEpoch) return;
+        if (!shouldAnimate()) return;
+        if (!artCanvas || !artCtx) return;
+
+        const metrics = metricsRef.current;
+        if (!metrics.logicalWidth || !metrics.logicalHeight) return;
+
+        artCtx.setTransform(metrics.artPixelRatio, 0, 0, metrics.artPixelRatio, 0, 0);
+
+        const particles = particlesRef.current;
+        if (!particles || !particles.length) {
+          if (epoch === loopEpoch && shouldAnimate()) {
+            queueAnimationFrame(epoch);
+          }
+          return;
+        }
+
+        const sim = {
+          rng: rngRef.current,
+          noise: noiseRef.current,
+          particles: particles
+        };
+
+        drawSimulationFrame(artCtx, sim, state.config, metrics.logicalWidth, metrics.logicalHeight, rgbCacheRef);
+
+        const perf = perfRef.current;
+        if ((timestamp - perf.lastViewComposite) >= perf.compositeIntervalMs) {
+          perf.lastViewComposite = timestamp;
+          renderView();
+        }
+
+        if (epoch === loopEpoch && shouldAnimate()) {
+          queueAnimationFrame(epoch);
+        }
+      }
+
+      function setConfigValue(key, value, opts) {
+        const options = opts || {};
+        state.config[key] = value;
+        if (key === 'lineWidthMin' && state.config.lineWidthMin > state.config.lineWidthMax) {
+          state.config.lineWidthMax = state.config.lineWidthMin;
+        }
+        if (key === 'lineWidthMax' && state.config.lineWidthMax < state.config.lineWidthMin) {
+          state.config.lineWidthMin = state.config.lineWidthMax;
+        }
+
+        updateUI();
+
+        if (options.silent) return;
+        if (key === 'zoom') {
+          renderView();
+        } else if (CONFIG_RESET_KEYS.has(key)) {
+          if (mounted) fullReset(false);
+        }
+      }
+
+      function setPause(nextPaused) {
+        const paused = !!nextPaused;
+        if (state.isPaused === paused) return;
+        state.isPaused = paused;
+        if (paused) {
+          stopAnimationLoop();
+          renderView();
+        } else {
+          loopEpoch += 1;
+          startAnimationLoop(true);
+        }
+        updateUI();
+      }
+
+      function toggleConfigPanel() {
+        if (state.isExporting) return;
+        state.isConfigOpen = !state.isConfigOpen;
+        if (state.isConfigOpen) state.isSaveMenuOpen = false;
+        updateUI();
+      }
+
+      function toggleSavePanel() {
+        if (state.isExporting) return;
+        state.isSaveMenuOpen = !state.isSaveMenuOpen;
+        if (state.isSaveMenuOpen) state.isConfigOpen = false;
+        updateUI();
+      }
+
+      function closePanels() {
+        if (!state.isConfigOpen && !state.isSaveMenuOpen) return;
+        state.isConfigOpen = false;
+        state.isSaveMenuOpen = false;
+        updateUI();
+      }
+
+      async function handleSave(transparent, scale) {
+        if (state.isExporting) return;
+
+        const cfg = { ...state.config };
+        const metrics = { ...metricsRef.current };
+
+        if (!artCanvas || !metrics.logicalWidth || !metrics.logicalHeight) return;
+
+        try {
+          state.isExporting = true;
+          stopAnimationLoop();
+          state.exportMessage = 'Exporting current view ' + (transparent ? 'transparent' : 'background') + ' PNG ' + scale + '×';
+          updateUI();
+
+          await nextFrame();
+
+          const exportCanvas = document.createElement('canvas');
+          exportCanvas.width = Math.max(1, Math.floor(metrics.logicalWidth * scale));
+          exportCanvas.height = Math.max(1, Math.floor(metrics.logicalHeight * scale));
+
+          const ctx = exportCanvas.getContext('2d', { alpha: true, willReadFrequently: false, desynchronized: true });
+          if (!ctx) throw new Error('Canvas context is not available.');
+
+          ctx.setTransform(scale, 0, 0, scale, 0, 0);
+          renderComposite(ctx, artCanvas, cfg, metrics.logicalWidth, metrics.logicalHeight, !!transparent);
+
+          const blob = await canvasToBlob(exportCanvas);
+          const filename = 'lien-' + (transparent ? 'transparent' : 'background') + '-' + scale + 'x-' + Date.now() + '.png';
+          triggerDownload(blob, filename);
+
+          state.exportMessage = 'Export complete';
+          updateUI();
+
+          window.setTimeout(function() {
+            if (!state.isExporting) {
+              state.exportMessage = '';
+              updateUI();
+            }
+          }, 1200);
+        } catch (error) {
+          console.error(error);
+          const message = error && error.message ? error.message : 'Export failed.';
+          state.exportMessage = message;
+          updateUI();
+          window.alert(message);
+        } finally {
+          state.isExporting = false;
+          updateUI();
+          syncAnimationLoop(true);
+        }
+      }
+
+      function attachEvents() {
+        customizeBtn.addEventListener('click', toggleConfigPanel);
+        downloadBtn.addEventListener('click', toggleSavePanel);
+        configCloseBtn.addEventListener('click', function() {
+          state.isConfigOpen = false;
+          updateUI();
+        });
+        saveCloseBtn.addEventListener('click', function() {
+          state.isSaveMenuOpen = false;
+          updateUI();
+        });
+
+        let lastPauseToggleAt = 0;
+        function onPauseToggle(event) {
+          const now = Date.now();
+          if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+            if (event.type === 'click' && (now - lastPauseToggleAt) < 250) return;
+          }
+          lastPauseToggleAt = now;
+          if (state.isExporting) return;
+          setPause(!state.isPaused);
+        }
+
+        pauseBtn.addEventListener('click', onPauseToggle);
+        pauseBtn.addEventListener('pointerup', onPauseToggle);
+
+        resetBtn.addEventListener('click', function() {
+          if (state.isExporting) return;
+          fullReset(false);
+        });
+
+        document.addEventListener('keydown', function(event) {
+          if (event.key === 'Escape') closePanels();
+        });
+
+        document.addEventListener('pointerdown', function(event) {
+          const target = event.target;
+          if (!(target instanceof Node)) return;
+          if (
+            state.isConfigOpen &&
+            !configPanel.contains(target) &&
+            !customizeBtn.contains(target)
+          ) {
+            state.isConfigOpen = false;
+          }
+          if (
+            state.isSaveMenuOpen &&
+            !savePanel.contains(target) &&
+            !downloadBtn.contains(target)
+          ) {
+            state.isSaveMenuOpen = false;
+          }
+          updateUI();
+        });
+
+        const sliderKeys = [
+          'seed',
+          'stepsPerLine',
+          'stepLength',
+          'noiseFreq',
+          'curlStrength',
+          'particleCount',
+          'clustering',
+          'opacity',
+          'lineWidthMin',
+          'lineWidthMax',
+          'zoom'
+        ];
+
+        for (let i = 0; i < sliderKeys.length; i++) {
+          const key = sliderKeys[i];
+          const input = inputs[key];
+          input.addEventListener('input', function(event) {
+            const raw = parseFloat(event.target.value);
+            let next = raw;
+
+            if (key === 'seed' || key === 'stepsPerLine' || key === 'particleCount' || key === 'opacity') {
+              next = Math.round(raw);
+            }
+            if (key === 'lineWidthMin') {
+              next = Math.min(raw, state.config.lineWidthMax);
+            }
+            if (key === 'lineWidthMax') {
+              next = Math.max(raw, state.config.lineWidthMin);
+            }
+
+            setConfigValue(key, next);
+          });
+        }
+
+        inputs.lineColor.addEventListener('input', function(event) {
+          setConfigValue('lineColor', event.target.value);
+        });
+
+        inputs.colorInvert.addEventListener('change', function(event) {
+          const nextInvert = !!event.target.checked;
+          state.config.colorInvert = nextInvert;
+          state.config.lineColor = nextInvert ? '#000000' : '#ffffff';
+          updateUI();
+          if (mounted) fullReset(false);
+        });
+
+        for (let i = 0; i < optionButtons.length; i++) {
+          optionButtons[i].addEventListener('click', function(event) {
+            const btn = event.currentTarget;
+            const key = btn.getAttribute('data-config-key');
+            const value = btn.getAttribute('data-config-value');
+            if (!key) return;
+            setConfigValue(key, value);
+          });
+        }
+
+        for (let i = 0; i < exportButtons.length; i++) {
+          exportButtons[i].addEventListener('click', function(event) {
+            const btn = event.currentTarget;
+            const scale = parseInt(btn.getAttribute('data-export-scale') || '2', 10);
+            const transparent = btn.getAttribute('data-export-transparent') === '1';
+            state.isSaveMenuOpen = false;
+            updateUI();
+            handleSave(transparent, scale);
+          });
+        }
+
+        window.addEventListener('resize', function() {
+          window.clearTimeout(resizeTimer);
+          resizeTimer = window.setTimeout(function() {
+            fullReset(true);
+          }, 150);
+        });
+      }
+
+      function init() {
+        updateUI();
+        attachEvents();
+
+        window.setTimeout(function() {
+          fullReset(false);
+          mounted = true;
+          syncAnimationLoop(true);
+        }, 30);
+
+        window.addEventListener('beforeunload', function() {
+          stopAnimationLoop();
+        });
+      }
+
+      init();
+    })();
+  </script>
+</body>
+</html>
