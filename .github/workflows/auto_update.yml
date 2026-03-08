@@ -1,59 +1,63 @@
-name: Daily Nursing News Update
+name: Update nurse news
 
 on:
-  schedule:
-    - cron: '0 22 * * *'
-    - cron: '0 3 * * *'
-    - cron: '0 8 * * *'
   workflow_dispatch:
+  schedule:
+    - cron: "30 0 * * *"
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
 
 jobs:
-  update-news:
+  build-and-deploy:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+        uses: actions/checkout@v5
 
       - name: Setup Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
-          python-version: '3.11'
+          python-version: "3.12"
 
       - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install feedparser google-generativeai requests beautifulsoup4
+        run: pip install -r requirements.txt
 
-      - name: Verify files
-        run: |
-          pwd
-          ls -la
-          test -f update_news.py
-
-      - name: Run updater
+      - name: Generate nurse news
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-        run: |
-          python update_news.py
+        run: python scripts/update_nurse_news.py
 
-      - name: Show git diff
+      - name: Commit generated files
         run: |
-          git status
-          git diff -- articles_data.json seen_urls.json nurse-news.html || true
-
-      - name: Commit and push
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add articles_data.json seen_urls.json nurse-news.html
-          if git diff --cached --quiet; then
-            echo "No changes to commit"
-            exit 0
+          if [ -z "$(git status --porcelain docs/nurse-news.html seen_urls.json)" ]; then
+            echo "No changes to commit."
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add docs/nurse-news.html seen_urls.json
+            git commit -m "chore: update nurse news"
+            git push
           fi
-          git commit -m "Automated update: nursing news"
-          git push
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: ./docs
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
