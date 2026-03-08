@@ -1,0 +1,1287 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>TOPO — 複数穴干渉版 refined (p5.js)</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.min.js"></script>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    html, body { height: 100%; margin: 0; background: #000; }
+    #controls {
+      position: fixed;
+      right: 10px;
+      top: 10px;
+      width: 340px;
+      max-height: calc(100vh - 20px);
+      overflow: auto;
+      background: rgba(10, 10, 10, 0.78);
+      color: #eee;
+      padding: 10px;
+      border-radius: 8px;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
+      z-index: 1000;
+      backdrop-filter: blur(4px);
+      box-sizing: border-box;
+    }
+    #controls h3 { margin: 0 0 8px 0; font-size: 15px; }
+    #controls h4 { margin: 10px 0 8px 0; font-size: 13px; color: #fff; }
+    .row { margin-bottom: 8px; font-size: 13px; }
+    label { display: block; font-size: 12px; color: #ddd; margin-bottom: 4px; }
+    input[type="range"] { width: 100%; }
+    .val { float: right; font-weight: 600; color: #fff; }
+    button, select {
+      margin-top: 6px;
+      width: 100%;
+      padding: 6px;
+      border-radius: 4px;
+      border: 0;
+      background: #222;
+      color: #fff;
+      cursor: pointer;
+      box-sizing: border-box;
+    }
+    button:hover { background: #333; }
+    .small { width: 48%; display: inline-block; margin-right: 4%; }
+    .small:last-child { margin-right: 0; }
+    .muted { color: #9aa; font-size: 11px; line-height: 1.45; }
+    #holeInfo {
+      padding: 6px 8px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 6px;
+      font-size: 12px;
+      color: #eef;
+    }
+    .checkrow {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px 10px;
+      font-size: 12px;
+      padding: 6px 0 2px;
+    }
+    .checkrow label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin: 0;
+      cursor: pointer;
+    }
+    .checkrow input[type="checkbox"] { margin: 0; }
+  </style>
+</head>
+<body>
+  <div id="controls" aria-hidden="false">
+    <h3>TOPO</h3>
+
+    <div class="row">
+      <label>輪の数 (NUM_RINGS) <span id="rVal" class="val"></span></label>
+      <input id="r" type="range" min="8" max="220" step="1" value="70">
+    </div>
+
+    <div class="row">
+      <label>角度分割相当 (ANGLE_STEPS) <span id="aVal" class="val"></span></label>
+      <input id="a" type="range" min="128" max="2000" step="8" value="900">
+    </div>
+
+    <div class="row">
+      <label>ノイズ周波数 (NOISE_FREQ) <span id="fVal" class="val"></span></label>
+      <input id="f" type="range" min="0.5" max="8" step="0.1" value="3.5">
+    </div>
+
+    <div class="row">
+      <label>ノイズ振幅 (NOISE_AMPLITUDE) <span id="ampVal" class="val"></span></label>
+      <input id="amp" type="range" min="0.0" max="0.5" step="0.01" value="0.14">
+    </div>
+
+    <div class="row">
+      <label>中心突出 (CENTER_BULGE) <span id="bulgeVal" class="val"></span></label>
+      <input id="bulge" type="range" min="0.2" max="2.5" step="0.05" value="1.0">
+    </div>
+
+    <div class="row">
+      <label>外側半径比 (OUTER_RADIUS_RATIO) <span id="outerVal" class="val"></span></label>
+      <input id="outer" type="range" min="0.15" max="0.9" step="0.01" value="0.46">
+    </div>
+
+    <div class="row">
+      <label>赤影の透明度 (RED_SHADOW_ALPHA) <span id="redVal" class="val"></span></label>
+      <input id="red" type="range" min="0" max="200" step="2" value="42">
+    </div>
+
+    <div class="row">
+      <label>白線太さ (WHITE_STROKE_WEIGHT) <span id="wVal" class="val"></span></label>
+      <input id="w" type="range" min="0.3" max="6" step="0.1" value="1.1">
+    </div>
+
+    <div class="row">
+      <label>波の細かさ (WAVE_DETAIL) <span id="waveDetailVal" class="val"></span></label>
+      <input id="waveDetail" type="range" min="0.5" max="3.5" step="0.05" value="1.00">
+    </div>
+
+    <div class="row">
+      <label>干渉強度 (INTERFERENCE_BOOST) <span id="interferenceVal" class="val"></span></label>
+      <input id="interference" type="range" min="0.0" max="3.0" step="0.05" value="1.00">
+    </div>
+
+    <div class="row">
+      <label>円形寄せ量 (CIRCULARIZE_MIX) <span id="circularizeVal" class="val"></span></label>
+      <input id="circularize" type="range" min="0.0" max="1.0" step="0.01" value="0.30">
+    </div>
+
+    <h4>表示 / 効果</h4>
+    <div class="checkrow row">
+      <label><input id="enableInterference" type="checkbox" checked>干渉強化</label>
+      <label><input id="enableCircularize" type="checkbox" checked>円形寄せ</label>
+      <label><input id="showTexture" type="checkbox" checked>背景テクスチャ</label>
+      <label><input id="showRedShadow" type="checkbox" checked>赤影</label>
+      <label><input id="showHoleGuides" type="checkbox" checked>穴ガイド</label>
+    </div>
+
+    <div class="row" style="display:flex;gap:6px;">
+      <button id="regen">再生成 (R)</button>
+      <button id="export">PNG 保存 (S)</button>
+    </div>
+
+    <div class="row" style="display:flex;gap:6px;">
+      <button id="preset1" class="small">密な輪</button>
+      <button id="preset2" class="small">粗い／渦</button>
+    </div>
+
+    <h4>穴</h4>
+    <div id="holeInfo" class="row">選択穴: - / 総数: 0</div>
+
+    <div class="row" style="display:flex;gap:6px;">
+      <button id="addHole" class="small">穴を中央追加</button>
+      <button id="deleteHole" class="small">選択穴を削除</button>
+    </div>
+
+    <div class="row">
+      <label>選択穴の大きさ <span id="holeRadiusVal" class="val"></span></label>
+      <input id="holeRadius" type="range" min="0.10" max="4.00" step="0.01" value="1.00">
+    </div>
+
+    <div class="row">
+      <label>選択穴の強さ <span id="holeStrengthVal" class="val"></span></label>
+      <input id="holeStrength" type="range" min="0.35" max="3.00" step="0.01" value="1.00">
+    </div>
+
+    <div class="row">
+      <label>選択穴の波強度 <span id="holeWaveVal" class="val"></span></label>
+      <input id="holeWave" type="range" min="0.00" max="2.50" step="0.01" value="1.00">
+    </div>
+
+    <div class="muted">
+      操作: 何もない場所をクリックで穴追加 / 穴をドラッグで移動 / Delete または Backspace で選択穴削除。<br>
+      R=再生成, S=透過PNG保存（高解像度）。保存時も複数穴と干渉を同条件で再計算します。
+    </div>
+  </div>
+
+<script>
+let params = {
+  CANVAS_W: window.innerWidth,
+  CANVAS_H: window.innerHeight,
+  NUM_RINGS: 70,
+  ANGLE_STEPS: 900,
+  NOISE_FREQ: 3.5,
+  NOISE_AMPLITUDE: 0.14,
+  CENTER_BULGE: 1.0,
+  MIN_RADIUS_RATIO: 0.02,
+  OUTER_RADIUS_RATIO: 0.46,
+  RED_SHADOW_ALPHA: 42,
+  RED_SHADOW_SCALE: 2.2,
+  WHITE_STROKE_WEIGHT: 1.1,
+  EXPORT_SCALE: 4,
+  EXPORT_TRANSPARENT: true,
+  TEXTURE_POINTS: 700,
+  HANDLE_RADIUS: 9,
+  WAVE_DETAIL: 1.0,
+  INTERFERENCE_BOOST: 1.0,
+  CIRCULARIZE_MIX: 0.30,
+  ENABLE_INTERFERENCE: true,
+  ENABLE_CIRCULARIZE: true,
+  SHOW_TEXTURE: true,
+  SHOW_RED_SHADOW: true,
+  SHOW_HOLE_GUIDES: true
+};
+
+let scene = {
+  contours: [],
+  textureDots: [],
+  holesPx: [],
+  gridStep: 6
+};
+let holes = [];
+let seedVal = 0;
+let regenDebounceTimer = null;
+let dragRegenTimer = null;
+let isExporting = false;
+let selectedHoleIndex = -1;
+let dragHoleIndex = -1;
+
+function setup() {
+  createCanvas(params.CANVAS_W, params.CANVAS_H);
+  pixelDensity(1);
+  noLoop();
+
+  initControls();
+  initDefaultHoles();
+  regenerateScene({ newSeed: true });
+  redraw();
+
+  window.addEventListener('resize', () => {
+    params.CANVAS_W = window.innerWidth;
+    params.CANVAS_H = window.innerHeight;
+    resizeCanvas(params.CANVAS_W, params.CANVAS_H);
+    debouncedRegenerate(false);
+  });
+}
+
+function initControls() {
+  const sliderMap = [
+    ['r', 'NUM_RINGS', 'rVal'],
+    ['a', 'ANGLE_STEPS', 'aVal'],
+    ['f', 'NOISE_FREQ', 'fVal'],
+    ['amp', 'NOISE_AMPLITUDE', 'ampVal'],
+    ['bulge', 'CENTER_BULGE', 'bulgeVal'],
+    ['outer', 'OUTER_RADIUS_RATIO', 'outerVal'],
+    ['red', 'RED_SHADOW_ALPHA', 'redVal'],
+    ['w', 'WHITE_STROKE_WEIGHT', 'wVal'],
+    ['waveDetail', 'WAVE_DETAIL', 'waveDetailVal'],
+    ['interference', 'INTERFERENCE_BOOST', 'interferenceVal'],
+    ['circularize', 'CIRCULARIZE_MIX', 'circularizeVal']
+  ];
+
+  sliderMap.forEach(([id, key, valId]) => {
+    const el = document.getElementById(id);
+    const valEl = document.getElementById(valId);
+    if (!el || !valEl) return;
+    valEl.textContent = el.value;
+    el.addEventListener('input', () => {
+      const isFloat = String(el.step || '').includes('.');
+      params[key] = isFloat ? parseFloat(el.value) : parseInt(el.value, 10);
+      valEl.textContent = el.value;
+      debouncedRegenerate(false);
+    });
+  });
+
+  const checkboxMap = [
+    ['enableInterference', 'ENABLE_INTERFERENCE'],
+    ['enableCircularize', 'ENABLE_CIRCULARIZE'],
+    ['showTexture', 'SHOW_TEXTURE'],
+    ['showRedShadow', 'SHOW_RED_SHADOW'],
+    ['showHoleGuides', 'SHOW_HOLE_GUIDES']
+  ];
+  checkboxMap.forEach(([id, key]) => {
+    const el = document.getElementById(id);
+    el.checked = !!params[key];
+    el.addEventListener('change', () => {
+      params[key] = el.checked;
+      debouncedRegenerate(false);
+    });
+  });
+
+  document.getElementById('regen').addEventListener('click', () => {
+    regenerateScene({ newSeed: true });
+    redraw();
+  });
+
+  document.getElementById('export').addEventListener('click', () => {
+    exportPNG(params.EXPORT_SCALE, params.EXPORT_TRANSPARENT);
+  });
+
+  document.getElementById('preset1').addEventListener('click', () => {
+    applyPreset({
+      NUM_RINGS: 120,
+      ANGLE_STEPS: 1400,
+      NOISE_AMPLITUDE: 0.10,
+      NOISE_FREQ: 3.0,
+      WHITE_STROKE_WEIGHT: 0.9,
+      WAVE_DETAIL: 1.25,
+      INTERFERENCE_BOOST: 1.10,
+      CIRCULARIZE_MIX: 0.38,
+      ENABLE_INTERFERENCE: true,
+      ENABLE_CIRCULARIZE: true
+    });
+  });
+
+  document.getElementById('preset2').addEventListener('click', () => {
+    applyPreset({
+      NUM_RINGS: 42,
+      ANGLE_STEPS: 760,
+      NOISE_AMPLITUDE: 0.22,
+      NOISE_FREQ: 5.4,
+      CENTER_BULGE: 1.35,
+      WAVE_DETAIL: 1.9,
+      INTERFERENCE_BOOST: 1.65,
+      CIRCULARIZE_MIX: 0.12,
+      ENABLE_INTERFERENCE: true,
+      ENABLE_CIRCULARIZE: false
+    });
+  });
+
+  document.getElementById('addHole').addEventListener('click', () => {
+    addHole(0.5, 0.5);
+  });
+
+  document.getElementById('deleteHole').addEventListener('click', () => {
+    deleteSelectedHole();
+  });
+
+  const holeRadius = document.getElementById('holeRadius');
+  const holeStrength = document.getElementById('holeStrength');
+  const holeWave = document.getElementById('holeWave');
+
+  holeRadius.addEventListener('input', () => {
+    if (!hasSelectedHole()) return;
+    holes[selectedHoleIndex].radius = parseFloat(holeRadius.value);
+    syncSelectedHoleControls();
+    debouncedRegenerate(false);
+  });
+  holeStrength.addEventListener('input', () => {
+    if (!hasSelectedHole()) return;
+    holes[selectedHoleIndex].strength = parseFloat(holeStrength.value);
+    syncSelectedHoleControls();
+    debouncedRegenerate(false);
+  });
+  holeWave.addEventListener('input', () => {
+    if (!hasSelectedHole()) return;
+    holes[selectedHoleIndex].waveAmp = parseFloat(holeWave.value);
+    syncSelectedHoleControls();
+    debouncedRegenerate(false);
+  });
+
+  syncAllControlValues();
+
+  window.addEventListener('keydown', (e) => {
+    if (e.repeat) return;
+    if (e.key === 'r' || e.key === 'R') {
+      e.preventDefault();
+      regenerateScene({ newSeed: true });
+      redraw();
+      return;
+    }
+    if (e.key === 's' || e.key === 'S') {
+      e.preventDefault();
+      exportPNG(params.EXPORT_SCALE, params.EXPORT_TRANSPARENT);
+      return;
+    }
+    if ((e.key === 'Delete' || e.key === 'Backspace') && !isRangeElement(document.activeElement)) {
+      e.preventDefault();
+      deleteSelectedHole();
+    }
+  });
+}
+
+function syncAllControlValues() {
+  const valuePairs = [
+    ['r', params.NUM_RINGS],
+    ['a', params.ANGLE_STEPS],
+    ['f', params.NOISE_FREQ],
+    ['amp', params.NOISE_AMPLITUDE],
+    ['bulge', params.CENTER_BULGE],
+    ['outer', params.OUTER_RADIUS_RATIO],
+    ['red', params.RED_SHADOW_ALPHA],
+    ['w', params.WHITE_STROKE_WEIGHT],
+    ['waveDetail', params.WAVE_DETAIL],
+    ['interference', params.INTERFERENCE_BOOST],
+    ['circularize', params.CIRCULARIZE_MIX]
+  ];
+  valuePairs.forEach(([id, value]) => {
+    const el = document.getElementById(id);
+    if (el) el.value = value;
+  });
+
+  document.getElementById('enableInterference').checked = !!params.ENABLE_INTERFERENCE;
+  document.getElementById('enableCircularize').checked = !!params.ENABLE_CIRCULARIZE;
+  document.getElementById('showTexture').checked = !!params.SHOW_TEXTURE;
+  document.getElementById('showRedShadow').checked = !!params.SHOW_RED_SHADOW;
+  document.getElementById('showHoleGuides').checked = !!params.SHOW_HOLE_GUIDES;
+
+  syncValueLabels();
+}
+
+function initDefaultHoles() {
+  if (holes.length > 0) return;
+  holes = [createHole(0.5, 0.5, { radius: 1.0, strength: 1.0, waveAmp: 1.0 })];
+  selectedHoleIndex = 0;
+  syncSelectedHoleControls();
+}
+
+function createHole(nx, ny, overrides = {}) {
+  return {
+    x: clamp(nx, 0.03, 0.97),
+    y: clamp(ny, 0.03, 0.97),
+    radius: overrides.radius ?? 1.0,
+    strength: overrides.strength ?? 1.0,
+    waveAmp: overrides.waveAmp ?? 1.0,
+    phase: overrides.phase ?? computeHolePhase(holes.length)
+  };
+}
+
+function computeHolePhase(index) {
+  const base = (seedVal || 1) * 0.000001 + index * 0.61803398875;
+  return (base - Math.floor(base)) * TWO_PI;
+}
+
+function applyPreset(p) {
+  Object.assign(params, p);
+  syncAllControlValues();
+  debouncedRegenerate(false);
+}
+
+function syncValueLabels() {
+  const pairs = [
+    ['r', 'rVal'],
+    ['a', 'aVal'],
+    ['f', 'fVal'],
+    ['amp', 'ampVal'],
+    ['bulge', 'bulgeVal'],
+    ['outer', 'outerVal'],
+    ['red', 'redVal'],
+    ['w', 'wVal'],
+    ['waveDetail', 'waveDetailVal'],
+    ['interference', 'interferenceVal'],
+    ['circularize', 'circularizeVal']
+  ];
+  pairs.forEach(([inputId, labelId]) => {
+    const input = document.getElementById(inputId);
+    const label = document.getElementById(labelId);
+    if (input && label) label.textContent = input.value;
+  });
+}
+
+function syncSelectedHoleControls() {
+  const info = document.getElementById('holeInfo');
+  const holeRadius = document.getElementById('holeRadius');
+  const holeStrength = document.getElementById('holeStrength');
+  const holeWave = document.getElementById('holeWave');
+  const holeRadiusVal = document.getElementById('holeRadiusVal');
+  const holeStrengthVal = document.getElementById('holeStrengthVal');
+  const holeWaveVal = document.getElementById('holeWaveVal');
+
+  const exists = hasSelectedHole();
+  if (!exists) {
+    info.textContent = `選択穴: - / 総数: ${holes.length}`;
+    holeRadius.disabled = true;
+    holeStrength.disabled = true;
+    holeWave.disabled = true;
+    holeRadiusVal.textContent = '-';
+    holeStrengthVal.textContent = '-';
+    holeWaveVal.textContent = '-';
+    return;
+  }
+
+  const hole = holes[selectedHoleIndex];
+  info.textContent = `選択穴: ${selectedHoleIndex + 1} / 総数: ${holes.length}`;
+  holeRadius.disabled = false;
+  holeStrength.disabled = false;
+  holeWave.disabled = false;
+  holeRadius.value = hole.radius.toFixed(2);
+  holeStrength.value = hole.strength.toFixed(2);
+  holeWave.value = hole.waveAmp.toFixed(2);
+  holeRadiusVal.textContent = hole.radius.toFixed(2);
+  holeStrengthVal.textContent = hole.strength.toFixed(2);
+  holeWaveVal.textContent = hole.waveAmp.toFixed(2);
+}
+
+function hasSelectedHole() {
+  return selectedHoleIndex >= 0 && selectedHoleIndex < holes.length;
+}
+
+function isRangeElement(el) {
+  return !!(el && el.tagName === 'INPUT' && el.type === 'range');
+}
+
+function addHole(nx, ny) {
+  const hole = createHole(nx, ny, {
+    radius: hasSelectedHole() ? holes[selectedHoleIndex].radius : 1.0,
+    strength: hasSelectedHole() ? holes[selectedHoleIndex].strength : 1.0,
+    waveAmp: hasSelectedHole() ? holes[selectedHoleIndex].waveAmp : 1.0
+  });
+  holes.push(hole);
+  selectedHoleIndex = holes.length - 1;
+  syncSelectedHoleControls();
+  regenerateScene({ newSeed: false });
+  redraw();
+}
+
+function deleteSelectedHole() {
+  if (!hasSelectedHole() || holes.length <= 1) return;
+  holes.splice(selectedHoleIndex, 1);
+  selectedHoleIndex = clamp(selectedHoleIndex, 0, holes.length - 1);
+  syncSelectedHoleControls();
+  regenerateScene({ newSeed: false });
+  redraw();
+}
+
+function debouncedRegenerate(newSeed = false) {
+  if (regenDebounceTimer) clearTimeout(regenDebounceTimer);
+  regenDebounceTimer = setTimeout(() => {
+    regenerateScene({ newSeed });
+    redraw();
+  }, 160);
+}
+
+function requestDragRegenerate() {
+  if (dragRegenTimer) clearTimeout(dragRegenTimer);
+  dragRegenTimer = setTimeout(() => {
+    regenerateScene({ newSeed: false });
+    redraw();
+  }, 34);
+}
+
+function regenerateScene(options = {}) {
+  const { newSeed = false, targetWidth = width, targetHeight = height } = options;
+
+  if (newSeed || !Number.isFinite(seedVal) || seedVal === 0) {
+    seedVal = floor(random(1e9));
+    for (let i = 0; i < holes.length; i++) {
+      holes[i].phase = computeHolePhase(i);
+    }
+  }
+
+  scene = buildSceneData(targetWidth, targetHeight, seedVal);
+  syncSelectedHoleControls();
+}
+
+function buildSceneData(targetWidth, targetHeight, seed) {
+  const holesPx = holes.map((hole) => ({
+    x: hole.x * targetWidth,
+    y: hole.y * targetHeight,
+    radius: hole.radius,
+    coreRadiusPx: getHoleCoreRadiusPx(hole, targetWidth, targetHeight),
+    influenceSpreadPx: getHoleInfluenceSpreadPx(hole, targetWidth, targetHeight),
+    strength: hole.strength,
+    waveAmp: hole.waveAmp,
+    phase: hole.phase
+  }));
+
+  const flatMode = isFlatFieldMode();
+
+  noiseSeed(seed);
+  randomSeed(seed + 12345);
+
+  const gridStep = getGridStep(targetWidth, targetHeight, flatMode);
+  const cols = floor(targetWidth / gridStep) + 2;
+  const rows = floor(targetHeight / gridStep) + 2;
+  const field = new Float32Array(cols * rows);
+  let minField = Infinity;
+  let maxField = -Infinity;
+
+  for (let gy = 0; gy < rows; gy++) {
+    const y = gy * gridStep;
+    for (let gx = 0; gx < cols; gx++) {
+      const x = gx * gridStep;
+      const value = flatMode
+        ? sampleFlatFieldAt(x, y, targetWidth, targetHeight, holesPx)
+        : sampleFieldAt(x, y, targetWidth, targetHeight, holesPx, seed, false);
+      const idx = gy * cols + gx;
+      field[idx] = value;
+      if (value < minField) minField = value;
+      if (value > maxField) maxField = value;
+    }
+  }
+
+  const thresholds = flatMode
+    ? buildFlatThresholds(targetWidth, targetHeight, holesPx, gridStep)
+    : buildThresholds(minField, maxField, false);
+  let contours = [];
+  for (let i = 0; i < thresholds.length; i++) {
+    const paths = marchingSquaresPaths(field, cols, rows, gridStep, thresholds[i]);
+    for (let j = 0; j < paths.length; j++) {
+      if (paths[j].points.length >= 4) contours.push(paths[j]);
+    }
+  }
+
+  if (flatMode) {
+    contours = filterContoursForFlatMode(contours, targetWidth, targetHeight, gridStep)
+      .map((path) => smoothPathObject(path, 3, 0.42));
+  }
+
+  if (params.ENABLE_CIRCULARIZE && params.CIRCULARIZE_MIX > 0.0001) {
+    contours = contours.map((path) => circularizePathObject(path, params.CIRCULARIZE_MIX));
+  }
+
+  const textureDots = buildTextureDots(targetWidth, targetHeight, params.TEXTURE_POINTS, seed + 987654321);
+  return { contours, textureDots, holesPx, gridStep };
+}
+
+function getGridStep(targetWidth, targetHeight, flatMode = false) {
+  const base = map(params.ANGLE_STEPS, 128, 2000, 18, 4, true);
+  const sizeScale = Math.sqrt((targetWidth * targetHeight) / Math.max(1, width * height));
+  const raw = base / Math.max(1, sizeScale * 0.85);
+  return flatMode ? Math.max(2, Math.round(raw * 0.6)) : Math.max(3, Math.round(raw));
+}
+
+function sampleFlatFieldAt(x, y, targetWidth, targetHeight, holesPx) {
+  const minDim = Math.min(targetWidth, targetHeight);
+  const smoothK = minDim * (0.018 + params.OUTER_RADIUS_RATIO * 0.028);
+  let sdf = Infinity;
+
+  for (let i = 0; i < holesPx.length; i++) {
+    const hole = holesPx[i];
+    const radiusPx = hole.coreRadiusPx ?? getHoleCoreRadiusPx(hole, targetWidth, targetHeight);
+    const dx = x - hole.x;
+    const dy = y - hole.y;
+    const circleSdf = Math.hypot(dx, dy) - radiusPx;
+    sdf = smoothMinPoly(sdf, circleSdf, smoothK);
+  }
+
+  return Math.max(0, sdf);
+}
+
+function smoothMinPoly(a, b, k) {
+  if (!isFinite(a)) return b;
+  if (!isFinite(b)) return a;
+  if (k <= 0.0001) return Math.min(a, b);
+  const h = Math.max(k - Math.abs(a - b), 0) / k;
+  return Math.min(a, b) - (h * h * k * 0.25);
+}
+
+function sampleFieldAt(x, y, targetWidth, targetHeight, holesPx, seed, flatMode = false) {
+  const waveFreq = (1.0 + params.NOISE_FREQ * 1.15) * TWO_PI * params.WAVE_DETAIL;
+  const waveNoiseAmp = flatMode ? 0 : params.NOISE_AMPLITUDE;
+  let value = 0;
+  const waveTerms = [];
+
+  for (let i = 0; i < holesPx.length; i++) {
+    const hole = holesPx[i];
+    const dx = x - hole.x;
+    const dy = y - hole.y;
+    const dist = Math.hypot(dx, dy) + 0.0001;
+    const coreRadiusPx = hole.coreRadiusPx ?? getHoleCoreRadiusPx(hole, targetWidth, targetHeight);
+    const spread = hole.influenceSpreadPx ?? getHoleInfluenceSpreadPx(hole, targetWidth, targetHeight);
+    const edgeDist = Math.max(0, dist - coreRadiusPx);
+    const nd = edgeDist / Math.max(1, spread);
+
+    const core = hole.strength * Math.exp(-nd * nd * 1.55);
+    const shoulder = hole.strength * 0.28 * Math.exp(-nd * 0.92);
+    const waveEnv = Math.exp(-nd * (1.0 + 0.35 / Math.max(0.25, params.CENTER_BULGE)));
+    const wave = Math.sin(nd * waveFreq + hole.phase) * hole.waveAmp * waveNoiseAmp * 2.35;
+    const waveTerm = hole.strength * wave * waveEnv;
+
+    value += core + shoulder + waveTerm;
+    waveTerms.push(waveTerm);
+  }
+
+  if (!flatMode && params.ENABLE_INTERFERENCE && holesPx.length > 1 && params.INTERFERENCE_BOOST > 0.0001) {
+    let pairTerm = 0;
+    for (let i = 0; i < waveTerms.length; i++) {
+      for (let j = i + 1; j < waveTerms.length; j++) {
+        pairTerm += waveTerms[i] * waveTerms[j];
+      }
+    }
+    value += pairTerm * 0.22 * params.INTERFERENCE_BOOST;
+  }
+
+  const noiseFreq = 0.0032 * params.NOISE_FREQ;
+  const backgroundNoise = noise(
+    x * noiseFreq + seed * 1e-6,
+    y * noiseFreq + seed * 2e-6
+  );
+  value += (backgroundNoise - 0.5) * waveNoiseAmp * 0.55;
+
+  return value;
+}
+
+function getHoleCoreRadiusPx(hole, targetWidth = width, targetHeight = height) {
+  const minDim = Math.min(targetWidth, targetHeight);
+  const baseRadius = minDim * (0.018 + params.OUTER_RADIUS_RATIO * 0.080);
+  return Math.max(6, baseRadius * hole.radius);
+}
+
+function getHoleInfluenceSpreadPx(hole, targetWidth = width, targetHeight = height) {
+  const minDim = Math.min(targetWidth, targetHeight);
+  const spreadBase = minDim * (0.042 + params.OUTER_RADIUS_RATIO * 0.26);
+  return Math.max(10, spreadBase * (0.68 + hole.radius * 0.58));
+}
+
+function buildFlatThresholds(targetWidth, targetHeight, holesPx, gridStep) {
+  const count = Math.max(2, int(params.NUM_RINGS));
+  const minDim = Math.min(targetWidth, targetHeight);
+  const outerDist = minDim * (0.030 + params.OUTER_RADIUS_RATIO * 0.22);
+  const low = Math.max(gridStep * 0.9, 2.0);
+  const high = Math.max(low + 1, outerDist);
+  const thresholds = [];
+  for (let i = 0; i < count; i++) {
+    const t = count === 1 ? 0 : i / (count - 1);
+    thresholds.push(lerp(low, high, t));
+  }
+  return thresholds;
+}
+
+function buildThresholds(minField, maxField, flatMode = false) {
+  const range = Math.max(1e-6, maxField - minField);
+  const thresholds = [];
+  const count = Math.max(2, int(params.NUM_RINGS));
+  const high = maxField - range * 0.018;
+  const lowFrac = flatMode ? (0.12 + (1.0 - params.OUTER_RADIUS_RATIO) * 0.12) : (0.06 + (1.0 - params.OUTER_RADIUS_RATIO) * 0.22);
+  const low = minField + range * lowFrac;
+  const exponent = flatMode ? 1.0 : Math.max(0.18, 1.18 * params.CENTER_BULGE);
+
+  for (let i = 0; i < count; i++) {
+    const t = count === 1 ? 0 : i / (count - 1);
+    const eased = Math.pow(t, exponent);
+    thresholds.push(lerp(high, low, eased));
+  }
+  return thresholds;
+}
+
+function isFlatFieldMode() {
+  return params.NOISE_AMPLITUDE <= 0.0001;
+}
+
+function filterContoursForFlatMode(contours, targetWidth, targetHeight, gridStep) {
+  const minClosedArea = Math.max(48, gridStep * gridStep * 5.0);
+  const minOpenLength = Math.max(gridStep * 5.0, 40);
+  return contours.filter((path) => {
+    if (!path || path.points.length < 4) return false;
+    if (path.closed) {
+      return Math.abs(pathArea(path.points)) >= minClosedArea;
+    }
+    return pathLength(path.points) >= minOpenLength && !touchesBoundary(path.points, targetWidth, targetHeight, gridStep * 0.55);
+  });
+}
+
+function smoothPathObject(pathObj, passes = 1, mix = 0.35) {
+  if (!pathObj || pathObj.points.length < 3) return pathObj;
+  let pts = pathObj.points.slice();
+  for (let pass = 0; pass < passes; pass++) {
+    const next = [];
+    const n = pts.length;
+    for (let i = 0; i < n; i++) {
+      const prev = pts[(i - 1 + n) % n];
+      const cur = pts[i];
+      const following = pts[(i + 1) % n];
+      if (!pathObj.closed && (i === 0 || i === n - 1)) {
+        next.push({ x: cur.x, y: cur.y });
+        continue;
+      }
+      const avgX = (prev.x + cur.x + following.x) / 3;
+      const avgY = (prev.y + cur.y + following.y) / 3;
+      next.push({
+        x: lerp(cur.x, avgX, mix),
+        y: lerp(cur.y, avgY, mix)
+      });
+    }
+    pts = next;
+  }
+  return { points: pts, closed: pathObj.closed };
+}
+
+function pathArea(pts) {
+  if (!pts || pts.length < 3) return 0;
+  let area = 0;
+  for (let i = 0; i < pts.length; i++) {
+    const a = pts[i];
+    const b = pts[(i + 1) % pts.length];
+    area += a.x * b.y - b.x * a.y;
+  }
+  return area * 0.5;
+}
+
+function pathLength(pts) {
+  if (!pts || pts.length < 2) return 0;
+  let total = 0;
+  for (let i = 1; i < pts.length; i++) {
+    total += dist(pts[i - 1].x, pts[i - 1].y, pts[i].x, pts[i].y);
+  }
+  return total;
+}
+
+function touchesBoundary(pts, w, h, margin) {
+  for (let i = 0; i < pts.length; i++) {
+    const p = pts[i];
+    if (p.x <= margin || p.y <= margin || p.x >= w - margin || p.y >= h - margin) return true;
+  }
+  return false;
+}
+
+function marchingSquaresPaths(field, cols, rows, step, threshold) {
+  const segments = [];
+
+  for (let gy = 0; gy < rows - 1; gy++) {
+    for (let gx = 0; gx < cols - 1; gx++) {
+      const idx = gy * cols + gx;
+      const va = field[idx];
+      const vb = field[idx + 1];
+      const vc = field[idx + cols + 1];
+      const vd = field[idx + cols];
+
+      const a = { x: gx * step, y: gy * step };
+      const b = { x: (gx + 1) * step, y: gy * step };
+      const c = { x: (gx + 1) * step, y: (gy + 1) * step };
+      const d = { x: gx * step, y: (gy + 1) * step };
+
+      const mask = ((va >= threshold) << 3) | ((vb >= threshold) << 2) | ((vc >= threshold) << 1) | (vd >= threshold);
+      if (mask === 0 || mask === 15) continue;
+
+      const pTop = interpPoint(a, b, va, vb, threshold);
+      const pRight = interpPoint(b, c, vb, vc, threshold);
+      const pBottom = interpPoint(d, c, vd, vc, threshold);
+      const pLeft = interpPoint(a, d, va, vd, threshold);
+      const centerValue = (va + vb + vc + vd) * 0.25;
+
+      switch (mask) {
+        case 1: segments.push([pLeft, pBottom]); break;
+        case 2: segments.push([pBottom, pRight]); break;
+        case 3: segments.push([pLeft, pRight]); break;
+        case 4: segments.push([pTop, pRight]); break;
+        case 5:
+          if (centerValue >= threshold) {
+            segments.push([pTop, pLeft], [pBottom, pRight]);
+          } else {
+            segments.push([pTop, pRight], [pLeft, pBottom]);
+          }
+          break;
+        case 6: segments.push([pTop, pBottom]); break;
+        case 7: segments.push([pTop, pLeft]); break;
+        case 8: segments.push([pTop, pLeft]); break;
+        case 9: segments.push([pTop, pBottom]); break;
+        case 10:
+          if (centerValue >= threshold) {
+            segments.push([pTop, pRight], [pLeft, pBottom]);
+          } else {
+            segments.push([pTop, pLeft], [pBottom, pRight]);
+          }
+          break;
+        case 11: segments.push([pTop, pRight]); break;
+        case 12: segments.push([pLeft, pRight]); break;
+        case 13: segments.push([pBottom, pRight]); break;
+        case 14: segments.push([pLeft, pBottom]); break;
+      }
+    }
+  }
+
+  return stitchSegmentsToPaths(segments, step);
+}
+
+function interpPoint(p1, p2, v1, v2, threshold) {
+  if (Math.abs(v2 - v1) < 1e-9) return { x: (p1.x + p2.x) * 0.5, y: (p1.y + p2.y) * 0.5 };
+  const t = (threshold - v1) / (v2 - v1);
+  return {
+    x: p1.x + (p2.x - p1.x) * t,
+    y: p1.y + (p2.y - p1.y) * t
+  };
+}
+
+function stitchSegmentsToPaths(segments, step) {
+  const adjacency = new Map();
+  const used = new Array(segments.length).fill(false);
+
+  for (let i = 0; i < segments.length; i++) {
+    const seg = segments[i];
+    const k0 = pointKey(seg[0], step);
+    const k1 = pointKey(seg[1], step);
+    if (!adjacency.has(k0)) adjacency.set(k0, []);
+    if (!adjacency.has(k1)) adjacency.set(k1, []);
+    adjacency.get(k0).push({ segIndex: i, end: 0 });
+    adjacency.get(k1).push({ segIndex: i, end: 1 });
+  }
+
+  const paths = [];
+  for (let i = 0; i < segments.length; i++) {
+    if (used[i]) continue;
+    used[i] = true;
+    const seg = segments[i];
+    const path = [seg[0], seg[1]];
+    extendPath(path, adjacency, segments, used, true, step);
+    extendPath(path, adjacency, segments, used, false, step);
+    const normalized = normalizePath(path, step);
+    if (normalized.points.length >= 2) paths.push(normalized);
+  }
+  return paths;
+}
+
+function extendPath(path, adjacency, segments, used, extendTail, step) {
+  while (true) {
+    const anchor = extendTail ? path[path.length - 1] : path[0];
+    const items = adjacency.get(pointKey(anchor, step)) || [];
+    let found = null;
+
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
+      if (used[item.segIndex]) continue;
+      found = item;
+      break;
+    }
+
+    if (!found) break;
+
+    used[found.segIndex] = true;
+    const seg = segments[found.segIndex];
+    const nextPoint = found.end === 0 ? seg[1] : seg[0];
+
+    if (extendTail) {
+      path.push(nextPoint);
+    } else {
+      path.unshift(nextPoint);
+    }
+  }
+}
+
+function normalizePath(path, step) {
+  if (!path || path.length < 2) return { points: [], closed: false };
+  const pts = path.slice();
+  const tolerance = Math.max(0.8, step * 0.45);
+  const first = pts[0];
+  const last = pts[pts.length - 1];
+  const closed = dist(first.x, first.y, last.x, last.y) <= tolerance;
+
+  if (closed) {
+    pts[pts.length - 1] = { x: first.x, y: first.y };
+    if (pts.length >= 3) pts.pop();
+  }
+
+  return { points: dedupeSequentialPoints(pts, tolerance * 0.25), closed };
+}
+
+function dedupeSequentialPoints(pts, tolerance) {
+  if (pts.length <= 1) return pts.slice();
+  const out = [pts[0]];
+  for (let i = 1; i < pts.length; i++) {
+    const prev = out[out.length - 1];
+    const cur = pts[i];
+    if (dist(prev.x, prev.y, cur.x, cur.y) > tolerance) out.push(cur);
+  }
+  return out;
+}
+
+function pointKey(pt, step) {
+  const precision = Math.max(2, Math.ceil(8 / Math.max(1, step)) + 2);
+  return `${pt.x.toFixed(precision)}:${pt.y.toFixed(precision)}`;
+}
+
+function circularizePathObject(pathObj, mix) {
+  if (!pathObj.closed || pathObj.points.length < 8) return pathObj;
+
+  const pts = pathObj.points;
+  let cx = 0;
+  let cy = 0;
+  for (let i = 0; i < pts.length; i++) {
+    cx += pts[i].x;
+    cy += pts[i].y;
+  }
+  cx /= pts.length;
+  cy /= pts.length;
+
+  let radiusSum = 0;
+  for (let i = 0; i < pts.length; i++) {
+    radiusSum += Math.hypot(pts[i].x - cx, pts[i].y - cy);
+  }
+  const avgRadius = Math.max(0.0001, radiusSum / pts.length);
+  const blend = clamp(mix, 0, 1);
+
+  const newPts = pts.map((pt) => {
+    const dx = pt.x - cx;
+    const dy = pt.y - cy;
+    const ang = Math.atan2(dy, dx);
+    const circleX = cx + Math.cos(ang) * avgRadius;
+    const circleY = cy + Math.sin(ang) * avgRadius;
+    return {
+      x: lerp(pt.x, circleX, blend),
+      y: lerp(pt.y, circleY, blend)
+    };
+  });
+
+  return { points: newPts, closed: true };
+}
+
+function buildTextureDots(w, h, count, seed) {
+  randomSeed(seed);
+  const dots = [];
+  for (let i = 0; i < count; i++) {
+    dots.push({
+      x: random(w),
+      y: random(h),
+      s: random(0.4, 2.0)
+    });
+  }
+  return dots;
+}
+
+function draw() {
+  background(0);
+
+  if (params.SHOW_TEXTURE) {
+    drawFaintTextureToMain(scene.textureDots);
+  }
+
+  for (let i = 0; i < scene.contours.length; i++) {
+    const contour = scene.contours[i];
+    if (params.SHOW_RED_SHADOW) {
+      stroke(200, 40, 60, params.RED_SHADOW_ALPHA);
+      strokeWeight(params.WHITE_STROKE_WEIGHT * params.RED_SHADOW_SCALE);
+      noFill();
+      drawSmoothPathMain(contour.points, contour.closed);
+    }
+
+    stroke(255);
+    strokeWeight(params.WHITE_STROKE_WEIGHT);
+    noFill();
+    drawSmoothPathMain(contour.points, contour.closed);
+  }
+
+  if (params.SHOW_HOLE_GUIDES) {
+    drawHoleHandlesMain(scene.holesPx, false);
+  }
+}
+
+function drawSmoothPathMain(pts, closed) {
+  const n = pts.length;
+  if (n < 2) return;
+
+  beginShape();
+  if (closed) {
+    curveVertex(pts[n - 1].x, pts[n - 1].y);
+    curveVertex(pts[0].x, pts[0].y);
+    for (let i = 0; i < n; i++) curveVertex(pts[i].x, pts[i].y);
+    curveVertex(pts[0].x, pts[0].y);
+    curveVertex(pts[1].x, pts[1].y);
+    endShape(CLOSE);
+  } else {
+    curveVertex(pts[0].x, pts[0].y);
+    curveVertex(pts[0].x, pts[0].y);
+    for (let i = 1; i < n; i++) curveVertex(pts[i].x, pts[i].y);
+    curveVertex(pts[n - 1].x, pts[n - 1].y);
+    curveVertex(pts[n - 1].x, pts[n - 1].y);
+    endShape();
+  }
+}
+
+function drawSmoothPathOnGraphics(pg, pts, closed) {
+  const n = pts.length;
+  if (n < 2) return;
+
+  pg.beginShape();
+  if (closed) {
+    pg.curveVertex(pts[n - 1].x, pts[n - 1].y);
+    pg.curveVertex(pts[0].x, pts[0].y);
+    for (let i = 0; i < n; i++) pg.curveVertex(pts[i].x, pts[i].y);
+    pg.curveVertex(pts[0].x, pts[0].y);
+    pg.curveVertex(pts[1].x, pts[1].y);
+    pg.endShape(CLOSE);
+  } else {
+    pg.curveVertex(pts[0].x, pts[0].y);
+    pg.curveVertex(pts[0].x, pts[0].y);
+    for (let i = 1; i < n; i++) pg.curveVertex(pts[i].x, pts[i].y);
+    pg.curveVertex(pts[n - 1].x, pts[n - 1].y);
+    pg.curveVertex(pts[n - 1].x, pts[n - 1].y);
+    pg.endShape();
+  }
+}
+
+function drawFaintTextureToMain(dots) {
+  push();
+  noStroke();
+  fill(255, 6);
+  for (let i = 0; i < dots.length; i++) {
+    const d = dots[i];
+    ellipse(d.x, d.y, d.s, d.s);
+  }
+  pop();
+}
+
+function drawFaintTextureToGraphics(pg, dots) {
+  pg.push();
+  pg.noStroke();
+  pg.fill(255, 6);
+  for (let i = 0; i < dots.length; i++) {
+    const d = dots[i];
+    pg.ellipse(d.x, d.y, d.s, d.s);
+  }
+  pg.pop();
+}
+
+function drawHoleHandlesMain(holesPx, exportMode) {
+  if (exportMode) return;
+  push();
+  for (let i = 0; i < holesPx.length; i++) {
+    const hole = holesPx[i];
+    const radiusPx = getHoleHandleRadiusPx(hole, width, height);
+    const isSelected = i === selectedHoleIndex;
+
+    noFill();
+    stroke(isSelected ? 120 : 80, isSelected ? 210 : 150, 255, isSelected ? 190 : 90);
+    strokeWeight(isSelected ? 1.6 : 1.0);
+    ellipse(hole.x, hole.y, radiusPx * 2, radiusPx * 2);
+
+    stroke(255, isSelected ? 220 : 120);
+    line(hole.x - 4, hole.y, hole.x + 4, hole.y);
+    line(hole.x, hole.y - 4, hole.x, hole.y + 4);
+  }
+  pop();
+}
+
+function getHoleHandleRadiusPx(hole, targetWidth = width, targetHeight = height) {
+  const coreRadiusPx = hole.coreRadiusPx ?? getHoleCoreRadiusPx(hole, targetWidth, targetHeight);
+  return Math.max(params.HANDLE_RADIUS, coreRadiusPx);
+}
+
+function exportPNG(scale = 4, transparent = true) {
+  if (isExporting) return;
+  isExporting = true;
+
+  const exportButton = document.getElementById('export');
+  const prevLabel = exportButton ? exportButton.textContent : '';
+  if (exportButton) {
+    exportButton.disabled = true;
+    exportButton.textContent = '書き出し中…';
+  }
+
+  const finish = () => {
+    if (exportButton) {
+      exportButton.disabled = false;
+      exportButton.textContent = prevLabel;
+    }
+    isExporting = false;
+  };
+
+  try {
+    const exportW = Math.max(64, Math.round(width * scale));
+    const exportH = Math.max(64, Math.round(height * scale));
+    const pg = createGraphics(exportW, exportH);
+    pg.pixelDensity(1);
+    pg.clear();
+
+    if (!transparent) {
+      pg.background(0);
+    }
+
+    const exportScene = buildSceneData(exportW, exportH, seedVal);
+
+    if (params.SHOW_TEXTURE) {
+      drawFaintTextureToGraphics(pg, exportScene.textureDots);
+    }
+
+    for (let i = 0; i < exportScene.contours.length; i++) {
+      const contour = exportScene.contours[i];
+      if (params.SHOW_RED_SHADOW) {
+        pg.stroke(200, 40, 60, params.RED_SHADOW_ALPHA);
+        pg.strokeWeight(params.WHITE_STROKE_WEIGHT * params.RED_SHADOW_SCALE * scale);
+        pg.noFill();
+        drawSmoothPathOnGraphics(pg, contour.points, contour.closed);
+      }
+
+      pg.stroke(255);
+      pg.strokeWeight(params.WHITE_STROKE_WEIGHT * scale);
+      pg.noFill();
+      drawSmoothPathOnGraphics(pg, contour.points, contour.closed);
+    }
+
+    const ts = Date.now();
+    const filename = `TOPO_multihole_refined_transparent_seed${seedVal}_x${scale}_${ts}.png`;
+    downloadCanvasPNG(pg.elt || pg.canvas, filename, () => {
+      pg.remove();
+      finish();
+    });
+  } catch (err) {
+    console.error(err);
+    finish();
+  }
+}
+
+function downloadCanvasPNG(canvasEl, filename, onDone) {
+  const done = typeof onDone === 'function' ? onDone : () => {};
+  try {
+    if (canvasEl && typeof canvasEl.toBlob === 'function') {
+      canvasEl.toBlob((blob) => {
+        if (!blob) {
+          downloadCanvasPNGDataURL(canvasEl, filename);
+          done();
+          return;
+        }
+        const url = URL.createObjectURL(blob);
+        triggerDownload(url, filename, true);
+        done();
+      }, 'image/png');
+      return;
+    }
+    downloadCanvasPNGDataURL(canvasEl, filename);
+  } finally {
+    if (!(canvasEl && typeof canvasEl.toBlob === 'function')) done();
+  }
+}
+
+function downloadCanvasPNGDataURL(canvasEl, filename) {
+  const dataURL = canvasEl.toDataURL('image/png');
+  triggerDownload(dataURL, filename, false);
+}
+
+function triggerDownload(url, filename, revokeObjectURL) {
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  if (revokeObjectURL) {
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+}
+
+function mousePressed() {
+  if (mouseButton !== LEFT) return true;
+  if (isPointerInsideControls(mouseX, mouseY)) return true;
+
+  const hitIndex = hitTestHole(mouseX, mouseY);
+  if (hitIndex >= 0) {
+    selectedHoleIndex = hitIndex;
+    dragHoleIndex = hitIndex;
+    syncSelectedHoleControls();
+    redraw();
+    return false;
+  }
+
+  addHole(mouseX / width, mouseY / height);
+  dragHoleIndex = selectedHoleIndex;
+  return false;
+}
+
+function mouseDragged() {
+  if (dragHoleIndex < 0) return true;
+  if (dragHoleIndex >= holes.length) return true;
+
+  holes[dragHoleIndex].x = clamp(mouseX / width, 0.02, 0.98);
+  holes[dragHoleIndex].y = clamp(mouseY / height, 0.02, 0.98);
+  selectedHoleIndex = dragHoleIndex;
+  syncSelectedHoleControls();
+  requestDragRegenerate();
+  return false;
+}
+
+function mouseReleased() {
+  if (dragHoleIndex >= 0) {
+    if (dragRegenTimer) clearTimeout(dragRegenTimer);
+    regenerateScene({ newSeed: false });
+    redraw();
+  }
+  dragHoleIndex = -1;
+  return true;
+}
+
+function hitTestHole(px, py) {
+  let bestIndex = -1;
+  let bestDist = Infinity;
+  for (let i = 0; i < scene.holesPx.length; i++) {
+    const hole = scene.holesPx[i];
+    const hitR = Math.max(params.HANDLE_RADIUS + 4, getHoleHandleRadiusPx(hole));
+    const d = dist(px, py, hole.x, hole.y);
+    if (d <= hitR && d < bestDist) {
+      bestDist = d;
+      bestIndex = i;
+    }
+  }
+  return bestIndex;
+}
+
+function isPointerInsideControls(px, py) {
+  const rect = document.getElementById('controls').getBoundingClientRect();
+  return px >= rect.left && px <= rect.right && py >= rect.top && py <= rect.bottom;
+}
+
+function clamp(value, minValue, maxValue) {
+  return Math.min(maxValue, Math.max(minValue, value));
+}
+</script>
+</body>
+</html>
