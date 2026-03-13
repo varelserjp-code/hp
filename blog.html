@@ -1,1 +1,107 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>記事タイトル — VARELSER Blog</title>
+  <meta name="description" content="記事の概要をここに記載" />
+  <meta name="theme-color" content="#ffffff" />
+  <style>
+    :root{
+      --bg:#fff;
+      --fg:#111;
+      --muted:rgba(0,0,0,.55);
+      --border:rgba(0,0,0,.10);
+    }
+    *{box-sizing:border-box;}
+    body{
+      margin:0; background:var(--bg); color:var(--fg);
+      font-family: ui-sans-serif, system-ui, -apple-system, "Hiragino Kaku Gothic ProN","Noto Sans JP","Segoe UI", sans-serif;
+    }
+    .page{min-height:100svh; display:flex; flex-direction:column; align-items:center;}
+    .header{
+      width:min(680px, calc(100% - 40px));
+      display:flex; flex-direction:column; align-items:center;
+      padding:32px 0 24px; gap:12px;
+    }
+    .site-name{
+      font-size:13px; letter-spacing:.18em; color:var(--muted); text-decoration:none;
+    }
+    .site-name:hover{color:var(--fg);}
+    .content{
+      width:min(680px, calc(100% - 40px));
+      padding:0 0 80px;
+    }
+    .back{
+      display:inline-block; font-size:13px; color:var(--muted);
+      text-decoration:none; margin-bottom:40px;
+    }
+    .back:hover{color:var(--fg);}
+    .post-meta{
+      display:flex; gap:12px; align-items:center;
+      font-size:12px; color:var(--muted); margin:0 0 24px;
+      flex-wrap:wrap;
+    }
+    .category{
+      font-size:11px; letter-spacing:.12em; text-transform:uppercase;
+      border:1px solid var(--border); border-radius:999px;
+      padding:3px 10px; color:var(--muted);
+    }
+    h1{
+      font-size:22px; font-weight:600; line-height:1.5;
+      margin:0 0 16px; letter-spacing:.03em;
+    }
+    h2{
+      font-size:14px; font-weight:600; letter-spacing:.12em;
+      text-transform:uppercase; color:var(--muted);
+      margin:48px 0 16px; border-top:1px solid var(--border); padding-top:24px;
+    }
+    p{
+      font-size:15px; line-height:1.9; margin:0 0 20px; color:var(--fg);
+    }
+    a{color:var(--fg);}
+    a:hover{opacity:.6;}
+    .foot{margin-top:auto; padding:18px 0 24px; color:var(--muted); font-size:12px; text-align:center;}
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="header">
+      <a class="site-name" href="https://varelserjp-code.github.io/hp/">VARELSER</a>
+    </header>
 
+    <main class="content">
+
+      <a class="back" href="https://varelserjp-code.github.io/hp/blog.html">← Blog</a>
+
+      <!-- タイトル -->
+      <h1>記事タイトル</h1>
+
+      <!-- 日付・カテゴリ -->
+      <div class="post-meta">
+        <span>2026年3月</span>
+        <!-- カテゴリは複数可。不要なものは削除 -->
+        <span class="category">Music</span>
+        <span class="category">ASC</span>
+        <span class="category">Note</span>
+        <span class="category">Software</span>
+        <span class="category">Art</span>
+        <span class="category">Research</span>
+      </div>
+
+      <!-- 本文 -->
+      <p>本文をここに記載します。</p>
+
+      <!-- セクション（必要に応じて増減） -->
+      <h2>セクション見出し</h2>
+      <p>本文。</p>
+
+    </main>
+
+    <footer class="foot">
+      <small>© <span id="y"></span> VARELSER</small>
+    </footer>
+  </div>
+  <script>document.getElementById("y").textContent = String(new Date().getFullYear());</script>
+</body>
+</html>
