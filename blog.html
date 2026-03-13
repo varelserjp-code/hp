@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>記事タイトル — VARELSER Blog</title>
-  <meta name="description" content="記事の概要をここに記載" />
+  <title>Blog — VARELSER</title>
+  <meta name="description" content="VARELSER — Blog" />
   <meta name="theme-color" content="#ffffff" />
   <style>
     :root{
@@ -28,39 +28,39 @@
       font-size:13px; letter-spacing:.18em; color:var(--muted); text-decoration:none;
     }
     .site-name:hover{color:var(--fg);}
+    h1{margin:0; font-size:22px; font-weight:600; letter-spacing:.08em;}
     .content{
       width:min(680px, calc(100% - 40px));
       padding:0 0 80px;
+      display:flex; flex-direction:column; gap:0;
     }
-    .back{
-      display:inline-block; font-size:13px; color:var(--muted);
-      text-decoration:none; margin-bottom:40px;
+    .post-item{
+      display:block; text-decoration:none; color:var(--fg);
+      padding:24px 0;
+      border-bottom:1px solid var(--border);
     }
-    .back:hover{color:var(--fg);}
+    .post-item:first-child{border-top:1px solid var(--border);}
+    .post-item:hover .post-title{opacity:.6;}
     .post-meta{
-      display:flex; gap:12px; align-items:center;
-      font-size:12px; color:var(--muted); margin:0 0 24px;
+      display:flex; gap:10px; align-items:center;
+      font-size:12px; color:var(--muted); margin-bottom:8px;
       flex-wrap:wrap;
     }
     .category{
-      font-size:11px; letter-spacing:.12em; text-transform:uppercase;
+      font-size:11px; letter-spacing:.10em; text-transform:uppercase;
       border:1px solid var(--border); border-radius:999px;
-      padding:3px 10px; color:var(--muted);
+      padding:2px 9px; color:var(--muted);
     }
-    h1{
-      font-size:22px; font-weight:600; line-height:1.5;
-      margin:0 0 16px; letter-spacing:.03em;
+    .post-title{
+      font-size:16px; font-weight:600; line-height:1.5;
+      margin:0 0 6px; transition:opacity .15s;
     }
-    h2{
-      font-size:14px; font-weight:600; letter-spacing:.12em;
-      text-transform:uppercase; color:var(--muted);
-      margin:48px 0 16px; border-top:1px solid var(--border); padding-top:24px;
+    .post-desc{
+      font-size:13px; color:var(--muted); margin:0; line-height:1.7;
     }
-    p{
-      font-size:15px; line-height:1.9; margin:0 0 20px; color:var(--fg);
+    .empty{
+      font-size:14px; color:var(--muted); padding:40px 0;
     }
-    a{color:var(--fg);}
-    a:hover{opacity:.6;}
     .foot{margin-top:auto; padding:18px 0 24px; color:var(--muted); font-size:12px; text-align:center;}
   </style>
 </head>
@@ -68,40 +68,57 @@
   <div class="page">
     <header class="header">
       <a class="site-name" href="https://varelserjp-code.github.io/hp/">VARELSER</a>
+      <h1>Blog</h1>
     </header>
 
-    <main class="content">
-
-      <a class="back" href="https://varelserjp-code.github.io/hp/blog.html">← Blog</a>
-
-      <!-- タイトル -->
-      <h1>記事タイトル</h1>
-
-      <!-- 日付・カテゴリ -->
-      <div class="post-meta">
-        <span>2026年3月</span>
-        <!-- カテゴリは複数可。不要なものは削除 -->
-        <span class="category">Music</span>
-        <span class="category">ASC</span>
-        <span class="category">Note</span>
-        <span class="category">Software</span>
-        <span class="category">Art</span>
-        <span class="category">Research</span>
-      </div>
-
-      <!-- 本文 -->
-      <p>本文をここに記載します。</p>
-
-      <!-- セクション（必要に応じて増減） -->
-      <h2>セクション見出し</h2>
-      <p>本文。</p>
-
+    <main class="content" id="post-list">
+      <p class="empty">読み込み中...</p>
     </main>
 
     <footer class="foot">
       <small>© <span id="y"></span> VARELSER</small>
     </footer>
   </div>
-  <script>document.getElementById("y").textContent = String(new Date().getFullYear());</script>
+
+  <script>
+    document.getElementById('y').textContent = String(new Date().getFullYear());
+
+    fetch('blog_index.json')
+      .then(r => r.json())
+      .then(posts => {
+        const list = document.getElementById('post-list');
+
+        if (!posts.length) {
+          list.innerHTML = '<p class="empty">記事はまだありません。</p>';
+          return;
+        }
+
+        // 日付の新しい順にソート
+        posts.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+        list.innerHTML = posts.map(post => {
+          const date = new Date(post.date).toLocaleDateString('ja-JP', {
+            year: 'numeric', month: 'long', day: 'numeric'
+          });
+          const cats = (post.category || []).map(c =>
+            `<span class="category">${c}</span>`
+          ).join('');
+
+          return `
+            <a class="post-item" href="${post.url}">
+              <div class="post-meta">
+                <span>${date}</span>
+                ${cats}
+              </div>
+              <p class="post-title">${post.title}</p>
+              ${post.description ? `<p class="post-desc">${post.description}</p>` : ''}
+            </a>`;
+        }).join('');
+      })
+      .catch(() => {
+        document.getElementById('post-list').innerHTML =
+          '<p class="empty">記事を読み込めませんでした。</p>';
+      });
+  </script>
 </body>
 </html>
