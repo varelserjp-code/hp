@@ -1,1 +1,117 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Privacy Policy — VARELSER</title>
+  <meta name="description" content="VARELSER — プライバシーポリシー" />
+  <meta name="theme-color" content="#ffffff" />
+  <style>
+    :root{
+      --bg:#fff;
+      --fg:#111;
+      --muted:rgba(0,0,0,.55);
+      --border:rgba(0,0,0,.10);
+    }
+    *{box-sizing:border-box;}
+    body{
+      margin:0; background:var(--bg); color:var(--fg);
+      font-family: ui-sans-serif, system-ui, -apple-system, "Hiragino Kaku Gothic ProN","Noto Sans JP","Segoe UI", sans-serif;
+    }
+    .page{min-height:100svh; display:flex; flex-direction:column; align-items:center;}
+    .header{
+      width:min(680px, calc(100% - 40px));
+      display:flex; flex-direction:column; align-items:center;
+      padding:32px 0 24px; gap:12px;
+    }
+    .site-name{
+      font-size:13px; letter-spacing:.18em; color:var(--muted); text-decoration:none;
+    }
+    .site-name:hover{color:var(--fg);}
+    h1{ margin:0; font-size:22px; font-weight:600; letter-spacing:.08em; }
+    .content{
+      width:min(680px, calc(100% - 40px));
+      padding:0 0 64px; display:flex; flex-direction:column; gap:40px;
+    }
+    .label{ font-size:11px; letter-spacing:.16em; color:var(--muted); text-transform:uppercase; margin:0 0 14px; }
+    .ja{ font-size:15px; line-height:1.85; color:var(--fg); margin:0 0 8px; }
+    .en{ font-size:13px; line-height:1.8; color:var(--muted); margin:0; }
+    .date{ font-size:12px; color:var(--muted); margin:0 0 32px; }
+    hr{ border:none; border-top:1px solid var(--border); margin:0; }
+    .foot{margin-top:auto; padding:18px 0 24px; color:var(--muted); font-size:12px;}
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="header">
+      <a class="site-name" href="https://varelserjp-code.github.io/hp/">VARELSER</a>
+      <h1>Privacy Policy</h1>
+    </header>
 
+    <main class="content">
+
+      <p class="date">最終更新：2026年3月</p>
+
+      <div class="block">
+        <p class="label">個人情報の収集について</p>
+        <p class="ja">本サイトは、閲覧者の個人情報を収集・保存しません。お問い合わせフォームは設置しておらず、アカウント登録も不要です。</p>
+        <p class="en">This site does not collect or store any personal information from visitors. There is no contact form or account registration.</p>
+      </div>
+
+      <hr />
+
+      <div class="block">
+        <p class="label">アクセス解析</p>
+        <p class="ja">本サイトは現在、アクセス解析ツールを使用していません。</p>
+        <p class="en">This site does not currently use any analytics tools.</p>
+      </div>
+
+      <hr />
+
+      <div class="block">
+        <p class="label">広告について</p>
+        <p class="ja">本サイトは現在、広告を掲載していません。将来的に Google AdSense 等を導入する場合は、本ポリシーを更新した上でお知らせします。</p>
+        <p class="en">This site does not currently display any advertisements. If advertising such as Google AdSense is introduced in the future, this policy will be updated accordingly.</p>
+      </div>
+
+      <hr />
+
+      <div class="block">
+        <p class="label">外部リンクについて</p>
+        <p class="ja">本サイトには外部サービス（Amazon、note、Gumroad 等）へのリンクが含まれます。リンク先のプライバシーポリシーについては各サービスの規約をご確認ください。</p>
+        <p class="en">This site contains links to external services such as Amazon, note, and Gumroad. Please refer to each service's own privacy policy for details.</p>
+      </div>
+
+      <hr />
+
+      <div class="block">
+        <p class="label">Amazonアソシエイト</p>
+        <p class="ja">本サイトはAmazonアソシエイト・プログラムの参加者です。適格販売により収入を得る場合があります。</p>
+        <p class="en">This site participates in the Amazon Associates Program and may earn from qualifying purchases.</p>
+      </div>
+
+      <hr />
+
+      <div class="block">
+        <p class="label">ポリシーの変更</p>
+        <p class="ja">本ポリシーは予告なく変更される場合があります。最新の内容は本ページをご確認ください。</p>
+        <p class="en">This policy may be updated without prior notice. Please check this page for the latest version.</p>
+      </div>
+
+      <hr />
+
+      <div class="block">
+        <p class="label">お問い合わせ</p>
+        <p class="ja">本ポリシーに関するお問い合わせは <a href="https://varelserjp-code.github.io/hp/contact.html" style="color:var(--fg);">Contact</a> ページよりご連絡ください。</p>
+        <p class="en">For inquiries regarding this policy, please use the <a href="https://varelserjp-code.github.io/hp/contact.html" style="color:var(--muted);">Contact</a> page.</p>
+      </div>
+
+    </main>
+
+    <footer class="foot">
+      <small>© <span id="y"></span> VARELSER</small>
+    </footer>
+  </div>
+  <script>document.getElementById("y").textContent = String(new Date().getFullYear());</script>
+</body>
+</html>
