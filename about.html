@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>About — VARELSER</title>
+  <meta name="description" content="VARELSER — 変性意識状態をテーマとするマルチレイヤー・アートプロジェクト" />
+  <meta name="theme-color" content="#ffffff" />
+  <style>
+    :root{
+      --bg:#fff;
+      --fg:#111;
+      --muted:rgba(0,0,0,.55);
+      --tap:rgba(0,0,0,.05);
+      --focus:rgba(0,0,0,.30);
+      --border:rgba(0,0,0,.10);
+    }
+    *{box-sizing:border-box;}
+    body{
+      margin:0; background:var(--bg); color:var(--fg);
+      font-family: ui-sans-serif, system-ui, -apple-system, "Hiragino Kaku Gothic ProN","Noto Sans JP","Segoe UI", sans-serif;
+    }
+    .page{min-height:100svh; display:flex; flex-direction:column; align-items:center;}
+
+    .header{
+      width:min(680px, calc(100% - 40px));
+      display:flex; flex-direction:column; align-items:center;
+      padding:32px 0 24px;
+      gap:12px;
+    }
+
+    .site-name{
+      font-size:13px; letter-spacing:.18em; color:var(--muted);
+      text-decoration:none;
+    }
+    .site-name:hover{color:var(--fg);}
+
+    h1{
+      margin:0;
+      font-size:22px; font-weight:600; letter-spacing:.08em;
+    }
+
+    .content{
+      width:min(680px, calc(100% - 40px));
+      padding:0 0 64px;
+      display:flex; flex-direction:column; gap:48px;
+    }
+
+    .block{}
+
+    .label{
+      font-size:11px; letter-spacing:.16em; color:var(--muted);
+      text-transform:uppercase; margin:0 0 14px;
+    }
+
+    .bilingual{
+      display:flex; flex-direction:column; gap:16px;
+    }
+
+    .ja{
+      font-size:15px; line-height:1.85; color:var(--fg);
+      margin:0;
+    }
+
+    .en{
+      font-size:13px; line-height:1.8; color:var(--muted);
+      margin:0;
+    }
+
+    hr{
+      border:none; border-top:1px solid var(--border);
+      margin:0;
+    }
+
+    .tags{
+      display:flex; flex-wrap:wrap; gap:8px;
+      margin:0;
+    }
+
+    .tag{
+      font-size:12px; letter-spacing:.06em;
+      border:1px solid var(--border);
+      border-radius:999px;
+      padding:4px 12px;
+      color:var(--muted);
+    }
+
+    .links-row{
+      display:flex; gap:20px; flex-wrap:wrap;
+    }
+
+    .text-link{
+      font-size:13px; color:var(--fg);
+      text-decoration:none;
+      border-bottom:1px solid var(--border);
+      padding-bottom:1px;
+    }
+    .text-link:hover{border-color:var(--fg);}
+
+    .foot{margin-top:auto; padding:18px 0 24px; color:var(--muted); font-size:12px;}
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="header">
+      <a class="site-name" href="https://varelserjp-code.github.io/hp/">VARELSER</a>
+      <h1>About</h1>
+    </header>
+
+    <main class="content">
+
+      <div class="block">
+        <p class="label">Project</p>
+        <div class="bilingual">
+          <p class="ja">Varelserは、変性意識状態（Altered States of Consciousness）をテーマとするマルチレイヤー・アートプロジェクトです。音楽・ビジュアルアート・テキスト・ソフトウェアを横断し、意識の変容と拡張を探求します。</p>
+          <p class="en">Varelser is a multi-layered art project centered on Altered States of Consciousness (ASC). Spanning music, visual art, writing, and software, the project explores the transformation and expansion of human awareness.</p>
+        </div>
+      </div>
+
+      <hr />
+
+      <div class="block">
+        <p class="label">Concept</p>
+        <div class="bilingual">
+          <p class="ja">神経科学・瞑想・民族音楽学・哲学・実験音楽の交差点に立ち、変性意識が人間のウェルビーイングにもたらす可能性を作品として提示します。アート・コンテンツ・ソフトウェアを、有益な変性意識を誘発するための手段として位置づけます。</p>
+          <p class="en">Standing at the intersection of neuroscience, meditation, ethnomusicology, philosophy, and experimental music, Varelser presents the potential of altered states to benefit human wellbeing. Art, content, and software are treated as tools for inducing meaningful shifts in consciousness.</p>
+        </div>
+      </div>
+
+      <hr />
+
+      <div class="block">
+        <p class="label">Genre</p>
+        <div class="tags">
+          <span class="tag">Experimental</span>
+          <span class="tag">No Wave</span>
+          <span class="tag">Noise</span>
+          <span class="tag">Ambient</span>
+          <span class="tag">Drone</span>
+          <span class="tag">Psychedelic</span>
+          <span class="tag">Pointillism</span>
+        </div>
+      </div>
+
+      <hr />
+
+      <div class="block">
+        <p class="label">Links</p>
+        <div class="links-row">
+          <a class="text-link" href="https://varelserjp-code.github.io/hp/knowledgenetwork.html" target="_blank" rel="noreferrer">ASC Knowledge Network</a>
+          <a class="text-link" href="https://varelserjp-code.github.io/hp/contact.html">Contact</a>
+          <a class="text-link" href="https://varelserjp-code.github.io/hp/privacy.html">Privacy Policy</a>
+        </div>
+      </div>
+
+    </main>
+
+    <footer class="foot">
+      <small>© <span id="y"></span> VARELSER</small>
+    </footer>
+  </div>
+  <script>document.getElementById("y").textContent = String(new Date().getFullYear());</script>
+</body>
+</html>
