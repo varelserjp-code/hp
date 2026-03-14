@@ -5,27 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MEIKYOSHISUI v25.7 — Ambient/Drone/Psychedelic MIDI Generator</title>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="Meikyo/styles.css">
-
-<style>
-.meikyo-manual h1,.meikyo-manual h2,.meikyo-manual h3,.meikyo-manual h4{
-  font-family:'Rajdhani',system-ui,sans-serif;
-  line-height:1.35;
-  margin:22px 0 10px 0;
-}
-.meikyo-manual h1{font-size:28px;color:#f5f7fa;}
-.meikyo-manual h2{font-size:22px;color:#dbeafe;border-top:1px solid rgba(255,255,255,.08);padding-top:16px;}
-.meikyo-manual h3{font-size:18px;color:#c4b5fd;}
-.meikyo-manual h4{font-size:16px;color:#93c5fd;}
-.meikyo-manual p{margin:0 0 10px 0;white-space:normal;}
-.meikyo-manual ul{margin:0 0 14px 20px;padding:0;}
-.meikyo-manual li{margin:0 0 6px 0;}
-.meikyo-manual hr{border:none;border-top:1px solid rgba(255,255,255,.08);margin:18px 0;}
-</style>
-
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="styles-readable.css">
 </head>
 
-<body>
+<body class="readable-ui">
 
 <div class="wrap">
 <header>
@@ -1735,766 +1719,77 @@
 <footer>MEIKYOSHISUI v25.7 — GENERATIVE MIDI SYSTEM — ALL PROCESSING IN BROWSER</footer>
 </div>
 
-<script src="Meikyo/00-oscilloscope.js"></script>
-<script src="Meikyo/01-euclidean.js"></script>
-<script src="Meikyo/02-pcset.js"></script>
-<script src="Meikyo/03-negative-harmony.js"></script>
-<script src="Meikyo/04-twelve-tone.js"></script>
-<script src="Meikyo/05-integral-serialism.js"></script>
-<script src="Meikyo/06-boids.js"></script>
-<script src="Meikyo/07-sieve.js"></script>
-<script src="Meikyo/08-lorenz.js"></script>
-<script src="Meikyo/09-cellular-automaton.js"></script>
-<script src="Meikyo/10-rubato.js"></script>
-<script src="Meikyo/11-markov.js"></script>
-<script src="Meikyo/12-lsystem.js"></script>
-<script src="Meikyo/13-humanizer.js"></script>
-<script src="Meikyo/14-music-data.js"></script>
-<script src="Meikyo/15-midi-core.js"></script>
-<script src="Meikyo/16-layer-generators.js"></script>
-<script src="Meikyo/17-ui-state.js"></script>
-<script src="Meikyo/18-solfeggio.js"></script>
-<script src="Meikyo/19-binaural.js"></script>
-<script src="Meikyo/20-comp-tuning.js"></script>
-<script src="Meikyo/21-engine-control.js"></script>
-<script src="Meikyo/25-chord-progression.js"></script>
-<script src="Meikyo/26-scale-mutation.js"></script>
-<script src="Meikyo/27-cc-automation.js"></script>
-<script src="Meikyo/28-midi-preview.js"></script>
-<script src="Meikyo/29-state-persist.js"></script>
-<script src="Meikyo/30-neo-riemannian.js"></script>
-<script src="Meikyo/31-voice-leading.js"></script>
-<script src="Meikyo/32-just-intonation.js"></script>
-<script src="Meikyo/33-rhythmic-canons.js"></script>
-<script src="Meikyo/34-conductor-viz.js"></script>
-<script src="Meikyo/35-init-conductor-viz.js"></script>
-<script src="Meikyo/22-ui-functions.js"></script>
-<script src="Meikyo/24-spectral.js"></script>
-<script src="Meikyo/66-spectral-harmony.js"></script>
-<script src="Meikyo/23-init.js"></script>
-<script src="Meikyo/36-init-just-intonation.js"></script>
-<script src="Meikyo/37-init-rhythmic-canons.js"></script>
-<script src="Meikyo/38-init-neo-riemannian.js"></script>
-<script src="Meikyo/39-init-chord-progression.js"></script>
-<script src="Meikyo/40-init-scale-mutation.js"></script>
-<script src="Meikyo/41-init-pc-sim-map.js"></script>
-<script src="Meikyo/42-init-attractor.js"></script>
-<script src="Meikyo/43-init-cc-automation.js"></script>
-<script src="Meikyo/44-init-state-persist.js"></script>
-<script src="Meikyo/45-init-midi-preview.js"></script>
-<script src="Meikyo/46-init-seed-ui.js"></script>
-<script src="Meikyo/47-init-ab-ui.js"></script>
-<script src="Meikyo/48-init-humanizer.js"></script>
-<script src="Meikyo/49-init-lsystem.js"></script>
-<script src="Meikyo/50-init-markov.js"></script>
-<script src="Meikyo/51-init-lorenz-legacy.js"></script>
-<script src="Meikyo/52-init-rubato.js"></script>
-<script src="Meikyo/53-init-cellular-automaton.js"></script>
-<script src="Meikyo/54-init-boids.js"></script>
-<script src="Meikyo/55-init-sieve.js"></script>
-<script src="Meikyo/56-init-integral-serialism.js"></script>
-<script src="Meikyo/57-init-mpe.js"></script>
-<script src="Meikyo/58-init-macro.js"></script>
-<script src="Meikyo/59-init-euclidean.js"></script>
-<script src="Meikyo/60-init-gate-resolution.js"></script>
-<script src="Meikyo/61-init-comp-tuning.js"></script>
-<script src="Meikyo/62-init-binaural.js"></script>
-<script src="Meikyo/63-init-multi-export.js"></script>
-<script src="Meikyo/64-init-spectral.js"></script>
-<script src="Meikyo/65-midi-input.js"></script>
-<script src="Meikyo/67-osc-export.js"></script>
-<script src="Meikyo/68-musicxml-export.js"></script>
-
-<section class="panel full meikyo-manual" id="manual" style="margin-top:24px;">
-  <div class="panel-top" style="background:#1f2937;opacity:.85;"></div>
-  <div class="sec-label">Documentation <span class="badge" style="border-color:#cbd5e1;color:#cbd5e1;">IMPLEMENTED SYSTEMS / THEORY / FUNCTIONS</span></div>
-  <div class="manual-intro" style="padding:16px 18px 8px 18px;color:var(--text);">
-    <p style="margin:0 0 10px 0;line-height:1.9;">実装一覧</p>
-  </div>
-  <div class="manual-body" style="padding:0 18px 22px 18px;line-height:1.9;color:var(--text);">
-    <h1>MEIKYOSHISUI 説明書（実装網羅版）</h1>
-<h2>1. 概要</h2>
-<p>MEIKYOSHISUI は、ブラウザ上で動作するアンビエント／ドローン／サイケデリック向けの MIDI ジェネレーターです。単一の HTML・CSS と多数の JavaScript モジュールで構成され、ビルドツールなしで動作します。コード、スケール、テンポ、密度、各種理論エンジン、カオスエンジン、チューニング、可視化、外部連携を組み合わせ、複数レイヤーの MIDI を生成します。</p>
-<p>本システムの中核は、和声理論・生成理論・カオス系・微分音／チューニング・可視化・書き出しを一つのブラウザ UI に統合している点にあります。単なるランダム MIDI 生成器ではなく、各理論を独立に ON/OFF し、相互作用を検証しながら生成結果を比較できる設計になっています。</p>
-<hr>
-<h2>2. システム構成</h2>
-<p>MEIKYOSHISUI は以下の層で構成されています。</p>
-<h3>2-1. UI 層</h3>
-<ul>
-<li>`index.html`：全パネル UI</li>
-<li>`styles.css`：全体スタイル</li>
-<li>各 `xx-init-*.js`：個別機能の UI 初期化、イベント接続、状態同期</li>
-</ul>
-<h3>2-2. 状態管理層</h3>
-<ul>
-<li>`17-ui-state.js`</li>
-<li>グローバル状態 `S` が唯一の状態ソース</li>
-<li>`S.engines` に各エンジンの ON/OFF 状態を保持</li>
-<li>コード、スケール、BPM、レイヤー、A/B バリアント、MIDI 生成結果などを一元管理</li>
-</ul>
-<h3>2-3. 生成統合層</h3>
-<ul>
-<li>`22-ui-functions.js`</li>
-<li>`doGenerate()` を中心に、各エンジン設定を読み取り、レイヤー生成・後処理・プレビュー更新・エクスポート UI 更新を統合</li>
-</ul>
-<h3>2-4. MIDI 生成層</h3>
-<ul>
-<li>`16-layer-generators.js`：各レイヤー生成関数群</li>
-<li>`15-midi-core.js`：MIDI バイト列生成、MPE、CompTuning、ダウンロード</li>
-</ul>
-<h3>2-5. エンジン層</h3>
-<ul>
-<li>音楽理論、カオス、リズム、確率、フラクタル、群知能、スペクトル、純正律、バイノーラルなどの各エンジンで構成</li>
-</ul>
-<h3>2-6. 出力／外部連携層</h3>
-<ul>
-<li>MIDI ダウンロード</li>
-<li>MIDI Preview</li>
-<li>State Persist</li>
-<li>Multi-File Export</li>
-<li>Web MIDI 入力</li>
-<li>OSC WebSocket 送信</li>
-<li>MusicXML エクスポート</li>
-</ul>
-<hr>
-<h2>3. 基本的な生成フロー</h2>
-<p>1. ユーザーがコード、スケール、BPM、密度、各種エンジン設定を変更する</p>
-<p>2. それらの設定が `S` と `ENGINE_PARAMS` に反映される</p>
-<p>3. `doGenerate()` が呼ばれる</p>
-<p>4. 各エンジンの状態に応じて、音高・リズム・ゲート・ベロシティ・構造が変調される</p>
-<p>5. 各レイヤーが `makeXxx()` 系関数で生成される</p>
-<p>6. `writeMIDI()` によって MIDI データへ変換される</p>
-<p>7. 生成物はダウンロード、プレビュー、A/B 比較、各種エクスポートへ流れる</p>
-<hr>
-<h2>4. レイヤー構成と MIDI チャンネル</h2>
-<h3>標準レイヤー</h3>
-<ul>
-<li>ch1: Drone</li>
-<li>ch2: Pad</li>
-<li>ch3: Arp</li>
-<li>ch4: Melody</li>
-<li>ch5: Bass</li>
-<li>ch6: Overtone</li>
-<li>ch7: Texture</li>
-<li>ch8: Lead</li>
-</ul>
-<h3>拡張レイヤー</h3>
-<ul>
-<li>ch9: Markov</li>
-<li>ch10: L-System</li>
-<li>ch11: 予備</li>
-<li>ch12: Solfeggio</li>
-<li>ch13: Binaural L</li>
-<li>ch14: Binaural R</li>
-</ul>
-<p>通常の和声レイヤーに加えて、Markov、L-System、Solfeggio、Binaural などは独立レイヤーとして追加生成されます。</p>
-<hr>
-<h2>5. エンジン群（理論・システム・機能）</h2>
-<h2>5-1. THEORY グループ</h2>
-<h3>PC Set Theory</h3>
-<ul>
-<li>ファイル: `02-pcset.js`</li>
-<li>理論: Allen Forte の音級集合論</li>
-<li>機能:</li>
-</ul>
-<p>  - pitch class set 解析</p>
-<p>  - interval vector</p>
-<p>  - Z 関係</p>
-<p>  - 音級集合プール整列</p>
-<p>  - 不協和度評価</p>
-<p>  - resolution 系処理との連携</p>
-<ul>
-<li>役割:</li>
-</ul>
-<p>  - 和声集合の抽象解析</p>
-<p>  - 音選択の整理</p>
-<p>  - 不協和解決の前提</p>
-<h3>Negative Harmony</h3>
-<ul>
-<li>ファイル: `03-negative-harmony.js`</li>
-<li>理論: Ernst Levy の負和声</li>
-<li>機能:</li>
-</ul>
-<p>  - 対称軸に基づく和音反転</p>
-<p>  - シャドウコード生成</p>
-<ul>
-<li>役割:</li>
-</ul>
-<p>  - 既存コードを反転的に変形し、陰影の強い和声語彙を得る</p>
-<h3>12-Tone</h3>
-<ul>
-<li>ファイル: `04-twelve-tone.js`</li>
-<li>理論: Schoenberg 系列技法</li>
-<li>機能:</li>
-</ul>
-<p>  - P / R / I / RI</p>
-<p>  - 行列処理</p>
-<p>  - 系列展開</p>
-<ul>
-<li>役割:</li>
-</ul>
-<p>  - Pad、Arp、Melody、Lead などの音程列を決定論的に構成する</p>
-<h3>Integral Serialism</h3>
-<ul>
-<li>ファイル: `05-integral-serialism.js`</li>
-<li>理論: Boulez / Stockhausen</li>
-<li>機能:</li>
-</ul>
-<p>  - 音高だけでなく duration、velocity、gate も系列化</p>
-<ul>
-<li>役割:</li>
-</ul>
-<p>  - 音価・ベロシティ・ゲートまで含めた決定論的制御</p>
-<h3>Resolution</h3>
-<ul>
-<li>実装先: 主に `02-pcset.js`</li>
-<li>機能:</li>
-</ul>
-<p>  - 不協和音程の自動解決</p>
-<p>  - Dissonance Resolver</p>
-<ul>
-<li>役割:</li>
-</ul>
-<p>  - 緊張を含む音集合を、より落ち着いた和声へ収束させる</p>
-<hr>
-<h2>5-2. CHAOS グループ</h2>
-<h3>Attractor Sequencer / Lorenz 系</h3>
-<ul>
-<li>ファイル: `08-lorenz.js`</li>
-<li>理論: Lorenz / Rössler / Thomas アトラクター</li>
-<li>機能:</li>
-</ul>
-<p>  - X / Y / Z の軌道を音楽パラメータへマッピング</p>
-<p>  - velocity、pitch、duration、gate、density の変調</p>
-<ul>
-<li>役割:</li>
-</ul>
-<p>  - 有機的で予測不能だが完全なランダムではない揺らぎを与える</p>
-<h3>Cellular Automaton</h3>
-<ul>
-<li>ファイル: `09-cellular-automaton.js`</li>
-<li>理論: Wolfram 系 1D セル・オートマトン</li>
-<li>機能:</li>
-</ul>
-<p>  - rule 0–255</p>
-<p>  - seed / override</p>
-<p>  - gate 行列生成</p>
-<ul>
-<li>役割:</li>
-</ul>
-<p>  - Texture や Pad の発音パターンを離散的に制御する</p>
-<h3>Rubato</h3>
-<ul>
-<li>ファイル: `10-rubato.js`</li>
-<li>理論: バウンスボール物理ベースの時間変調</li>
-<li>機能:</li>
-</ul>
-<p>  - tick / step 長の変調</p>
-<p>  - Arp、Melody、Lead の時間的揺れ</p>
-<ul>
-<li>役割:</li>
-</ul>
-<p>  - 機械的なグリッドを崩し、物理的なテンポ変動を加える</p>
-<hr>
-<h2>5-3. GENERATE グループ</h2>
-<h3>Sieve</h3>
-<ul>
-<li>ファイル: `07-sieve.js`</li>
-<li>理論: Xenakis の篩理論</li>
-<li>機能:</li>
-</ul>
-<p>  - モジュロ演算 × 集合論による音高・リズム選別</p>
-<p>  - 非対称スケール、ポリリズム生成</p>
-<ul>
-<li>役割:</li>
-</ul>
-<p>  - 音階や拍の候補空間を数学的に絞る</p>
-<h3>Euclidean Rhythm</h3>
-<ul>
-<li>ファイル: `01-euclidean.js`</li>
-<li>理論: Björklund アルゴリズム</li>
-<li>機能:</li>
-</ul>
-<p>  - E(k,n) パターン生成</p>
-<p>  - ゲート系列構成</p>
-<p>  - 可視化 UI</p>
-<ul>
-<li>役割:</li>
-</ul>
-<p>  - 均等に分散された拍配置を与える</p>
-<h3>Markov Melody</h3>
-<ul>
-<li>ファイル: `11-markov.js`</li>
-<li>理論: マルコフ連鎖</li>
-<li>機能:</li>
-</ul>
-<p>  - 遷移行列による確率的メロディ生成</p>
-<p>  - 独立トラック生成</p>
-<ul>
-<li>役割:</li>
-</ul>
-<p>  - 反復と逸脱のバランスを持つ旋律層を追加する</p>
-<h3>L-System</h3>
-<ul>
-<li>ファイル: `12-lsystem.js`</li>
-<li>理論: Lindenmayer system</li>
-<li>機能:</li>
-</ul>
-<p>  - 書き換え規則によるフレーズ自己増殖</p>
-<p>  - 独立トラック生成</p>
-<ul>
-<li>役割:</li>
-</ul>
-<p>  - 再帰的・有機的な構文成長による旋律展開</p>
-<h3>Solfeggio</h3>
-<ul>
-<li>ファイル: `18-solfeggio.js`</li>
-<li>理論: ソルフェジオ周波数、Schumann resonance、planetary frequency</li>
-<li>機能:</li>
-</ul>
-<p>  - 特定周波数系列の生成</p>
-<ul>
-<li>役割:</li>
-</ul>
-<p>  - 通常の調性とは別の周波数的レイヤーを加える</p>
-<h3>Binaural Beats</h3>
-<ul>
-<li>ファイル: `19-binaural.js`</li>
-<li>理論: バイノーラルビート</li>
-<li>機能:</li>
-</ul>
-<p>  - Delta / Theta / Alpha / Beta / Gamma / Hi-Gamma</p>
-<p>  - L / R の独立チャンネル生成</p>
-<ul>
-<li>役割:</li>
-</ul>
-<p>  - 左右差周波数による脳波帯域的なビート構造を出力する</p>
-<h3>Compensation Tuning</h3>
-<ul>
-<li>ファイル: `20-comp-tuning.js`</li>
-<li>機能:</li>
-</ul>
-<p>  - A4 基準ピッチ変更</p>
-<p>  - 音律補正</p>
-<p>  - Pitch Bend による後処理補正</p>
-<p>  - EDO 基盤</p>
-<ul>
-<li>役割:</li>
-</ul>
-<p>  - 生成済みノートをより望ましいチューニングへ寄せる</p>
-<h3>Humanizer</h3>
-<ul>
-<li>ファイル: `13-humanizer.js`</li>
-<li>理論: 1/f ピンクノイズ + Perlin FBM</li>
-<li>機能:</li>
-</ul>
-<p>  - velocity / timing の人間化</p>
-<ul>
-<li>役割:</li>
-</ul>
-<p>  - 無機質な機械反復を崩し、自然なゆらぎを加える</p>
-<hr>
-<h2>5-4. FINISH グループ</h2>
-<h3>MPE</h3>
-<ul>
-<li>実装中心: `15-midi-core.js`</li>
-<li>機能:</li>
-</ul>
-<p>  - per-note pitch bend</p>
-<p>  - microtonal 出力</p>
-<p>  - degree cents ベースの detune map</p>
-<ul>
-<li>役割:</li>
-</ul>
-<p>  - 微分音や純正律、可変律を MIDI 上で実音化する</p>
-<h3>Macro</h3>
-<ul>
-<li>実装中心: `22-ui-functions.js`</li>
-<li>機能:</li>
-</ul>
-<p>  - Tension カーブ</p>
-<p>  - テンポドリフト</p>
-<p>  - セクション構造</p>
-<ul>
-<li>役割:</li>
-</ul>
-<p>  - 曲全体の大局的な起伏を制御する</p>
-<h3>Boids</h3>
-<ul>
-<li>ファイル: `06-boids.js`</li>
-<li>理論: Reynolds の群知能</li>
-<li>機能:</li>
-</ul>
-<p>  - 分離、整列、結合ルールによるパラメータ変調</p>
-<ul>
-<li>役割:</li>
-</ul>
-<p>  - 複数要素の集団的運動を音楽変化へ変換する</p>
-<h3>Spectral</h3>
-<ul>
-<li>ファイル: `24-spectral.js`</li>
-<li>理論: 倍音列スペクトル解析</li>
-<li>機能:</li>
-</ul>
-<p>  - 音色整形</p>
-<p>  - 協和度ゲート</p>
-<p>  - テクスチャ共鳴フィルタ</p>
-<ul>
-<li>役割:</li>
-</ul>
-<p>  - 倍音構造をもとに、響きの質感を制御する</p>
-<hr>
-<h2>5-5. 高度理論・拡張機能</h2>
-<h3>Chord Progression Engine</h3>
-<ul>
-<li>ファイル: `25-chord-progression.js`</li>
-<li>機能:</li>
-</ul>
-<p>  - コード進行エディタ</p>
-<p>  - 借用コード（Modal Mixture / Borrowed Chords）</p>
-<p>  - 遷移モード切替</p>
-<p>  - Voice Leading や Neo-Riemannian との連携</p>
-<ul>
-<li>役割:</li>
-</ul>
-<p>  - 和声語彙と進行設計の中核</p>
-<h3>Scale Mutation Engine</h3>
-<ul>
-<li>ファイル: `26-scale-mutation.js`</li>
-<li>機能:</li>
-</ul>
-<p>  - スケール変異</p>
-<p>  - IV 差分ヒートマップ</p>
-<p>  - CT% オーバーレイ</p>
-<ul>
-<li>役割:</li>
-</ul>
-<p>  - スケールを連続変形し、和声的な異化や推移を可視化する</p>
-<h3>CC Automation</h3>
-<ul>
-<li>ファイル: `27-cc-automation.js`</li>
-<li>機能:</li>
-</ul>
-<p>  - MIDI CC オートメーション生成</p>
-<p>  - 複数レーン管理</p>
-<ul>
-<li>役割:</li>
-</ul>
-<p>  - 外部シンセや DAW に対する連続制御情報を付与する</p>
-<h3>MIDI Preview</h3>
-<ul>
-<li>ファイル: `28-midi-preview.js`</li>
-<li>機能:</li>
-</ul>
-<p>  - ブラウザ内 MIDI プレビュー再生</p>
-<p>  - シーク、再生、停止</p>
-<ul>
-<li>役割:</li>
-</ul>
-<p>  - ダウンロード前の試聴</p>
-<h3>State Persist</h3>
-<ul>
-<li>ファイル: `29-state-persist.js`</li>
-<li>機能:</li>
-</ul>
-<p>  - 状態保存／復元</p>
-<p>  - exportAll / importAll</p>
-<p>  - PROG / SCALE_MUT / CC_AUTO スロット保存</p>
-<ul>
-<li>役割:</li>
-</ul>
-<p>  - プロジェクト状態の再現性を確保する</p>
-<h3>Neo-Riemannian Engine</h3>
-<ul>
-<li>ファイル: `30-neo-riemannian.js`</li>
-<li>理論: Lewin / Cohn による変換理論</li>
-<li>機能:</li>
-</ul>
-<p>  - P / R / L 変換</p>
-<p>  - 複合変換</p>
-<p>  - BFS によるパス探索</p>
-<p>  - Tonnetz 可視化</p>
-<ul>
-<li>役割:</li>
-</ul>
-<p>  - 和音間の最小変換経路を扱う</p>
-<h3>Voice Leading Engine</h3>
-<ul>
-<li>ファイル: `31-voice-leading.js`</li>
-<li>理論: Tymoczko の声部進行幾何学</li>
-<li>機能:</li>
-</ul>
-<p>  - 声部分配最適化</p>
-<p>  - 並行 5 度／8 度チェック</p>
-<p>  - smoothness 評価</p>
-<ul>
-<li>役割:</li>
-</ul>
-<p>  - 和声連結を滑らかにする</p>
-<h3>Just Intonation</h3>
-<ul>
-<li>ファイル: `32-just-intonation.js`</li>
-<li>理論: 純正律、5-limit、Harmonic Series</li>
-<li>機能:</li>
-</ul>
-<p>  - セント偏差計算</p>
-<p>  - MPE セント注入</p>
-<p>  - deviation 可視化</p>
-<ul>
-<li>役割:</li>
-</ul>
-<p>  - 平均律外の純正な比率へ音高を寄せる</p>
-<h3>Rhythmic Canons</h3>
-<ul>
-<li>ファイル: `33-rhythmic-canons.js`</li>
-<li>理論: Tiling Canon / Vuza / Messiaen 的付加価値リズム</li>
-<li>機能:</li>
-</ul>
-<p>  - タイリング可能なパターン探索</p>
-<p>  - リズム分割</p>
-<ul>
-<li>役割:</li>
-</ul>
-<p>  - 非重複かつ構造的な二声以上のリズム設計</p>
-<h3>Conductor Track Visualization</h3>
-<ul>
-<li>ファイル: `34-conductor-viz.js`</li>
-<li>機能:</li>
-</ul>
-<p>  - テンションカーブ描画</p>
-<p>  - BPM 折れ線</p>
-<p>  - セクションマーカー</p>
-<p>  - 編集ハンドル</p>
-<p>  - 手動編集カーブ反映</p>
-<ul>
-<li>役割:</li>
-</ul>
-<p>  - 曲全体の構造を可視化し、Macro と生成を結びつける</p>
-<h3>Spectral Harmony</h3>
-<ul>
-<li>ファイル: `66-spectral-harmony.js`</li>
-<li>理論: 倍音列からの和声音抽出</li>
-<li>機能:</li>
-</ul>
-<p>  - harmonic series 由来のピッチ候補抽出</p>
-<ul>
-<li>役割:</li>
-</ul>
-<p>  - スペクトル音楽的な和声音語彙の拡張</p>
-<hr>
-<h2>6. UI・補助システム</h2>
-<h3>Engine Control Bar (ECB)</h3>
-<ul>
-<li>ファイル: `21-engine-control.js`</li>
-<li>機能:</li>
-</ul>
-<p>  - 全エンジンの ON/OFF 一括管理</p>
-<p>  - 既存パネルトグルとの双方向同期</p>
-<p>  - グループ別表示（THEORY / CHAOS / GENERATE / FINISH）</p>
-<p>  - プリセット適用</p>
-<h3>ECB プリセット</h3>
-<ul>
-<li>ALL ON</li>
-<li>MINIMAL</li>
-<li>CHAOS</li>
-<li>SERIAL</li>
-<li>XENAKIS</li>
-<li>SWARM</li>
-<li>ORGANIC</li>
-<li>SACRED</li>
-<li>ALL OFF</li>
-</ul>
-<p>これらは制作意図に応じて、複数エンジンの組み合わせを即座に呼び出すための構成です。</p>
-<h3>Seed / Random Reproducibility</h3>
-<ul>
-<li>ランダムシード固定</li>
-<li>再現性確保</li>
-<li>A/B 比較生成の基盤</li>
-</ul>
-<h3>A/B Variant Generation</h3>
-<ul>
-<li>`doGenerateAB()` 系</li>
-<li>同条件から微差を持つ 2 案を生成</li>
-<li>A/B 比較再生と切替プレビュー</li>
-</ul>
-<h3>Attractor / Euclidean / Scale Mutation / Tonnetz などの可視化</h3>
-<ul>
-<li>各種 Canvas ベース UI</li>
-<li>理論・生成結果を数値だけでなく図として把握できる</li>
-</ul>
-<hr>
-<h2>7. 外部入力・外部出力</h2>
-<h3>Web MIDI Input</h3>
-<ul>
-<li>ファイル: `65-midi-input.js`</li>
-<li>機能:</li>
-</ul>
-<p>  - Web MIDI API でデバイス接続</p>
-<p>  - 入力ポート選択</p>
-<p>  - ノートバッファ管理</p>
-<p>  - 和音認識</p>
-<p>  - `S.chord` のリアルタイム更新</p>
-<p>  - 基本 CC マッピング</p>
-<ul>
-<li>標準 CC 例:</li>
-</ul>
-<p>  - CC1 → density</p>
-<p>  - CC7 → velocity</p>
-<p>  - CC71 → dissonance</p>
-<p>  - CC74 → humanize</p>
-<h3>OSC Export</h3>
-<ul>
-<li>ファイル: `67-osc-export.js`</li>
-<li>機能:</li>
-</ul>
-<p>  - OSC WebSocket ブリッジ送信</p>
-<ul>
-<li>役割:</li>
-</ul>
-<p>  - ブラウザ外のリアルタイムシステムとの接続</p>
-<h3>MusicXML Export</h3>
-<ul>
-<li>ファイル: `68-musicxml-export.js`</li>
-<li>機能:</li>
-</ul>
-<p>  - score-partwise 形式出力</p>
-<p>  - 各レイヤーの独立 part 化</p>
-<p>  - chord 化</p>
-<p>  - tie 分割</p>
-<p>  - conductor 情報から metronome / rehearsal mark 反映</p>
-<p>  - grand staff 化</p>
-<p>  - rest 分割</p>
-<p>  - DOMParser ベース自己検査</p>
-<p>  - auto-fix と warning 要約</p>
-<ul>
-<li>役割:</li>
-</ul>
-<p>  - MIDI だけでなく、譜面編集可能な形で生成物を外部へ渡す</p>
-<h3>Multi-File Export</h3>
-<ul>
-<li>関連 UI: `63-init-multi-export.js`</li>
-<li>役割:</li>
-</ul>
-<p>  - 複数形式の書き出しをまとめて扱う</p>
-<hr>
-<h2>8. チューニングと微分音</h2>
-<p>本システムは、平均律の MIDI 出力に留まりません。</p>
-<h3>対応要素</h3>
-<ul>
-<li>A4 基準ピッチ変更</li>
-<li>Just Intonation</li>
-<li>Harmonic Series ベースの偏差</li>
-<li>MPE per-note pitch bend</li>
-<li>Compensation Tuning</li>
-<li>EDO 基盤</li>
-<li>microtonal degree cents ベース生成の一部対応</li>
-</ul>
-<h3>意義</h3>
-<ul>
-<li>生成段階での音高選択</li>
-<li>出力段階での detune 補正</li>
-<li>共有チャンネル時の衝突緩和</li>
-<li>平均律外の和声音響をブラウザ環境から扱うための実装</li>
-</ul>
-<hr>
-<h2>9. 現在実装されている主要理論の一覧</h2>
-<ul>
-<li>PC Set Theory</li>
-<li>Negative Harmony</li>
-<li>12-Tone / Serialism</li>
-<li>Integral Serialism</li>
-<li>Xenakis Sieve</li>
-<li>Euclidean Rhythm</li>
-<li>Cellular Automaton</li>
-<li>Attractor Dynamics (Lorenz / Rössler / Thomas)</li>
-<li>Rubato Physics</li>
-<li>Markov Chain Melody</li>
-<li>Lindenmayer L-System</li>
-<li>Solfeggio / Resonance 系</li>
-<li>Binaural Beats</li>
-<li>Compensation Tuning</li>
-<li>Humanizer (1/f + Perlin FBM)</li>
-<li>Neo-Riemannian Transformations</li>
-<li>Voice Leading Geometry</li>
-<li>Just Intonation</li>
-<li>Rhythmic Canons / Vuza</li>
-<li>Spectral Analysis</li>
-<li>Spectral Harmony</li>
-<li>Conductor Curve / Macro Form</li>
-</ul>
-<hr>
-<h2>10. 実用上の使い方</h2>
-<h3>最低限の基本操作</h3>
-<p>1. コードを入力する</p>
-<p>2. スケールと BPM を決める</p>
-<p>3. 必要なエンジンを ON にする</p>
-<p>4. GENERATE を実行する</p>
-<p>5. MIDI Preview で確認する</p>
-<p>6. MIDI / MusicXML / OSC 等へ出力する</p>
-<h3>典型的な制作モード</h3>
-<h4>ミニマル生成</h4>
-<ul>
-<li>PC Set</li>
-<li>Resolution</li>
-<li>必要なら Humanizer</li>
-</ul>
-<h4>カオス寄り生成</h4>
-<ul>
-<li>Lorenz</li>
-<li>CA</li>
-<li>Rubato</li>
-<li>Euclidean</li>
-<li>Humanizer</li>
-<li>Macro</li>
-</ul>
-<h4>系列主義寄り生成</h4>
-<ul>
-<li>12-Tone</li>
-<li>Integral Serialism</li>
-<li>PC Set</li>
-</ul>
-<h4>Xenakis 寄り生成</h4>
-<ul>
-<li>Sieve</li>
-<li>Euclidean</li>
-<li>Rhythmic Canons</li>
-</ul>
-<h4>微分音・倍音寄り生成</h4>
-<ul>
-<li>Just Intonation</li>
-<li>CompTuning</li>
-<li>MPE</li>
-<li>Spectral</li>
-<li>Spectral Harmony</li>
-</ul>
-<h4>空間・瞑想寄り生成</h4>
-<ul>
-<li>Solfeggio</li>
-<li>Binaural</li>
-<li>Macro</li>
-<li>Humanizer</li>
-<li>Spectral</li>
-</ul>
-<hr>
-<h2>11. 本システムの特徴</h2>
-<p>MEIKYOSHISUI は、単一の美学や単一理論に閉じたツールではありません。以下のような異なる層を一つの制作環境に重ねています。</p>
-<ul>
-<li>和声理論</li>
-<li>音列技法</li>
-<li>確率・フラクタル・カオス</li>
-<li>群知能</li>
-<li>倍音・スペクトル</li>
-<li>純正律・微分音</li>
-<li>脳波帯域や周波数的レイヤー</li>
-<li>可視化と構造編集</li>
-<li>MIDI / OSC / MusicXML 出力</li>
-</ul>
-<p>そのため、単なる MIDI 自動生成ではなく、**理論の比較実験、響きの探索、構造制御、再現性ある A/B 比較、微分音出力、外部環境接続**までを一つのブラウザ上で扱える点が最大の特徴です。</p>
-<hr>
-<h2>12. 付記</h2>
-<p></p>
-  </div>
-</section>
-
+<script src="js/00-oscilloscope.js"></script>
+<script src="js/01-euclidean.js"></script>
+<script src="js/02-pcset.js"></script>
+<script src="js/03-negative-harmony.js"></script>
+<script src="js/04-twelve-tone.js"></script>
+<script src="js/05-integral-serialism.js"></script>
+<script src="js/06-boids.js"></script>
+<script src="js/07-sieve.js"></script>
+<script src="js/08-lorenz.js"></script>
+<script src="js/09-cellular-automaton.js"></script>
+<script src="js/10-rubato.js"></script>
+<script src="js/11-markov.js"></script>
+<script src="js/12-lsystem.js"></script>
+<script src="js/13-humanizer.js"></script>
+<script src="js/14-music-data.js"></script>
+<script src="js/15-midi-core.js"></script>
+<script src="js/16-layer-generators.js"></script>
+<script src="js/17-ui-state.js"></script>
+<script src="js/18-solfeggio.js"></script>
+<script src="js/19-binaural.js"></script>
+<script src="js/20-comp-tuning.js"></script>
+<script src="js/21-engine-control.js"></script>
+<script src="js/25-chord-progression.js"></script>
+<script src="js/26-scale-mutation.js"></script>
+<script src="js/27-cc-automation.js"></script>
+<script src="js/28-midi-preview.js"></script>
+<script src="js/29-state-persist.js"></script>
+<script src="js/30-neo-riemannian.js"></script>
+<script src="js/31-voice-leading.js"></script>
+<script src="js/32-just-intonation.js"></script>
+<script src="js/33-rhythmic-canons.js"></script>
+<script src="js/34-conductor-viz.js"></script>
+<script src="js/35-init-conductor-viz.js"></script>
+<script src="js/22-ui-functions.js"></script>
+<script src="js/24-spectral.js"></script>
+<script src="js/66-spectral-harmony.js"></script>
+<script src="js/23-init.js"></script>
+<script src="js/36-init-just-intonation.js"></script>
+<script src="js/37-init-rhythmic-canons.js"></script>
+<script src="js/38-init-neo-riemannian.js"></script>
+<script src="js/39-init-chord-progression.js"></script>
+<script src="js/40-init-scale-mutation.js"></script>
+<script src="js/41-init-pc-sim-map.js"></script>
+<script src="js/42-init-attractor.js"></script>
+<script src="js/43-init-cc-automation.js"></script>
+<script src="js/44-init-state-persist.js"></script>
+<script src="js/45-init-midi-preview.js"></script>
+<script src="js/46-init-seed-ui.js"></script>
+<script src="js/47-init-ab-ui.js"></script>
+<script src="js/48-init-humanizer.js"></script>
+<script src="js/49-init-lsystem.js"></script>
+<script src="js/50-init-markov.js"></script>
+<script src="js/51-init-lorenz-legacy.js"></script>
+<script src="js/52-init-rubato.js"></script>
+<script src="js/53-init-cellular-automaton.js"></script>
+<script src="js/54-init-boids.js"></script>
+<script src="js/55-init-sieve.js"></script>
+<script src="js/56-init-integral-serialism.js"></script>
+<script src="js/57-init-mpe.js"></script>
+<script src="js/58-init-macro.js"></script>
+<script src="js/59-init-euclidean.js"></script>
+<script src="js/60-init-gate-resolution.js"></script>
+<script src="js/61-init-comp-tuning.js"></script>
+<script src="js/62-init-binaural.js"></script>
+<script src="js/63-init-multi-export.js"></script>
+<script src="js/64-init-spectral.js"></script>
+<script src="js/65-midi-input.js"></script>
+<script src="js/67-osc-export.js"></script>
+<script src="js/68-musicxml-export.js"></script>
+<script src="js/90-patch-shared.js"></script>
+<script src="js/91-patch-engine-fixes.js"></script>
+<script src="js/92-patch-state-ui.js"></script>
 </body>
 </html>

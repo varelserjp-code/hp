@@ -1,0 +1,292 @@
+:root {
+  --readable-text: #ffffff;
+  --readable-text-soft: rgba(255, 255, 255, 0.9);
+  --readable-text-muted: rgba(255, 255, 255, 0.78);
+  --readable-text-faint: rgba(255, 255, 255, 0.66);
+}
+
+body.readable-ui {
+  --text: var(--readable-text);
+  --text2: var(--readable-text-soft);
+  --text-dim: var(--readable-text-faint);
+  --cyan: #ffffff;
+  --cyan2: #ffffff;
+  --cyan-dim: rgba(255, 255, 255, 0.82);
+  --teal: #ffffff;
+  --purple: #ffffff;
+  --purple-dim: rgba(255, 255, 255, 0.42);
+  --amber: #ffffff;
+  --amber2: rgba(255, 255, 255, 0.82);
+  --red: #ffffff;
+  --green: #ffffff;
+  --pink: #ffffff;
+  --pink-dim: rgba(255, 255, 255, 0.42);
+  color: var(--readable-text);
+  font-size: 16px;
+}
+
+body.readable-ui,
+body.readable-ui button,
+body.readable-ui input,
+body.readable-ui select,
+body.readable-ui textarea,
+body.readable-ui option,
+body.readable-ui .g-name,
+body.readable-ui .tog-name,
+body.readable-ui .ti-block .v,
+body.readable-ui .seed-val,
+body.readable-ui .log-l,
+body.readable-ui .badge,
+body.readable-ui .ab-label {
+  color: var(--readable-text);
+}
+
+body.readable-ui .sys-tag,
+body.readable-ui .sub,
+body.readable-ui .sec-label,
+body.readable-ui .chord-status,
+body.readable-ui .chip,
+body.readable-ui .g-sub,
+body.readable-ui .t-tab,
+body.readable-ui .scale-sync-badge,
+body.readable-ui .scale-output-badge,
+body.readable-ui .scale-sync-text,
+body.readable-ui .scale-active-info,
+body.readable-ui .s-btn,
+body.readable-ui .ti-block h4,
+body.readable-ui .ti-block .sub,
+body.readable-ui .oct-label,
+body.readable-ui .oct-pill,
+body.readable-ui .param-label,
+body.readable-ui .tog-desc,
+body.readable-ui .seed-label,
+body.readable-ui .seed-btn,
+body.readable-ui .midi-in-btn,
+body.readable-ui .midi-in-status,
+body.readable-ui .log,
+body.readable-ui footer,
+body.readable-ui .c-btn,
+body.readable-ui .chain-label,
+body.readable-ui .gate-indicator,
+body.readable-ui .resolve-indicator,
+body.readable-ui .ecb-title,
+body.readable-ui .ecb-preset-btn,
+body.readable-ui .ecb-group-label {
+  color: var(--readable-text-muted);
+}
+
+body.readable-ui .wrap {
+  max-width: 1280px;
+}
+
+body.readable-ui .panel,
+body.readable-ui .ecb,
+body.readable-ui .log,
+body.readable-ui .midi-in-status,
+body.readable-ui .midi-in-select,
+body.readable-ui .seed-input,
+body.readable-ui select.chain-sel,
+body.readable-ui .chord-box {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+body.readable-ui .panel,
+body.readable-ui .ecb,
+body.readable-ui .midi-in-select,
+body.readable-ui .seed-input,
+body.readable-ui select.chain-sel,
+body.readable-ui .midi-in-status,
+body.readable-ui .log,
+body.readable-ui .chip,
+body.readable-ui .g-btn,
+body.readable-ui .s-btn,
+body.readable-ui .c-btn,
+body.readable-ui .oct-pill,
+body.readable-ui .btn-gen-ab,
+body.readable-ui .ab-btn,
+body.readable-ui .midi-in-btn,
+body.readable-ui .ecb-preset-btn,
+body.readable-ui .seed-btn {
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+body.readable-ui .panel-top,
+body.readable-ui .panel-top.purple,
+body.readable-ui .panel-top.teal,
+body.readable-ui .panel-top.amber,
+body.readable-ui .panel-top.red,
+body.readable-ui .panel-top.pink,
+body.readable-ui .panel-top.gold {
+  opacity: 0.35;
+}
+
+body.readable-ui .chord-box,
+body.readable-ui .btn-gen,
+body.readable-ui .btn-dl,
+body.readable-ui .btn-gen-ab,
+body.readable-ui .ab-btn,
+body.readable-ui .midi-in-btn,
+body.readable-ui .ecb-preset-btn,
+body.readable-ui .seed-btn,
+body.readable-ui .g-btn,
+body.readable-ui .s-btn,
+body.readable-ui .c-btn,
+body.readable-ui .oct-pill,
+body.readable-ui .t-tab,
+body.readable-ui select,
+body.readable-ui input,
+body.readable-ui textarea {
+  text-shadow: none;
+}
+
+body.readable-ui .sys-tag {
+  font-size: 11px;
+}
+
+body.readable-ui .sub {
+  font-size: 12px;
+}
+
+body.readable-ui .sec-label {
+  font-size: 10px;
+}
+
+body.readable-ui .panel {
+  padding: 24px;
+}
+
+body.readable-ui .chord-status,
+body.readable-ui .chip,
+body.readable-ui .oct-pill,
+body.readable-ui .log,
+body.readable-ui .seed-val,
+body.readable-ui .midi-in-select,
+body.readable-ui .midi-in-btn,
+body.readable-ui .midi-in-status,
+body.readable-ui .seed-input,
+body.readable-ui .ecb-preset-btn {
+  font-size: 11px;
+}
+
+body.readable-ui .g-name,
+body.readable-ui .tog-name,
+body.readable-ui .ti-block .v {
+  font-size: 14px;
+}
+
+body.readable-ui .g-sub,
+body.readable-ui .tog-desc,
+body.readable-ui .param-label,
+body.readable-ui .pval,
+body.readable-ui .seed-label,
+body.readable-ui .ab-label,
+body.readable-ui footer,
+body.readable-ui .badge,
+body.readable-ui .chain-label,
+body.readable-ui .gate-indicator,
+body.readable-ui .resolve-indicator,
+body.readable-ui .ecb-title,
+body.readable-ui .ecb-group-label {
+  font-size: 10px;
+}
+
+body.readable-ui .t-tab,
+body.readable-ui .s-btn,
+body.readable-ui .c-btn,
+body.readable-ui .ecb-preset-btn {
+  font-size: 10px;
+}
+
+body.readable-ui .btn-gen {
+  font-size: 15px;
+}
+
+body.readable-ui .btn-dl,
+body.readable-ui .btn-gen-ab,
+body.readable-ui .ab-btn {
+  font-size: 11px;
+}
+
+body.readable-ui .midi-in-btn:hover,
+body.readable-ui .seed-btn:hover,
+body.readable-ui .ecb-preset-btn:hover,
+body.readable-ui .chip:hover,
+body.readable-ui .g-btn:hover,
+body.readable-ui .s-btn:hover,
+body.readable-ui .c-btn:hover,
+body.readable-ui .oct-pill:hover,
+body.readable-ui .ab-btn:hover,
+body.readable-ui .btn-gen-ab:hover {
+  color: var(--readable-text);
+  border-color: rgba(255, 255, 255, 0.52);
+}
+
+body.readable-ui .midi-in-btn.on,
+body.readable-ui .s-btn.on,
+body.readable-ui .c-btn.on,
+body.readable-ui .oct-pill.on,
+body.readable-ui .g-btn.on,
+body.readable-ui .ab-btn.on,
+body.readable-ui .btn-gen-ab.on,
+body.readable-ui .tog.on {
+  color: var(--readable-text);
+}
+
+body.readable-ui .chord-box::placeholder,
+body.readable-ui ::placeholder {
+  color: rgba(255, 255, 255, 0.56);
+}
+
+body.readable-ui [style*="color:#"],
+body.readable-ui [style*="color: #"] {
+  color: var(--readable-text-soft) !important;
+}
+
+body.readable-ui [style*="font-size:7px"],
+body.readable-ui [style*="font-size: 7px"] {
+  font-size: 8px !important;
+}
+
+body.readable-ui [style*="font-size:8px"],
+body.readable-ui [style*="font-size: 8px"] {
+  font-size: 9px !important;
+}
+
+body.readable-ui [style*="font-size:9px"],
+body.readable-ui [style*="font-size: 9px"] {
+  font-size: 10px !important;
+}
+
+body.readable-ui [style*="font-size:10px"],
+body.readable-ui [style*="font-size: 10px"] {
+  font-size: 11px !important;
+}
+
+body.readable-ui [style*="font-size:11px"],
+body.readable-ui [style*="font-size: 11px"] {
+  font-size: 12px !important;
+}
+
+body.readable-ui #patchDiagnostics,
+body.readable-ui #ctScalaStatus,
+body.readable-ui #midiMonitorLog,
+body.readable-ui #midiLearnStatus,
+body.readable-ui #midiLearnMap,
+body.readable-ui #midiCaptureStatus,
+body.readable-ui #oscPayloadPreview,
+body.readable-ui #oscTestStatus,
+body.readable-ui #jiAdaptiveMemoryInfo,
+body.readable-ui #ctSectionInfo {
+  color: var(--readable-text-soft) !important;
+  line-height: 1.75 !important;
+}
+
+body.readable-ui #patchDiagnostics,
+body.readable-ui #midiMonitorLog {
+  background: rgba(255, 255, 255, 0.05) !important;
+}
+
+body.readable-ui .slider::-webkit-slider-thumb,
+body.readable-ui .slider::-moz-range-thumb {
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.16);
+}
