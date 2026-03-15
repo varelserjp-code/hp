@@ -37,6 +37,53 @@ function updateMacroPreview(){if(!S.macroEnabled)return;const cv=generateTension
  * @returns {{ tracks: Uint8Array[], trackNames: string[] }}
  */
 function generateForChord(c, barCount, barOffset, shared){
+  const PATCH = window.__MEIKY_PATCH__ || {};
+
+  /* ── [v25.7 統合] JI PBマップをバーオフセットごとに再構築するヘルパー ── */
+  const buildSharedForBar = (currentBarOffset) => {
+    let nextShared = shared;
+    if (c && c.iv &&
+        typeof JI_PARAMS !== 'undefined' && JI_PARAMS && JI_PARAMS.enabled &&
+        typeof JustIntonation !== 'undefined') {
+      const safePbRange = typeof S !== 'undefined' && S && Number.isFinite(S.pbRange) && S.pbRange > 0 ? S.pbRange : 2;
+      const jiParamsForBar = typeof PATCH.getJiParamsForBar === 'function'
+        ? PATCH.getJiParamsForBar(currentBarOffset) : JI_PARAMS;
+      nextShared = Object.assign({}, shared, {
+        jiPBMap: typeof PATCH.buildAdaptiveJiPitchBendMap === 'function'
+          ? PATCH.buildAdaptiveJiPitchBendMap(c, safePbRange, currentBarOffset)
+          : JustIntonation.getPitchBendMap(
+              c.iv.map(interval => (((c.root % 12) + 12 + interval) % 12 + 12) % 12),
+              ((c.root % 12) + 12) % 12,
+              jiParamsForBar,
+              safePbRange
+            ),
+      });
+    }
+    return nextShared;
+  };
+
+  /* ── [v25.7 統合] CompTuning セクション分割: 複数セグメントの場合は分割再帰→merge ── */
+  const _segments = typeof PATCH.getCompSectionSegments === 'function'
+    ? PATCH.getCompSectionSegments(barOffset, barCount)
+    : [{ barOffset: barOffset, bars: barCount }];
+  if (Array.isArray(_segments) && _segments.length > 1) {
+    const segmentResults = _segments.map(segment => {
+      const nextShared = buildSharedForBar(segment.barOffset);
+      const result = generateForChord(c, segment.bars, segment.barOffset, nextShared);
+      result.tracks = PATCH.applyCompTuningToTrackSlice(result.tracks, result.trackNames, c, segment.barOffset);
+      return { tracks: result.tracks, trackNames: result.trackNames, bars: segment.bars };
+    });
+    if (typeof S !== 'undefined' && S) S.compSectionPreTuned = true;
+    return {
+      tracks: typeof mergeProgTracks === 'function'
+        ? mergeProgTracks(segmentResults, (shared && shared.ppq) || 480)
+        : segmentResults[0].tracks,
+      trackNames: segmentResults[0].trackNames,
+    };
+  }
+  /* 単一セグメント: JI PBマップを現在のbarOffsetで再構築 */
+  shared = buildSharedForBar(barOffset);
+
   const{ppq,scIv,prg,tensionCurve,eucPattern,sievePattern,sieveScale,boidsResult,
         lorenz,attractor,attractorMap,ca,rubatoDelta,ttForms,isInst,isState,velShape,velShapeMode,velShapeAmt,
         scaleMutExpanded,scaleMutTransMode,scaleMutTransLen,
@@ -104,6 +151,12 @@ function generateForChord(c, barCount, barOffset, shared){
   if(S.engines.lsystem&&LSEngine.STATE.enabled&&LSEngine.STATE.lstring){
     const lsTrk=LSEngine.makeLSTrack(rootMidi,effectiveScIv,p,prg);
     if(lsTrk&&lsTrk.length){tracks.push(lsTrk);tn.push('L-System');}
+  }
+  /* [v25.7 統合] 単一セグメントでCompTuningセクションが有効な場合、トラックスライスに適用 */
+  if (typeof PATCH.isCompSectionRuntimeActive === 'function' && PATCH.isCompSectionRuntimeActive()) {
+    if (typeof S !== 'undefined' && S) S.compSectionPreTuned = true;
+    const _tuned = PATCH.applyCompTuningToTrackSlice(tracks, tn, c, barOffset);
+    if (Array.isArray(_tuned)) { tracks.length = 0; _tuned.forEach(t => tracks.push(t)); }
   }
   return{tracks,trackNames:tn};
 }
