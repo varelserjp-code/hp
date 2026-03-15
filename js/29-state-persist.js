@@ -179,6 +179,24 @@ const StatePersist = (() => {
         if (idx.length > MAX_SLOTS) idx = idx.slice(0, MAX_SLOTS);
         setIndex(idx);
       }
+      /* [v25.7 統合] パッチ拡張データの追加保存 */
+      try {
+        const PATCH = window.__MEIKY_PATCH__ || {};
+        const raw2 = localStorage.getItem(STORAGE_PREFIX + slotName);
+        if (raw2 && PATCH.jsonClone) {
+          const snapshot2 = JSON.parse(raw2);
+          snapshot2.ji = typeof JI_PARAMS !== 'undefined' ? PATCH.jsonClone(JI_PARAMS) : null;
+          snapshot2.rc = typeof RC_PARAMS !== 'undefined' ? PATCH.jsonClone(RC_PARAMS) : null;
+          snapshot2.compTuning = (typeof CompTuningEngine !== 'undefined' && CompTuningEngine.STATE)
+            ? { ...PATCH.jsonClone(CompTuningEngine.STATE), channels: Array.from(CompTuningEngine.STATE.channels || []) }
+            : null;
+          snapshot2.conductorViz = typeof CONDUCTOR_VIZ_STATE !== 'undefined' ? PATCH.jsonClone(CONDUCTOR_VIZ_STATE) : null;
+          if (PATCH.sectionLearnFocus) snapshot2.sectionLearnFocus = PATCH.jsonClone(PATCH.sectionLearnFocus);
+          if (typeof PATCH.ensureSectionPreviewFollow === 'function') snapshot2.sectionPreviewFollow = PATCH.jsonClone(PATCH.ensureSectionPreviewFollow());
+          if (typeof PATCH.ensureMidiCapturePolicy === 'function') snapshot2.midiCapturePolicy = PATCH.jsonClone(PATCH.ensureMidiCapturePolicy());
+          localStorage.setItem(STORAGE_PREFIX + slotName, JSON.stringify(snapshot2));
+        }
+      } catch(_) {}
       return true;
     } catch(e) {
       console.error('[StatePersist] save failed:', e);
@@ -324,11 +342,72 @@ const StatePersist = (() => {
     _try('Humanizer',  () => restoreHumanizer(snap.humanizer));
     _try('CCAuto',     () => restoreCCAuto(snap.ccAuto));
 
+    /* [v25.7 統合] パッチ拡張データの復元 */
+    const PATCH = window.__MEIKY_PATCH__ || {};
+    _try('PatchExtras', () => {
+      if (typeof PATCH.clearGeneratedArtifacts === 'function') PATCH.clearGeneratedArtifacts();
+      if (snap.ji && typeof JI_PARAMS !== 'undefined') Object.assign(JI_PARAMS, snap.ji);
+      if (snap.rc && typeof RC_PARAMS !== 'undefined') Object.assign(RC_PARAMS, snap.rc);
+      if (snap.compTuning && typeof CompTuningEngine !== 'undefined' && CompTuningEngine.STATE) {
+        const saved = { ...snap.compTuning };
+        if (Array.isArray(saved.channels)) saved.channels = new Set(saved.channels);
+        Object.assign(CompTuningEngine.STATE, saved);
+        if (!(CompTuningEngine.STATE.channels instanceof Set)) {
+          CompTuningEngine.STATE.channels = new Set(saved.channels || []);
+        }
+      }
+      if (snap.conductorViz && typeof CONDUCTOR_VIZ_STATE !== 'undefined') Object.assign(CONDUCTOR_VIZ_STATE, snap.conductorViz);
+      if (snap.sectionLearnFocus && PATCH.sectionLearnFocus) Object.assign(PATCH.sectionLearnFocus, snap.sectionLearnFocus);
+      if (snap.sectionPreviewFollow && typeof PATCH.ensureSectionPreviewFollow === 'function') Object.assign(PATCH.ensureSectionPreviewFollow(), snap.sectionPreviewFollow);
+      if (snap.midiCapturePolicy && typeof PATCH.ensureMidiCapturePolicy === 'function') Object.assign(PATCH.ensureMidiCapturePolicy(), snap.midiCapturePolicy);
+    });
+
     /* UI全体を再構築 */
     try { _refreshUI(); } catch(e) {
       if (typeof log === 'function') log('// STATE LOAD: _refreshUI failed — ' + e.message, 'err');
       console.error('[StatePersist.load] _refreshUI', e);
     }
+
+    /* [v25.7 統合] パッチUI同期 */
+    _try('PatchUISync', () => {
+      if (typeof PATCH.syncAttractorUI === 'function') PATCH.syncAttractorUI();
+      if (typeof CompTuningEngine !== 'undefined' && CompTuningEngine.STATE) {
+        const toggler = document.getElementById('togCompTuning');
+        const controls = document.getElementById('compTuningControls');
+        const compEnabled = typeof S !== 'undefined' && S && S.engines ? !!S.engines.comptuning : false;
+        if (toggler) toggler.classList.toggle('on', compEnabled);
+        if (controls) controls.style.display = compEnabled ? 'block' : 'none';
+        const pbS = document.getElementById('ctPbRange'), pbV = document.getElementById('ctPbRangeV');
+        const a4S = document.getElementById('ctA4Slider'), a4V = document.getElementById('ctA4Val');
+        const gS = document.getElementById('ctGlobalCents'), gV = document.getElementById('ctGlobalCentsV');
+        if (pbS) pbS.value = CompTuningEngine.STATE.pbRange;
+        if (pbV) pbV.textContent = '±' + CompTuningEngine.STATE.pbRange + ' st';
+        if (a4S) a4S.value = CompTuningEngine.STATE.a4Hz;
+        if (a4V) a4V.textContent = CompTuningEngine.STATE.a4Hz.toFixed(1) + ' Hz';
+        if (gS) gS.value = CompTuningEngine.STATE.globalCents;
+        if (gV) { const sign = CompTuningEngine.STATE.globalCents >= 0 ? '+' : ''; gV.textContent = sign + CompTuningEngine.STATE.globalCents.toFixed(1) + '¢'; }
+        const rS = document.getElementById('ctRootPc'), rV = document.getElementById('ctRootPcV');
+        if (rS) rS.value = CompTuningEngine.STATE.rootPc;
+        if (rV && PATCH.NOTE_NAMES) rV.textContent = PATCH.NOTE_NAMES[CompTuningEngine.STATE.rootPc] || 'C';
+        const scaleSyncBtn = document.getElementById('ctScaleSyncBtn');
+        if (scaleSyncBtn) { const auto = !!CompTuningEngine.STATE.autoScaleSync; scaleSyncBtn.classList.toggle('on', auto); scaleSyncBtn.textContent = auto ? 'AUTO' : 'MANUAL'; }
+        if (typeof PATCH.ensureScalaTemperamentEntry === 'function') PATCH.ensureScalaTemperamentEntry();
+        if (typeof PATCH.refreshScalaProfile === 'function') PATCH.refreshScalaProfile(false);
+        if (typeof CompTuningEngine.buildTemperamentButtons === 'function') CompTuningEngine.buildTemperamentButtons();
+        if (typeof CompTuningEngine.buildIntervalGrid === 'function') CompTuningEngine.buildIntervalGrid();
+        if (typeof CompTuningEngine.updateDisplay === 'function') CompTuningEngine.updateDisplay();
+      }
+      if (typeof PATCH.syncCAPreviewUI === 'function') PATCH.syncCAPreviewUI();
+      if (typeof PATCH.syncJustIntonationUI === 'function') PATCH.syncJustIntonationUI();
+      if (typeof PATCH.syncRhythmicCanonsUI === 'function') PATCH.syncRhythmicCanonsUI();
+      if (typeof PATCH.syncConductorVizUI === 'function') PATCH.syncConductorVizUI();
+      if (typeof PATCH.syncGeneratedOutputUI === 'function') PATCH.syncGeneratedOutputUI();
+      if (typeof PATCH.syncBinauralUI === 'function') PATCH.syncBinauralUI();
+      if (typeof PATCH.syncConcertPitchUI === 'function') PATCH.syncConcertPitchUI();
+      if (typeof PATCH.syncScalaUI === 'function') PATCH.syncScalaUI();
+      if (typeof PATCH.syncCompSectionUI === 'function') PATCH.syncCompSectionUI();
+    });
+
     return true;
   }
 
@@ -350,8 +429,19 @@ const StatePersist = (() => {
 
   /* ── 全スロットをJSONファイルにエクスポート ── */
   function exportAll() {
+    const PATCH = window.__MEIKY_PATCH__ || {};
     const slots = getIndex();
     const out = { version: 25, exportedAt: new Date().toISOString(), slots: [] };
+    /* [v25.7 統合] patchExtras (Scala, MIDI Learn, Section設定) を付与 */
+    try {
+      out.patchExtras = {
+        scalaFavorites: typeof PATCH.readScalaFavorites === 'function' ? PATCH.readScalaFavorites() : null,
+        midiLearnMappings: typeof PATCH.readMidiLearnMappings === 'function' ? PATCH.readMidiLearnMappings() : null,
+        sectionLearnFocus: PATCH.jsonClone ? PATCH.jsonClone(PATCH.sectionLearnFocus) : null,
+        sectionPreviewFollow: (PATCH.jsonClone && typeof PATCH.ensureSectionPreviewFollow === 'function') ? PATCH.jsonClone(PATCH.ensureSectionPreviewFollow()) : null,
+        midiCapturePolicy: (PATCH.jsonClone && typeof PATCH.ensureMidiCapturePolicy === 'function') ? PATCH.jsonClone(PATCH.ensureMidiCapturePolicy()) : null,
+      };
+    } catch(_) {}
     slots.forEach(s => {
       const raw = localStorage.getItem(STORAGE_PREFIX + s.name);
       if (raw) {
@@ -399,6 +489,22 @@ const StatePersist = (() => {
             count++;
           } catch(_) {}
         });
+        /* [v25.7 統合] patchExtras の復元 */
+        try {
+          const PATCH = window.__MEIKY_PATCH__ || {};
+          if (parsed.patchExtras) {
+            const pe = parsed.patchExtras;
+            if (pe.scalaFavorites && typeof pe.scalaFavorites === 'object' && typeof PATCH.writeScalaFavorites === 'function') PATCH.writeScalaFavorites(pe.scalaFavorites);
+            if (pe.midiLearnMappings && typeof pe.midiLearnMappings === 'object' && typeof PATCH.writeMidiLearnMappings === 'function') PATCH.writeMidiLearnMappings(pe.midiLearnMappings);
+            if (pe.sectionLearnFocus && typeof pe.sectionLearnFocus === 'object' && PATCH.sectionLearnFocus) Object.assign(PATCH.sectionLearnFocus, pe.sectionLearnFocus);
+            if (pe.sectionPreviewFollow && typeof pe.sectionPreviewFollow === 'object' && typeof PATCH.ensureSectionPreviewFollow === 'function') Object.assign(PATCH.ensureSectionPreviewFollow(), pe.sectionPreviewFollow);
+            if (pe.midiCapturePolicy && typeof pe.midiCapturePolicy === 'object' && typeof PATCH.ensureMidiCapturePolicy === 'function') Object.assign(PATCH.ensureMidiCapturePolicy(), pe.midiCapturePolicy);
+          }
+          if (typeof PATCH.syncScalaUI === 'function') PATCH.syncScalaUI();
+          if (typeof PATCH.syncJustIntonationUI === 'function') PATCH.syncJustIntonationUI();
+          if (typeof PATCH.syncCompSectionUI === 'function') PATCH.syncCompSectionUI();
+          if (typeof PATCH.syncMidiMonitorUI === 'function') PATCH.syncMidiMonitorUI();
+        } catch(_) {}
         if (typeof log === 'function') log('// IMPORTED ' + count + ' preset(s)', 'ok');
         if (typeof onComplete === 'function') onComplete(count);
       };
