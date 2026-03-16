@@ -1,124 +1,279 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Blog — VARELSER</title>
-  <meta name="description" content="VARELSER — Blog" />
-  <meta name="theme-color" content="#ffffff" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blog | VARELSER</title>
+  <meta name="description" content="VARELSER Blog — ASC、音楽、意識研究、テクノロジーに関する記事">
   <style>
-    :root{
-      --bg:#fff;
-      --fg:#111;
-      --muted:rgba(0,0,0,.55);
-      --border:rgba(0,0,0,.10);
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+      background: #fff;
+      color: #333;
+      line-height: 1.7;
+      min-height: 100vh;
     }
-    *{box-sizing:border-box;}
-    body{
-      margin:0; background:var(--bg); color:var(--fg);
-      font-family: ui-sans-serif, system-ui, -apple-system, "Hiragino Kaku Gothic ProN","Noto Sans JP","Segoe UI", sans-serif;
+
+    /* ── header ── */
+    .header-bar {
+      border-bottom: 1px solid #e0e0e0;
+      padding: 14px 24px;
+      display: flex; align-items: center; gap: 20px;
+      font-size: 13px;
     }
-    .page{min-height:100svh; display:flex; flex-direction:column; align-items:center;}
-    .header{
-      width:min(680px, calc(100% - 40px));
-      display:flex; flex-direction:column; align-items:center;
-      padding:32px 0 24px; gap:12px;
+    .header-bar a {
+      color: #666; text-decoration: none;
+      transition: color 0.2s;
     }
-    .site-name{
-      font-size:13px; letter-spacing:.18em; color:var(--muted); text-decoration:none;
+    .header-bar a:hover { color: #000; }
+    .header-bar .site-name {
+      color: #111; font-weight: 700;
+      font-size: 14px; letter-spacing: 0.12em;
     }
-    .site-name:hover{color:var(--fg);}
-    h1{margin:0; font-size:22px; font-weight:600; letter-spacing:.08em;}
-    .content{
-      width:min(680px, calc(100% - 40px));
-      padding:0 0 80px;
-      display:flex; flex-direction:column; gap:0;
+    .header-bar .sep { color: #ccc; }
+
+    /* ── main ── */
+    main {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 48px 20px 80px;
     }
-    .post-item{
-      display:block; text-decoration:none; color:var(--fg);
-      padding:24px 0;
-      border-bottom:1px solid var(--border);
+    h1 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #111;
+      margin-bottom: 8px;
     }
-    .post-item:first-child{border-top:1px solid var(--border);}
-    .post-item:hover .post-title{opacity:.6;}
-    .post-meta{
-      display:flex; gap:10px; align-items:center;
-      font-size:12px; color:var(--muted); margin-bottom:8px;
-      flex-wrap:wrap;
+    .page-desc {
+      font-size: 13px;
+      color: #999;
+      margin-bottom: 40px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #eee;
     }
-    .category{
-      font-size:11px; letter-spacing:.10em; text-transform:uppercase;
-      border:1px solid var(--border); border-radius:999px;
-      padding:2px 9px; color:var(--muted);
+
+    /* ── loading / error ── */
+    .status {
+      text-align: center;
+      color: #999;
+      font-size: 13px;
+      padding: 40px 0;
     }
-    .post-title{
-      font-size:16px; font-weight:600; line-height:1.5;
-      margin:0 0 6px; transition:opacity .15s;
+
+    /* ── post list ── */
+    .post-list { list-style: none; }
+    .post-item {
+      padding: 20px 0;
+      border-bottom: 1px solid #f0f0f0;
     }
-    .post-desc{
-      font-size:13px; color:var(--muted); margin:0; line-height:1.7;
+    .post-item:last-child { border-bottom: none; }
+    .post-item a {
+      text-decoration: none;
+      color: inherit;
+      display: block;
     }
-    .empty{
-      font-size:14px; color:var(--muted); padding:40px 0;
+    .post-item a:hover .post-title { color: #1a73e8; }
+    .post-date {
+      font-size: 12px;
+      color: #aaa;
+      letter-spacing: 0.03em;
     }
-    .foot{margin-top:auto; padding:18px 0 24px; color:var(--muted); font-size:12px; text-align:center;}
+    .post-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #222;
+      margin: 4px 0 6px;
+      transition: color 0.2s;
+    }
+    .post-summary {
+      font-size: 13px;
+      color: #777;
+      line-height: 1.6;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .post-tags {
+      margin-top: 6px;
+    }
+    .post-tags span {
+      display: inline-block;
+      border: 1px solid #e0e0e0;
+      color: #888;
+      padding: 1px 7px;
+      border-radius: 3px;
+      font-size: 10px;
+      margin-right: 4px;
+    }
+
+    @media (max-width: 600px) {
+      main { padding: 32px 16px 60px; }
+      h1 { font-size: 1.15rem; }
+    }
   </style>
 </head>
 <body>
-  <div class="page">
-    <header class="header">
-      <a class="site-name" href="https://varelserjp-code.github.io/hp/">VARELSER</a>
-      <h1>Blog</h1>
-    </header>
 
-    <main class="content" id="post-list">
-      <p class="empty">読み込み中...</p>
-    </main>
+<div class="header-bar">
+  <a href="index.html" class="site-name">VARELSER</a>
+  <span class="sep">|</span>
+  <a href="blog.html" style="color:#111; font-weight:600;">Blog</a>
+  <span class="sep">|</span>
+  <a href="about.html">About</a>
+</div>
 
-    <footer class="foot">
-      <small>© <span id="y"></span> VARELSER</small>
-    </footer>
+<main>
+  <h1>Blog</h1>
+  <p class="page-desc">ASC・意識研究・音楽・テクノロジーに関する記事</p>
+
+  <div id="post-container">
+    <p class="status" id="loading">記事を読み込み中...</p>
   </div>
+</main>
 
-  <script>
-    document.getElementById('y').textContent = String(new Date().getFullYear());
+<script>
+/*
+  自動記事一覧システム
+  ───────────────────
+  仕組み：
+    1. posts/ フォルダ内の .html ファイルを fetch で取得
+    2. 各HTMLの <meta> タグから title, date, summary, tags を読み取り
+    3. 日付降順でカード一覧を自動生成
 
-    fetch('blog_index.json')
-      .then(r => r.json())
-      .then(posts => {
-        const list = document.getElementById('post-list');
+  記事追加時の作業：
+    posts/ フォルダに HTML を1つ置くだけ。JSONの編集は不要。
 
-        if (!posts.length) {
-          list.innerHTML = '<p class="empty">記事はまだありません。</p>';
-          return;
-        }
+  記事HTML側の要件（<head>内に以下の meta を記載）：
+    <meta name="post-date"    content="2026-03-16">
+    <meta name="post-summary" content="記事の概要...">
+    <meta name="post-tags"    content="ASC,トラウマ,神経科学">
+    <title>記事タイトル | VARELSER</title>
 
-        // 日付の新しい順にソート
-        posts.sort((a, b) => new Date(b.date) - new Date(a.date));
+  ※ meta が無い場合はファイル名と更新日から自動推定
+*/
 
-        list.innerHTML = posts.map(post => {
-          const date = new Date(post.date).toLocaleDateString('ja-JP', {
-            year: 'numeric', month: 'long', day: 'numeric'
-          });
-          const cats = (post.category || []).map(c =>
-            `<span class="category">${c}</span>`
-          ).join('');
+const REPO_OWNER = 'varelserjp-code';
+const REPO_NAME  = 'hp';
+const POSTS_DIR  = 'posts';
+const BRANCH     = 'main';
 
-          return `
-            <a class="post-item" href="${post.url}">
-              <div class="post-meta">
-                <span>${date}</span>
-                ${cats}
-              </div>
-              <p class="post-title">${post.title}</p>
-              ${post.description ? `<p class="post-desc">${post.description}</p>` : ''}
-            </a>`;
-        }).join('');
-      })
-      .catch(() => {
-        document.getElementById('post-list').innerHTML =
-          '<p class="empty">記事を読み込めませんでした。</p>';
-      });
-  </script>
+async function loadPosts() {
+  const container = document.getElementById('post-container');
+  const loading   = document.getElementById('loading');
+
+  try {
+    // Step 1: posts/ フォルダのファイル一覧を取得
+    const apiUrl = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${POSTS_DIR}?ref=${BRANCH}`;
+    const res = await fetch(apiUrl);
+
+    if (!res.ok) {
+      // API失敗時：ローカルの posts-index.json にフォールバック
+      return await loadFromIndex(container, loading);
+    }
+
+    const files = await res.json();
+    const htmlFiles = files.filter(f => f.name.endsWith('.html'));
+
+    if (htmlFiles.length === 0) {
+      loading.textContent = 'まだ記事がありません。';
+      return;
+    }
+
+    // Step 2: 各HTMLから meta を取得
+    const posts = [];
+    for (const file of htmlFiles) {
+      const meta = await fetchPostMeta(file);
+      if (meta) posts.push(meta);
+    }
+
+    // Step 3: 日付降順でソート
+    posts.sort((a, b) => b.date.localeCompare(a.date));
+
+    // Step 4: レンダリング
+    renderPosts(container, posts);
+    loading.style.display = 'none';
+
+  } catch (err) {
+    console.warn('GitHub API error, trying fallback:', err);
+    await loadFromIndex(container, loading);
+  }
+}
+
+async function fetchPostMeta(file) {
+  try {
+    const url = `${POSTS_DIR}/${file.name}`;
+    const res = await fetch(url);
+    if (!res.ok) return null;
+
+    const html = await res.text();
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+
+    const title   = (doc.querySelector('title')?.textContent || file.name)
+                      .replace(/\s*\|.*$/, ''); // " | VARELSER" を除去
+    const date    = doc.querySelector('meta[name="post-date"]')?.content
+                    || extractDateFromName(file.name)
+                    || '不明';
+    const summary = doc.querySelector('meta[name="post-summary"]')?.content || '';
+    const tagsRaw = doc.querySelector('meta[name="post-tags"]')?.content || '';
+    const tags    = tagsRaw ? tagsRaw.split(',').map(t => t.trim()) : [];
+
+    return { title, date, summary, tags, url };
+  } catch {
+    return null;
+  }
+}
+
+function extractDateFromName(name) {
+  const m = name.match(/^(\d{4}-\d{2}-\d{2})/);
+  return m ? m[1] : null;
+}
+
+// フォールバック：posts-index.json（GitHub API のレート制限時用）
+async function loadFromIndex(container, loading) {
+  try {
+    const res = await fetch('posts-index.json');
+    if (!res.ok) throw new Error('no index');
+    const posts = await res.json();
+    posts.sort((a, b) => b.date.localeCompare(a.date));
+    renderPosts(container, posts);
+    loading.style.display = 'none';
+  } catch {
+    loading.textContent = '記事の読み込みに失敗しました。ページを再読み込みしてください。';
+  }
+}
+
+function renderPosts(container, posts) {
+  const ul = document.createElement('ul');
+  ul.className = 'post-list';
+
+  for (const p of posts) {
+    const li = document.createElement('li');
+    li.className = 'post-item';
+    li.innerHTML = `
+      <a href="${p.url}">
+        <span class="post-date">${p.date}</span>
+        <div class="post-title">${escHtml(p.title)}</div>
+        ${p.summary ? `<div class="post-summary">${escHtml(p.summary)}</div>` : ''}
+        ${p.tags.length ? `<div class="post-tags">${p.tags.map(t => `<span>${escHtml(t)}</span>`).join('')}</div>` : ''}
+      </a>
+    `;
+    ul.appendChild(li);
+  }
+  container.appendChild(ul);
+}
+
+function escHtml(s) {
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+// 起動
+loadPosts();
+</script>
+
 </body>
 </html>
