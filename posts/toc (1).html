@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>目次</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;700&family=Noto+Serif+JP:wght@300;400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f7f5f0;
+      --ink: #0e0e0e;
+      --mid: #555;
+      --faint: #bbb;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: 'Noto Serif JP', serif;
+      font-weight: 300;
+      min-height: 100vh;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--bg);
+      border-bottom: 1px solid var(--ink);
+      padding: 18px 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .site-title {
+      font-family: 'Unbounded', sans-serif;
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: .28em;
+      text-transform: uppercase;
+    }
+
+    .book-subtitle {
+      font-size: 11px;
+      letter-spacing: .18em;
+      color: var(--mid);
+      text-transform: uppercase;
+      font-family: 'Unbounded', sans-serif;
+      font-weight: 300;
+    }
+
+    main {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 64px 48px 120px;
+    }
+
+    .intro {
+      border-bottom: 1px solid var(--ink);
+      padding-bottom: 48px;
+      margin-bottom: 64px;
+    }
+
+    .intro-label {
+      font-family: 'Unbounded', sans-serif;
+      font-size: 10px;
+      letter-spacing: .3em;
+      color: var(--mid);
+      text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+
+    .intro-title {
+      font-family: 'Unbounded', sans-serif;
+      font-weight: 300;
+      font-size: clamp(28px, 5vw, 52px);
+      line-height: 1.1;
+    }
+
+    .intro-title em {
+      font-style: normal;
+      font-weight: 700;
+    }
+
+    .chapters {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .chapter {
+      border-top: 1px solid var(--faint);
+      padding: 28px 0;
+      display: grid;
+      grid-template-columns: 60px 1fr;
+      gap: 0 24px;
+      cursor: pointer;
+    }
+
+    .chapter:last-child { border-bottom: 1px solid var(--faint); }
+    .chapter:hover { background: rgba(0,0,0,.03); }
+
+    .chapter-num {
+      font-family: 'Unbounded', sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .15em;
+      color: var(--faint);
+      padding-top: 4px;
+      text-align: right;
+    }
+
+    .chapter-title {
+      font-family: 'Unbounded', sans-serif;
+      font-weight: 300;
+      font-size: 14px;
+      letter-spacing: .02em;
+      line-height: 1.5;
+      margin-bottom: 0;
+    }
+
+    .toggle {
+      float: right;
+      font-size: 10px;
+      color: var(--faint);
+      font-family: 'Unbounded', sans-serif;
+      font-weight: 700;
+      transition: transform .3s;
+      user-select: none;
+      margin-left: 12px;
+    }
+
+    .chapter.open .toggle { transform: rotate(45deg); }
+
+    .sub-list {
+      list-style: none;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height .4s ease;
+      margin-top: 0;
+    }
+
+    .chapter.open .sub-list {
+      max-height: 3000px;
+      margin-top: 14px;
+    }
+
+    .sub-list li {
+      font-size: 12px;
+      color: var(--mid);
+      letter-spacing: .04em;
+      line-height: 1.7;
+      padding-left: 16px;
+      position: relative;
+    }
+
+    .sub-list li::before {
+      content: '—';
+      position: absolute;
+      left: 0;
+      color: var(--faint);
+    }
+
+    .dot-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 64px;
+      justify-content: center;
+    }
+
+    .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--ink);
+      opacity: .2;
+    }
+
+    .dot.active { opacity: 1; }
+
+    footer {
+      border-top: 1px solid var(--ink);
+      padding: 20px 48px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      letter-spacing: .15em;
+      color: var(--mid);
+      font-family: 'Unbounded', sans-serif;
+      font-weight: 300;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .chapter {
+      opacity: 0;
+      animation: fadeUp .4s forwards;
+    }
+    .chapter:nth-child(1)  { animation-delay: .03s }
+    .chapter:nth-child(2)  { animation-delay: .06s }
+    .chapter:nth-child(3)  { animation-delay: .09s }
+    .chapter:nth-child(4)  { animation-delay: .12s }
+    .chapter:nth-child(5)  { animation-delay: .15s }
+    .chapter:nth-child(6)  { animation-delay: .18s }
+    .chapter:nth-child(7)  { animation-delay: .21s }
+    .chapter:nth-child(8)  { animation-delay: .24s }
+    .chapter:nth-child(9)  { animation-delay: .27s }
+    .chapter:nth-child(10) { animation-delay: .30s }
+    .chapter:nth-child(11) { animation-delay: .33s }
+    .chapter:nth-child(12) { animation-delay: .36s }
+    .chapter:nth-child(13) { animation-delay: .39s }
+    .chapter:nth-child(14) { animation-delay: .42s }
+    .chapter:nth-child(15) { animation-delay: .45s }
+    .chapter:nth-child(16) { animation-delay: .48s }
+
+    @media (max-width: 600px) {
+      header { padding: 16px 24px; }
+      main   { padding: 40px 24px 80px; }
+      footer { padding: 16px 24px; }
+    }
+
+    .intro {
+      border-bottom: 1px solid var(--ink);
+      padding-bottom: 48px;
+      margin-bottom: 64px;
+    }
+
+    .main-title {
+      font-family: 'Unbounded', sans-serif;
+      font-weight: 700;
+      font-size: clamp(32px, 6vw, 64px);
+      letter-spacing: .04em;
+      line-height: 1.1;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <span class="site-title">VARELSER</span>
+</header>
+
+<main>
+  <div class="intro">
+    <h1 class="main-title">慈愛体系</h1>
+  </div>
+  <div class="chapters">
+
+    <!-- 序章 -->
+    <div class="chapter" onclick="toggle(this)">
+      <div class="chapter-num">序章</div>
+      <div class="chapter-body">
+        <div class="chapter-title">なぜ今、変性意識なのか <span class="toggle">+</span></div>
+        <ul class="sub-list">
+          <li>自己という牢獄</li>
+          <li>「自分探し」の時代</li>
+          <li>反芻という病</li>
+          <li>脳の中の「私」</li>
+          <li>変性意識とは何か</li>
+          <li>ルネサンス</li>
+          <li>「治らない」という呪い</li>
+          <li>心理療法の可能性と限界</li>
+          <li>変性意識という扉</li>
+          <li>太古からの知恵</li>
+          <li>世界各地の実践</li>
+          <li>なぜ普遍的なのか</li>
+          <li>苦しみから慈悲へ—本書の核心</li>
+          <li>本書の構成</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 第1章 -->
+    <div class="chapter" onclick="toggle(this)">
+      <div class="chapter-num">01</div>
+      <div class="chapter-body">
+        <div class="chapter-title">精神の地図—3層モデル <span class="toggle">+</span></div>
+        <ul class="sub-list">
+          <li>「心」とは何か</li>
+          <li>からだ層：生体の現在</li>
+          <li>自動層：反応の高速道路</li>
+          <li>物語層：「私」という語り</li>
+          <li>2つのつまみ：意図と変性意識</li>
+          <li>3層モデルの臨床適用</li>
+          <li>後続章への道案内</li>
+          <li>複論理（Bi-Logic）：意識と無意識の数学</li>
+          <li>トラウマと構造的解離</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 第2章 -->
+    <div class="chapter" onclick="toggle(this)">
+      <div class="chapter-num">02</div>
+      <div class="chapter-body">
+        <div class="chapter-title">脳のネットワーク—DMN・GNW・予測処理 <span class="toggle">+</span></div>
+        <ul class="sub-list">
+          <li>脳を「見る」技術</li>
+          <li>デフォルトモードネットワーク（DMN）</li>
+          <li>DMNと精神病理</li>
+          <li>グローバル・ニューロナル・ワークスペース</li>
+          <li>予測処理パラダイム</li>
+          <li>REBUSモデル</li>
+          <li>4E認知—計算から身体へのパラダイムシフト</li>
+          <li>アロスタシス—予測する脳と身体予算</li>
+          <li>トリプルネットワークモデル—脳の動的均衡システム</li>
+          <li>発達障害：神経発達的なネットワーク配線の違い</li>
+          <li>ネットワーク不均衡の包括的マップ</li>
+          <li>発達段階とネットワーク成熟</li>
+          <li>内受容感覚と腸脳相関—感じる内臓</li>
+          <li>免疫・炎症と意識—身体の防衛システムが心を作る</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 第3章 -->
+    <div class="chapter" onclick="toggle(this)">
+      <div class="chapter-num">03</div>
+      <div class="chapter-body">
+        <div class="chapter-title">変性意識とは何か—エントロピック・ブレインへの旅 <span class="toggle">+</span></div>
+        <ul class="sub-list">
+          <li>ルードウィグの遺産</li>
+          <li>「見える」ようになった意識</li>
+          <li>エントロピック・ブレイン仮説</li>
+          <li>現代的含意—生成AIとハルシネーション</li>
+          <li>一次意識への回帰</li>
+          <li>神経可塑性—脳を変える脳</li>
+          <li>5D-ASC尺度</li>
+          <li>臨床介入の比較分析—二つの治療経路</li>
+          <li>脳波で見る意識—周波数から心を読む</li>
+          <li>統合的治療フレームワーク—身体から意識へ、恒常性から変容へ</li>
+          <li>意識の建築学—心理学における「魂」の喪失と回帰</li>
+          <li>意識の神経内分泌学—ホルモンが織りなす現実のレンズ</li>
+          <li>変性意識の神経解剖学—意識のゲートキーパーから統合中枢まで</li>
+          <li>変性意識の視覚現象学—幾何学から光明へ</li>
+          <li>変性意識の個人差—遺伝学と発達的視点</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 第4章 -->
+    <div class="chapter" onclick="toggle(this)">
+      <div class="chapter-num">04</div>
+      <div class="chapter-body">
+        <div class="chapter-title">変性意識の誘発法—瞑想からサイケデリクスまで <span class="toggle">+</span></div>
+        <ul class="sub-list">
+          <li>多様な扉</li>
+          <li>瞑想</li>
+          <li>慈悲と瞑想—神経可塑性の頂点</li>
+          <li>慈悲の語源と概念史—仏教とサンスクリット語</li>
+          <li>阿闍世コンプレックス—日本的精神分析の視点</li>
+          <li>ユマニチュード—慈悲のケア技法</li>
+          <li>呼吸法</li>
+          <li>感覚遮断（フローテーション）</li>
+          <li>光刺激—点滅する光と意識の入口</li>
+          <li>テクノロジー誘発ASC—神経工学とデジタル意識変容</li>
+          <li>音楽・リズム・同調運動</li>
+          <li>リズム同調—身体を「引っ張る」メカニズム</li>
+          <li>音楽による変性意識誘発の神経科学</li>
+          <li>雅楽・神事・神楽—日本における変性意識の伝統</li>
+          <li>美的体験と利他行動—救いの神経科学</li>
+          <li>ドローン音楽と持続音の伝統</li>
+          <li>ラ・モンテ・ヤングと「永遠の音楽」—純正律とTheatre of Eternal Music</li>
+          <li>Swansにおける音響的トランスの探求—「自己の消滅」と儀式的ライブ</li>
+          <li>世界の持続音の伝統—タンプーラ、ディジュリドゥ、笙</li>
+          <li>ノイズ・アンビエントと意識変容</li>
+          <li>ドローン音楽の脳波同調と変性意識誘発</li>
+          <li>アンビエント—環境としての音楽</li>
+          <li>ノイズとジャパノイズ—情報過多によるトランス</li>
+          <li>バイノーラルビートと音響エントレーション</li>
+          <li>バイノーラルビートの神経科学—脳幹での「うなり」生成と皮質同調</li>
+          <li>ヘミシンクとフォーカス・レベル—モンロー研究所の意識地図</li>
+          <li>ドリームマシーン—ストロボスコープと視覚誘発変性意識</li>
+          <li>音楽神経科学—二重経路モデルと予測的符号化</li>
+          <li>脳波（EEG）の基礎—周波数帯域と意識状態</li>
+          <li>サイケデリクス</li>
+          <li>変性意識の比較神経科学—統合的分析</li>
+          <li>睡眠と夢の神経科学—毎晩の変性意識</li>
+          <li>アートとテクノロジーによるASC誘発</li>
+          <li>ルシッド・ドリーミング（明晰夢）</li>
+          <li>VR/XR技術と変性意識</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 第5章 -->
+    <div class="chapter" onclick="toggle(this)">
+      <div class="chapter-num">05</div>
+      <div class="chapter-body">
+        <div class="chapter-title">畏敬（Awe）という入口—日常でアクセスできる変性意識 <span class="toggle">+</span></div>
+        <ul class="sub-list">
+          <li>サプライズ・ガーデン</li>
+          <li>畏敬の定義</li>
+          <li>畏敬の心理効果：スモール・セルフ</li>
+          <li>畏敬と利他性</li>
+          <li>畏敬と時間</li>
+          <li>畏敬の神経科学</li>
+          <li>REBUSモデルと畏敬の発生メカニズム—予測システムの「リセット」</li>
+          <li>畏敬発生の4ステッププロセス</li>
+          <li>圧倒的な刺激との遭遇 → 予測システムの破綻 → トップダウン制御の弛緩 → システム・リセット</li>
+          <li>死と再生の同義性—自我消滅と全体合一</li>
+          <li>自己縮小と解放のパラドックス</li>
+          <li>DMN低下と境界なき意識</li>
+          <li>畏敬の生理学—迷走神経と抗炎症効果</li>
+          <li>畏敬の測定尺度—科学的に捉える</li>
+          <li>ダーク・オー—脅威基盤の畏敬とそのリスク</li>
+          <li>世界の文化における畏敬—幽玄からUbuntuまで</li>
+          <li>Overview Effect—宇宙からの畏敬</li>
+          <li>ヌミノース—戦慄と魅惑の神秘</li>
+          <li>ルドルフ・オットーの「聖なるもの」</li>
+          <li>Mysterium Tremendum et Fascinans</li>
+          <li>サイケデリクス体験との対応</li>
+          <li>ケルトナーの「8つの驚異」—畏敬の源泉</li>
+          <li>道徳的美、集合的沸騰、自然、音楽</li>
+          <li>視覚的デザイン、精神性、生と死、エピファニー</li>
+          <li>畏敬の実践—畏敬の散歩（Awe Walk）</li>
+          <li>畏敬と変性意識の共通神経基盤</li>
+          <li>DMN抑制、「小さな自己」、向社会性、抗炎症</li>
+          <li>畏敬を日常に</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 第6章 -->
+    <div class="chapter" onclick="toggle(this)">
+      <div class="chapter-num">06</div>
+      <div class="chapter-body">
+        <div class="chapter-title">神話と儀礼の中の変性意識 <span class="toggle">+</span></div>
+        <ul class="sub-list">
+          <li>シャーマンの旅</li>
+          <li>集合的変性意識—共にトランスする</li>
+          <li>比較宗教学の視座—神秘主義の各伝統</li>
+          <li>東洋哲学の深淵—意識の地図</li>
+          <li>洞窟壁画と変性意識—岩壁の「膜」を通して</li>
+          <li>存在論的転回—複数の世界という問い</li>
+          <li>アニミズムの認知技術—トランスと神経生理学</li>
+          <li>通過儀礼とリミナリティ</li>
+          <li>火・水・音—儀礼の媒体</li>
+          <li>日本における変性意識の伝統</li>
+          <li>儀礼的トランスの神経科学—恐怖と律動の心理工学</li>
+          <li>神話と変性意識—外部化された神経生理学的プロセス</li>
+          <li>ニューロセオロジー（神経神学）—神話生成のハードウェア</li>
+          <li>認知オペレーター：二項演算子、因果律演算子、全体的演算子</li>
+          <li>生物遺伝学的構造主義（ダキリ、ニューバーグ）</li>
+          <li>脱求心化と「絶対的単一性（AUB）」</li>
+          <li>エントプティック現象と洞窟壁画の秘密</li>
+          <li>世界の土着信仰における変性意識—人類学的地形図</li>
+          <li>死と再生の生物学—細胞から神話へ</li>
+          <li>苦しみから慈悲へ—進化が用意した教科書</li>
+          <li>死の瞬間と慈悲—ガンマ波が明かすもの</li>
+          <li>慈悲—生物学的な「究極の境地」</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 第7章 -->
+    <div class="chapter" onclick="toggle(this)">
+      <div class="chapter-num">07</div>
+      <div class="chapter-body">
+        <div class="chapter-title">原始性の復権—プリミティヴィズムの潮流 <span class="toggle">+</span></div>
+        <ul class="sub-list">
+          <li>近代の不安</li>
+          <li>ゴーギャンとタヒチ</li>
+          <li>ピカソとアフリカ彫刻</li>
+          <li>ストラヴィンスキーと『春の祭典』</li>
+          <li>批判と再解釈</li>
+          <li>「原始性」の再定義</li>
+          <li>「原始性」と変性意識の進化的・神経科学的接続</li>
+          <li>「新しいアミニズム」—存在論的転回</li>
+          <li>エンセオジェン（神聖植物）の考古学</li>
+          <li>視覚芸術鑑賞の神経科学—美の脳内地図</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 第8章 -->
+    <div class="chapter" onclick="toggle(this)">
+      <div class="chapter-num">08</div>
+      <div class="chapter-body">
+        <div class="chapter-title">シュルレアリスムと無意識 <span class="toggle">+</span></div>
+        <ul class="sub-list">
+          <li>歴史的背景：戦争のトラウマとダダの灰</li>
+          <li>無意識の発見とフロイトの影響</li>
+          <li>眠りの時代（Époque des sommeils）—催眠による変性意識実験</li>
+          <li>シュルレアリスム宣言と研究所</li>
+          <li>自動筆記と偶然—無意識へのアクセス技法</li>
+          <li>シュルレアリストたちの技法</li>
+          <li>マルクス主義との緊張—精神と社会の二重革命</li>
+          <li>バタイユの異議—低次唯物論</li>
+          <li>女性シュルレアリストたち—ミューズから創造者へ</li>
+          <li>グローバルな展開—日本のシュルレアリスム</li>
+          <li>岡本太郎—対極主義と縄文的生命力の復権</li>
+          <li>無意識への介入としての芸術</li>
+          <li>変性意識との接続</li>
+          <li>シュルレアリスム技法の神経科学的分析</li>
+          <li>ベルギー派の概念的シュルレアリスム</li>
+          <li>デジタル時代の「超現実」—カオ・フェイとピエール・ユイグ</li>
+          <li>現代への遺産—未完の革命</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 第9章 -->
+    <div class="chapter" onclick="toggle(this)">
+      <div class="chapter-num">09</div>
+      <div class="chapter-body">
+        <div class="chapter-title">映画における変性意識——スクリーンに投影された意識の変容 <span class="toggle">+</span></div>
+        <ul class="sub-list">
+          <li>映画と変性意識—メディアの本質</li>
+          <li>「夢の工場」としての映画</li>
+          <li>映画の神経科学—ミラーニューロンと共感</li>
+          <li>変性意識を主題とする映画作家たち</li>
+          <li>アンドレイ・タルコフスキー—時間の彫刻</li>
+          <li>リチャード・リンクレイター—夢と時間の探求者</li>
+          <li>松本俊夫—日本の前衛と意識の解体</li>
+          <li>チャーリー・カウフマン—意識の迷宮</li>
+          <li>ギャスパー・ノエ—感覚への直接攻撃</li>
+          <li>ヤン・シュヴァンクマイエル—触覚的シュルレアリスム</li>
+          <li>デヴィッド・リンチ—無意識の風景画家</li>
+          <li>アレハンドロ・ホドロフスキー—詩的行為としての映画</li>
+          <li>ロン・フリック—言語を超えた意識の旅</li>
+          <li>映像技法と変性意識—対応表</li>
+          <li>映画—民主化された変性意識</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 第10章 -->
+    <div class="chapter" onclick="toggle(this)">
+      <div class="chapter-num">10</div>
+      <div class="chapter-body">
+        <div class="chapter-title">DMN正常化と統合のメカニズム <span class="toggle">+</span></div>
+        <ul class="sub-list">
+          <li>「リセット」という比喩</li>
+          <li>DMNの一時的抑制</li>
+          <li>ネットワーク連結の再編成</li>
+          <li>体験の質と治療効果</li>
+          <li>統合（Integration）</li>
+          <li>臨床エビデンスの現状</li>
+          <li>長期フォローアップ研究</li>
+          <li>緩和ケアへの応用</li>
+          <li>臨死体験（NDE）とケタミン—脳の極限状態</li>
+          <li>依存症とサイケデリクス—「つながり」の病の治療</li>
+          <li>統合プロトコル</li>
+          <li>瞑想と畏敬の効果</li>
+          <li>トラウマと構造的解離</li>
+          <li>スピリチュアル・バイパスの罠</li>
+          <li>身体化（Embodiment）と統合の実践</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 第11章 -->
+    <div class="chapter" onclick="toggle(this)">
+      <div class="chapter-num">11</div>
+      <div class="chapter-body">
+        <div class="chapter-title">実践のプロトコル <span class="toggle">+</span></div>
+        <ul class="sub-list">
+          <li>回復のための道具箱</li>
+          <li>「道具箱」という考え方</li>
+          <li>なぜ「日常」で実践するのか</li>
+          <li>始める前に</li>
+          <li>段階的アプローチ</li>
+          <li>畏敬の散歩（Awe Walk）</li>
+          <li>呼吸法</li>
+          <li>マインドフルネス瞑想</li>
+          <li>慈悲の瞑想（メッター・バーヴァナー）</li>
+          <li>音楽と身体運動</li>
+          <li>創作活動</li>
+          <li>自然との接触（森林浴）</li>
+          <li>断食と食事のリズム</li>
+          <li>セット＆セッティング</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 第12章 -->
+    <div class="chapter" onclick="toggle(this)">
+      <div class="chapter-num">12</div>
+      <div class="chapter-body">
+        <div class="chapter-title">意識の生化学—神経伝達物質と栄養学的変調 <span class="toggle">+</span></div>
+        <ul class="sub-list">
+          <li>エビデンスレベルについて</li>
+          <li>モノアミン作動系—意識の質感を決める神経伝達物質</li>
+          <li>内因性DMTとメチル化回路—生化学的超越のメカニズム</li>
+          <li>松果体の生理学—石灰化のメカニズムと保全</li>
+          <li>コリン作動系と意識の覚醒—明晰夢へのアプローチ</li>
+          <li>エンドカンナビノイド・システム（ECS）と至福の分子</li>
+          <li>代謝シフト—ケトーシスとミトコンドリアの覚醒</li>
+          <li>脳波の変調と栄養素</li>
+          <li>天然のモノアミン酸化酵素阻害剤（MAOIs）</li>
+          <li>ニューロ・ニュートリション・マトリックス—統合的アプローチ</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 第13章 -->
+    <div class="chapter" onclick="toggle(this)">
+      <div class="chapter-num">13</div>
+      <div class="chapter-body">
+        <div class="chapter-title">統合と安全—体験を日常に橋渡しする <span class="toggle">+</span></div>
+        <ul class="sub-list">
+          <li>禁忌と注意</li>
+          <li>専門家のサポートを求めるとき</li>
+          <li>体験の統合（Integration）</li>
+          <li>統合とは何か</li>
+          <li>統合なき体験の問題</li>
+          <li>統合の3段階</li>
+          <li>統合プラクティス—具体的技法</li>
+          <li>統合の障壁と克服</li>
+          <li>専門的統合サポート</li>
+          <li>失敗と困難な体験への対処</li>
+          <li>統合としての生き方</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 第14章 -->
+    <div class="chapter" onclick="toggle(this)">
+      <div class="chapter-num">14</div>
+      <div class="chapter-body">
+        <div class="chapter-title">意識の未来—ハード・プロブレムからハイヴ・マインドまで <span class="toggle">+</span></div>
+        <ul class="sub-list">
+          <li>意識のハード・プロブレムと変性意識研究</li>
+          <li>先住民の知識への敬意</li>
+          <li>ニューロエシックスと認知的自由（Cognitive Liberty）</li>
+          <li>意識統合の深層構造—断片から全体性へ</li>
+          <li>ユング心理学における個性化</li>
+          <li>トラウマと構造的解離—断片化した自己</li>
+          <li>スピリチュアル・バイパス—統合を阻む罠</li>
+          <li>意識統合の科学—IITと多重実現可能性</li>
+          <li>IIT vs GNWT—意識の科学の最前線</li>
+          <li>クオリア計算—意識の「形」</li>
+          <li>BCI技術の最前線—脳と機械の融合</li>
+          <li>インターネット・オブ・センシズ—2030年の予測</li>
+          <li>ハイヴ・マインド—ユートピアかディストピアか</li>
+          <li>三つの統合次元の収束</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 終章 -->
+    <div class="chapter" onclick="toggle(this)">
+      <div class="chapter-num">終章</div>
+      <div class="chapter-body">
+        <div class="chapter-title">慈愛 <span class="toggle">+</span></div>
+        <ul class="sub-list">
+          <li>旅の終わりに</li>
+          <li>溶解の先にあるもの</li>
+          <li>自己の相対化と連結の回復</li>
+          <li>畏敬の神経生理学—統合のまとめ</li>
+          <li>環境ミスマッチと「原始性」</li>
+          <li>回復とは何か</li>
+          <li>未来の展望</li>
+          <li>慈悲—溶解の先にあるもの</li>
+          <li>苦しみの意味—序章への回帰</li>
+          <li>あなたの通路</li>
+          <li>通路は開かれている</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="dot-row">
+    <span class="dot active"></span>
+    <span class="dot"></span>
+    <span class="dot"></span>
+    <span class="dot"></span>
+    <span class="dot"></span>
+    <span class="dot"></span>
+    <span class="dot"></span>
+    <span class="dot"></span>
+    <span class="dot"></span>
+    <span class="dot"></span>
+    <span class="dot"></span>
+    <span class="dot"></span>
+    <span class="dot"></span>
+  </div>
+
+</main>
+
+<footer>
+  <span>VARELSER</span>
+  <span>変性意識 — 序章から終章まで</span>
+</footer>
+
+<script>
+  function toggle(el) {
+    el.classList.toggle('open');
+  }
+</script>
+
+</body>
+</html>
