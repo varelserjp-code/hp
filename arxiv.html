@@ -101,19 +101,83 @@
     <p class="page-title">最新の arXiv AI 論文要約</p>
     <p class="page-desc">arXiv の最新AI論文をAIで日本語要約し、定期更新しています。</p>
 <!-- ARTICLES_START -->
-<article data-arxiv-id="http://arxiv.org/abs/2603.18004v1">
-  <p class="meta">arXiv　Wed, 18 Mar 2026 17:59:56 Z</p>
-  <h2 class="article-title">効率的なビデオVLMのための統一された時空間トークンスコアリング</h2>
-  <div class="summary">ビデオベースの視覚言語モデル（VLM）において、時間的な冗長性を削減し計算効率を高めるためには、トークン剪定が不可欠です。<br><br>従来の剪定手法は、単一モダリティタスク向けにVision Transformer (ViT) 内で行われるか、あるいは複雑なテキスト条件付けを必要とするLLM内でのみ行われていました。<br><br>本研究では、テキスト条件付けやトークン結合なしにViTとLLMの両方で視覚トークンを剪定する、シンプルで軽量なモジュール「Spatio-Temporal Token Scoring (STTS)」を提案します。<br><br>STTSは、補助損失とLLMの下流勾配を活用して時空間的にスコアリングを学習し、アーキテクチャ全体で視覚トークンの50%を剪定することに成功しました。<br><br>その結果、13のビデオQAタスクにおいて平均性能の低下をわずか0.7%に抑えつつ、学習時および推論時の効率を62%向上させることができました。<br><br>この手法は、統一されたアーキテクチャ全体にわたる視覚トークン剪定のための、新規かつシンプルでありながら非常に効果的なアプローチを示しています。</div>
+<article>
+  <p class="meta">arXiv cs.AI　Wed, 18 Mar 2026 17:59:10 Z</p>
+  <h2 class="article-title">Loc3R-VLM: 視覚言語モデルによる言語ベースの3D位置特定と推論</h2>
+  <div class="summary">本論文は、2次元の視覚言語モデル（VLM）に単眼ビデオ入力から高度な3D理解能力を付与するフレームワーク「Loc3R-VLM」を提案します。<br><br>人間の空間認知に着想を得て、シーン構造の全体的な表現を構築するためのグローバルレイアウト再構築と、自己中心的視点を固定するための明示的な状況モデリングという2つの共同目標に依存します。これらの目標は、知覚と言語の両方を3Dコンテキストに結びつける直接的な空間的監督を提供します。<br><br>幾何学的整合性とメトリック尺度アライメントを確保するため、事前学習済みの3D基盤モデルから抽出された軽量なカメラポーズ事前情報を活用します。Loc3R-VLMは、言語ベースの位置特定において最先端の性能を達成し、状況依存および一般的な3D質問応答ベンチマークにおいて、既存の2Dおよびビデオベースのアプローチを上回ります。これは、提案する空間監督フレームワークが強力な3D理解を可能にすることを示しています。</div>
   <div class="source-box">
     <strong>ソース・引用元</strong><br>
-    配信元：arXiv<br>
-    原題：Unified Spatio-Temporal Token Scoring for Efficient Video VLMs<br>
-    原文URL：<a href="http://arxiv.org/abs/2603.18004v1" target="_blank" rel="noopener">http://arxiv.org/abs/2603.18004v1</a>
+    配信元：arXiv cs.AI<br>
+    著者：Kevin Qu, Haozhe Qi, Mihai Dusmanu, Mahdi Rad, Rui Wang, Marc Pollefeys<br>
+    分類：cs.CV, cs.AI, cs.CL<br>
+    原文URL：<a href="https://arxiv.org/abs/2603.18002v1" target="_blank" rel="noopener">https://arxiv.org/abs/2603.18002v1</a>
   </div>
 </article>
 
+<article>
+  <p class="meta">arXiv cs.AI　Wed, 18 Mar 2026 16:54:07 Z</p>
+  <h2 class="article-title">IndicSafe: 南アジアにおける多言語LLMの安全性評価ベンチマーク</h2>
+  <div class="summary">本論文は、大規模言語モデル（LLM）が多言語環境で展開されるにつれて、文化的に多様でリソースの少ない言語における安全性の挙動が十分に理解されていないという問題に取り組みます。<br><br>12億人以上が話す12のインド諸語にわたるLLMの安全性に関する初の体系的な評価を提示します。これらの言語はLLMのトレーニングデータでは過小評価されています。カースト、宗教、ジェンダー、健康、政治を網羅する6,000の文化的に根ざしたプロンプトのデータセットを使用し、10の主要なLLMの安全性を評価します。<br><br>分析の結果、言語間で顕著な安全性のドリフトが明らかになりました。言語間の合意はわずか12.8%であり、安全率のばらつきは言語間で17%を超えます。一部のモデルはリソースの少ないスクリプトで無害なプロンプトを過剰に拒否したり、政治的に敏感なトピックを過剰にフラグ付けしたりする一方、安全でない生成をフラグ付けできないモデルも存在します。これらの失敗をプロンプトレベルのエントロピー、カテゴリバイアススコア、多言語一貫性指数を用いて定量化します。本研究の知見は、多言語LLMにおける重大な安全性一般化ギャップを浮き彫りにし、安全性の整合性が言語間で均等に転移しないことを示しています。文化的に情報に基づいたインド諸語展開のための安全性評価を可能にする初のベンチマークであるIndicSafeを公開し、地域的な危害に基づいた言語認識型整合戦略を提唱します。</div>
+  <div class="source-box">
+    <strong>ソース・引用元</strong><br>
+    配信元：arXiv cs.AI<br>
+    著者：Priyaranjan Pattnayak, Sanchari Chowdhuri<br>
+    分類：cs.CL, cs.AI<br>
+    原文URL：<a href="https://arxiv.org/abs/2603.17915v1" target="_blank" rel="noopener">https://arxiv.org/abs/2603.17915v1</a>
+  </div>
+</article>
 
+<article>
+  <p class="meta">arXiv cs.AI　Wed, 18 Mar 2026 17:59:56 Z</p>
+  <h2 class="article-title">効率的なビデオVLMのための統一的時空間トークン評価</h2>
+  <div class="summary">本論文は、特にビデオベースのタスクにおいて計算効率を高めるためのトークン削減の重要性に着目し、効率的なビデオ視覚言語モデル（VLM）のための新しい手法を提案します。<br><br>従来のトークン削減アプローチは、単一モダリティの知覚タスクに限定されるか、複雑なテキスト条件付き選択メカニズムを必要とするという課題がありました。本研究では、Spatiotemporal Token Scoring（STTS）というシンプルで軽量なモジュールを導入します。これは、テキスト条件付けやトークンマージなしに、ビジョン・トランスフォーマー（ViT）と大規模言語モデル（LLM）の両方でビジョントークンを削減します。<br><br>STTSは、補助的な損失を通じて時間的なスコアリングを学習し、LLMの下流勾配を通じて空間的なスコアリングを行うことで、アーキテクチャ全体でビジョントークンの50%を削減します。これにより、13の短編および長編ビデオQAタスク全体で平均パフォーマンスのわずか0.7%の低下で、トレーニングと推論の両方で62%の効率向上が実現されます。効率の向上は、ビデオあたりのサンプリングフレーム数が増加するにつれて大きくなります。長編ビデオQAに対するテスト時スケーリングを適用すると、ベースラインと比較して0.5〜1%のパフォーマンス向上が得られます。全体として、STTSは、統一されたアーキテクチャ全体にわたるビジョントークン削減のための、シンプルかつ効果的な新しい技術です。</div>
+  <div class="source-box">
+    <strong>ソース・引用元</strong><br>
+    配信元：arXiv cs.AI<br>
+    著者：Jianrui Zhang, Yue Yang, Rohun Tripathi, Winson Han, Ranjay Krishna, Christopher Clark, Yong Jae Lee, Sangho Lee<br>
+    分類：cs.CV, cs.AI, cs.LG<br>
+    原文URL：<a href="https://arxiv.org/abs/2603.18004v1" target="_blank" rel="noopener">https://arxiv.org/abs/2603.18004v1</a>
+  </div>
+</article>
+
+<article>
+  <p class="meta">arXiv cs.AI　Wed, 18 Mar 2026 16:16:28 Z</p>
+  <h2 class="article-title">RAMP：LLM推論を効率化する強化学習適応型混合精度量子化</h2>
+  <div class="summary">本論文は、リソースが制約されたハードウェアへの大規模言語モデル（LLM）展開に不可欠な、学習後量子化に関する研究です。既存手法は層間で一様なビット幅を強制し、精度と効率のトレードオフを最適化できていませんでした。<br><br>本研究では、強化学習（オフポリシーSoft Actor-Criticフレームワーク）を用いたRAMP（Reinforcement Adaptive Mixed Precision）を提案します。RAMPは、グローバルなビット予算内でパープレキシティを最小化するために、層ごとのビット幅割り当てを学習します。このポリシーは、活性化統計、重み特性、構造記述子の11次元埋め込みに条件付けられ、モデルファミリーやスケールを超えたゼロショット転送を可能にします。<br><br>特に、4ビット未満の安定した量子化を実現するために、スケール折り畳みという前処理技術を導入しています。これは、チャネルごとのスケーリングと正規化層の補償を通じて、活性化の外れ値を重みに移行させるものです。質を重視した報酬関数と予算の急峻性が、迅速な収束を促進します。Llama 2 7Bでは、RAMPは3.68GB（実効3.65ビット）で5.54のパープレキシティを達成し、一様な4ビットAWQ（3.90GBで5.60）を上回り、サイズで6%、品質で1%から3%向上しました。さらに、Llama 2 7Bのみで学習したポリシーが、Llama 2 13BやMistral 7Bにゼロショットで汎化し、ターゲット固有の学習を上回ることが多く、量子化感度は主にアーキテクチャに依存するという仮説を支持しています。HALOパイプラインは、カーネルフリー推論のためにGGUF形式で割り当てをエクスポートし、FP16コモンセンス推論性能の99.5%を維持します。</div>
+  <div class="source-box">
+    <strong>ソース・引用元</strong><br>
+    配信元：arXiv cs.AI<br>
+    著者：Arpit Singh Gautam, Saurabh Jha<br>
+    分類：cs.LG, cs.AI<br>
+    原文URL：<a href="https://arxiv.org/abs/2603.17891v1" target="_blank" rel="noopener">https://arxiv.org/abs/2603.17891v1</a>
+  </div>
+</article>
+
+<article>
+  <p class="meta">arXiv cs.CL　Wed, 18 Mar 2026 17:31:47 Z</p>
+  <h2 class="article-title">ConGA：機械翻訳における文脈的ジェンダーアノテーションのためのガイドライン</h2>
+  <div class="summary">本論文は、機械翻訳（MT）および大規模言語モデル（LLM）におけるジェンダー処理の課題に取り組んでいます。特に、英語のようなジェンダーニュートラルな言語からイタリア語のような文法的にジェンダーを持つ言語への翻訳において、非対称性がしばしば男性形への偏りを引き起こし、バイアスを強化し、翻訳精度を低下させます。<br><br>この問題に対処するため、語レベルのジェンダーアノテーションのための言語学的に根拠のあるガイドラインセットであるConGA（Contextual Gender Annotation）フレームワークを提案します。このスキームは、英語における意味的ジェンダーを3つのタグ（男性、女性、曖昧）で区別し、イタリア語における文法的ジェンダーの実現（男性、女性）を、文をまたぐ追跡のためのエンティティレベルの識別子と組み合わせています。<br><br>ConGAをgENder-ITデータセットに適用し、翻訳におけるジェンダーバイアスの評価のためのゴールドスタンダードリソースを作成しました。結果は、体系的な男性形の過剰使用と一貫性のない女性形の実現を示しており、現在のMTシステムの持続的な限界を浮き彫りにしています。この研究は、詳細な言語アノテーションと定量的評価を組み合わせることで、よりジェンダーを意識した多言語NLPシステムを構築するための方法論とベンチマークを提供します。</div>
+  <div class="source-box">
+    <strong>ソース・引用元</strong><br>
+    配信元：arXiv cs.CL<br>
+    著者：Argentina Anna Rescigno, Eva Vanmassenhove, Johanna Monti<br>
+    分類：cs.CL<br>
+    原文URL：<a href="https://arxiv.org/abs/2603.17962v1" target="_blank" rel="noopener">https://arxiv.org/abs/2603.17962v1</a>
+  </div>
+</article>
+
+<article>
+  <p class="meta">arXiv cs.CL　Wed, 18 Mar 2026 15:59:30 Z</p>
+  <h2 class="article-title">ドメイン接地型階層的検索によるLLMのハルシネーション軽減</h2>
+  <div class="summary">本論文は、大規模言語モデル（LLM）が生成する事実誤認や根拠のない内容である「ハルシネーション」の問題に対処します。この問題は、信頼性が最重要視される高リスクドメインにおいて特に深刻です。<br><br>提案するアーキテクチャは、LLMを確率的パターンマッチングから検証された真実追求へとシフトさせることで、事実誤認を体系的に傍受するように設計された、ドメイン接地型階層的検索および検証パイプラインです。このフレームワークは、LangGraphを介して実装された4段階の自己調整パイプラインを利用します。具体的には、（I）早期終了ロジックによる内在的検証、（II）ドメイン検出器を用いた適応的検索ルーティング、（III）CRAG（Corrective Retrieval-Augmented Generation）による関連性の低いコンテキストのフィルタリング、（IV）外部生成とその後のアトミックな主張レベル検証です。<br><br>このシステムは、5つの多様なベンチマーク（TimeQA v2, FreshQA v2, HaluEval General, MMLU Global Facts, TruthfulQA）からの650のクエリで評価されました。経験的結果は、このパイプラインが一貫してゼロショットベースラインを上回ることを示しています。特に、TimeQA v2では83.7%、MMLU Global Factsでは78.0%の勝率を記録し、詳細な時間的および数値的精度を必要とするドメインでの高い有効性を確認しました。根拠性スコアは、事実に基づいた回答行全体で78.8%から86.4%の間で安定して推移しました。このアーキテクチャは誤情報に対する堅牢なフェイルセーフを提供しますが、「誤った前提に基づく過剰な主張」という持続的な失敗モードが特定されました。これらの発見は、多段階RAGの動作に関する詳細な経験的特徴付けを提供し、将来の研究では会話型AIの信頼性のギャップをさらに埋めるために、検索前の「回答可能性」ノードを優先すべきであることを示唆しています。</div>
+  <div class="source-box">
+    <strong>ソース・引用元</strong><br>
+    配信元：arXiv cs.CL<br>
+    著者：Md. Asraful Haque, Aasar Mehdi, Maaz Mahboob, Tamkeen Fatima<br>
+    分類：cs.CL, cs.AI<br>
+    原文URL：<a href="https://arxiv.org/abs/2603.17872v1" target="_blank" rel="noopener">https://arxiv.org/abs/2603.17872v1</a>
+  </div>
+</article>
 <!-- ARTICLES_END -->
   </div>
 </body>
