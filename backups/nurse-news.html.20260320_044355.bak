@@ -1,0 +1,546 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Nursing News | VARELSER</title>
+  <style>
+    :root{
+      --bg: #fff;
+      --fg: #111;
+      --muted: rgba(0,0,0,.55);
+      --border: #e8e8e8;
+      --accent: #0056b3;
+      --card-bg: #fafafa;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--fg);
+      font-family: ui-sans-serif, system-ui, -apple-system,
+        "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Segoe UI", sans-serif;
+      line-height: 1.8;
+      font-size: 16px;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 48px 24px;
+    }
+    .back-link {
+      display: inline-block;
+      margin-bottom: 32px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 14px;
+    }
+    .back-link:hover { color: var(--fg); }
+    .page-title {
+      font-size: 22px;
+      font-weight: 700;
+      margin: 0 0 8px;
+      letter-spacing: .02em;
+    }
+    .page-desc {
+      color: var(--muted);
+      font-size: 13px;
+      margin: 0 0 48px;
+    }
+    article {
+      margin-bottom: 56px;
+      padding-bottom: 48px;
+      border-bottom: 1px solid var(--border);
+    }
+    article:last-child {
+      border-bottom: none;
+    }
+    .meta {
+      font-size: 12px;
+      color: var(--muted);
+      margin: 0 0 10px;
+      letter-spacing: .02em;
+    }
+    .article-title {
+      font-size: 19px;
+      font-weight: 700;
+      margin: 0 0 20px;
+      line-height: 1.5;
+      letter-spacing: .01em;
+    }
+    .summary {
+      font-size: 15px;
+      color: #222;
+      line-height: 1.9;
+      margin-bottom: 24px;
+      white-space: normal;
+    }
+    .source-box {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px 16px;
+      font-size: 13px;
+      color: #555;
+      line-height: 1.7;
+    }
+    .source-box strong {
+      color: var(--fg);
+      display: block;
+      margin-bottom: 4px;
+    }
+    .source-box a {
+      color: var(--accent);
+      word-break: break-all;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a href="/hp/" class="back-link">← ホームに戻る</a>
+    <p class="page-title">最新の医療・看護ニュース</p>
+    <p class="page-desc">海外の最新医療ニュースをAIで要約し、定期配信しています。</p>
+<!-- ARTICLES_START -->
+<article>
+  <p class="meta">ScienceDaily Health　Fri, 20 Mar 2026 03:08:04 Z</p>
+  <h2 class="article-title">オゼンピック等GLP-1受容体作動薬中止後の体重変化に関する実臨床研究</h2>
+  <div class="summary">GLP-1受容体作動薬（オゼンピック、マンジャロなど）の中止後に、多くの人が懸念するような劇的な体重増加は起こらない可能性が、約8,000人の患者を対象とした大規模な実臨床研究で示されました。この研究では、薬剤を中止した患者の多くが、治療の再開、他の薬剤への切り替え、または生活習慣の改善により、体重を維持、あるいはさらに減量することができていました。<br><br>これまで、管理された臨床試験では中止後に急速な体重増加が見られるという結果が示されていましたが、今回の新しいエビデンスはより希望の持てる見方を示唆しています。GLP-1受容体作動薬が広く使用されるようになるにつれて、管理された臨床試験の枠外で患者がこれらの薬剤を中止した場合に何が起こるのか、多くの人が疑問に思っています。<br><br>クリーブランド・クリニックによる約8,000人の患者を対象とした新しい分析によると、セマグルチドやチルトゼパチドのような薬剤を中止しても、実臨床の場では通常、大幅な体重増加にはつながらないことが示唆されています。多くの患者は、後で治療を再開したり、他の体重管理オプションに切り替えたりしており、これが体重増加を抑制するのに役立っている可能性があります。<br><br>GLP-1受容体作動薬の中止後の長期的な転帰を調査した、これまでに実施された中で最大規模の実臨床研究の1つである今回の研究では、かなりの数の患者が1年間体重を安定させることができたことがわかりました。これは、代替治療法や構造化された生活習慣のサポートによって達成されることがよくありました。看護実務への示唆：薬剤中止後の患者に対し、体重管理の継続的なサポートと代替治療法の選択肢を提供することが重要です。</div>
+  <div class="source-box">
+    <strong>ソース・引用元</strong><br>
+    配信元：ScienceDaily Health<br>
+    原文URL：<a href="https://www.sciencedaily.com/releases/2026/03/260319044648.htm" target="_blank" rel="noopener">https://www.sciencedaily.com/releases/2026/03/260319044648.htm</a>
+  </div>
+</article>
+
+<article>
+  <p class="meta">ScienceDaily Health　Fri, 20 Mar 2026 00:54:23 Z</p>
+  <h2 class="article-title">超加工食品の摂取が心臓発作・脳卒中リスクを67%増加させる可能性</h2>
+  <div class="summary">チップス、冷凍食品、甘い飲み物、包装されたスナック菓子などの超加工食品を大量に摂取すると、深刻な心臓病のリスクが大幅に高まる可能性があります。米国で行われた大規模な研究では、1日に約9サービングを摂取した人は、約1サービングしか摂取しなかった人と比較して、心臓発作、脳卒中、または心疾患による死亡のリスクが67%高かったとのことです。このリスクは、高摂取量だけでなく、摂取量が増えるにつれて上昇しました。カロリー、食事全体の質、一般的な健康状態を考慮しても、1日の摂取量が増えるごとにこれらのイベントの可能性が5%以上増加しました。<br><br>超加工食品の摂取量が多いと、深刻な心臓病のリスクが大幅に高まる可能性があることが、米国心臓病学会（ACC.26）で発表された研究で示されました。1日に9サービング以上を摂取した人は、1日あたり約1サービングしか摂取しなかった人と比較して、主要な心血管イベントを経験するリスクが67%高かったとのことです。超加工食品には、チップス、クラッカー、冷凍食品、加工肉、甘い飲み物、シリアル、パンなど、幅広い包装済み食品やインスタント食品が含まれます。<br><br>リスクは摂取量とともに着実に増加します。1日の摂取量が増えるごとに、心臓発作、脳卒中、または冠状動脈性心疾患や脳卒中による死亡の可能性が5%以上増加することに関連していました。この関連性は、他の人種グループと比較して、アフリカ系アメリカ人の間でより強いものでした。看護実務への示唆：患者に対し、超加工食品の摂取を控え、バランスの取れた食事を推奨することが、心血管疾患のリスク低減につながります。</div>
+  <div class="source-box">
+    <strong>ソース・引用元</strong><br>
+    配信元：ScienceDaily Health<br>
+    原文URL：<a href="https://www.sciencedaily.com/releases/2026/03/260319074604.htm" target="_blank" rel="noopener">https://www.sciencedaily.com/releases/2026/03/260319074604.htm</a>
+  </div>
+</article>
+
+<article>
+  <p class="meta">ScienceDaily Health　Thu, 19 Mar 2026 23:40:51 Z</p>
+  <h2 class="article-title">正常体重でも腹部脂肪は心不全リスクと関連、炎症が関与か</h2>
+  <div class="summary">体重計の数字以上に、腰回りの脂肪が危険である可能性が示唆されています。研究者らは、腹部脂肪が、正常体重の人であっても、ボディマス指数（BMI）よりも心不全リスクと強く関連していることを発見しました。この種の脂肪が特に有害である理由を説明する上で、炎症が重要な役割を果たしているようです。腹囲を測定することが、隠れたリスクを早期に検出するための簡単な方法となる可能性があります。<br><br>米国心臓病学会のEPI|Lifestyle Scientific Sessions 2026で発表された新しい研究によると、腰回りに蓄積された脂肪（中心性肥満または内臓脂肪）が、主に炎症のために心不全のリスクを高める可能性があるとのことです。この研究は、予防、ライフスタイル、および心血管代謝の健康に関する最新の知見を強調しています。<br><br>研究では、内臓脂肪のレベルが高いほど、全体的な体重よりも心不全リスクとの関連が強いことがわかりました。腹囲が大きいことは、BMIが正常範囲内にある人でもリスクの増加と関連していました。これらの結果は、脂肪が体内に蓄積される場所が、体重の量よりも重要である可能性を示唆しています。炎症は、腹部脂肪が心臓の健康にこれほど強い影響を与える理由を説明するのに役立つようです。したがって、腹囲の測定は、BMIだけに頼るよりも、リスクの高い人を特定するためのより良い方法を提供する可能性があります。<br><br>看護実務への示唆：患者のBMIだけでなく腹囲も測定し、中心性肥満のリスクを評価することで、心不全のリスクを早期に特定し、予防策を講じることが重要です。</div>
+  <div class="source-box">
+    <strong>ソース・引用元</strong><br>
+    配信元：ScienceDaily Health<br>
+    原文URL：<a href="https://www.sciencedaily.com/releases/2026/03/260319074558.htm" target="_blank" rel="noopener">https://www.sciencedaily.com/releases/2026/03/260319074558.htm</a>
+  </div>
+</article>
+
+<article>
+  <p class="meta">CDC (Centers for Disease Control and Prevention)　Sat, 28 Feb 2026 10:00:00 Z</p>
+  <h2 class="article-title">米国CDC予防接種諮問委員会の新任医師2名発表</h2>
+  <div class="summary">米国保健福祉省（HHS）と疾病予防管理センター（CDC）は、予防接種実施諮問委員会（ACIP）に新たに2名の医師が任命されたことを発表しました。今回の任命は、ロバート・F・ケネディ・ジュニア長官が、国の予防接種政策を導く上で、透明性、厳格な科学、多様な臨床専門知識へのコミットメントを反映したものです。長官は2025年6月に、ワクチンの信頼回復を目指してACIPを再編成しました。<br><br>新たに任命されたのは、内科・小児科を専門とするショーン・G・ダウニング医師と、テキサス州で家族健康ウェルネスクリニックを経営する小児科医のアンジェリーナ・ファレラ医師です。ダウニング医師は20年以上にわたり、フロリダ州で内科および小児科のプライマリケアに従事し、医療過疎地域での無保険患者の診療経験も持ちます。ファレラ医師も20年以上にわたり小児科医として、自身のクリニック経営のほか、小児救急、代診診療など幅広い臨床経験を有しています。<br><br>ケネディ長官は、「ACIPは証拠を公然と精査し、厳しい質問をし、透明性のある議論を通じて国民の信頼を得なければならない」と述べました。「ダウニング医師とファレラ医師は、子供、成人、家族のケアにおける数十年の実務経験をもたらしており、この最前線の視点は、最高水準の科学に基づき、国民の信頼に値する勧告を行う上で不可欠です。」<br><br>CDCのジェイ・バタチャリア暫定所長は、「公衆衛生は、科学が厳格でプロセスが透明である場合に最も効果的に機能する」と述べ、「これらの任命は、患者や家族にとって予防接種ガイダンスがどのように重要であるかを理解している経験豊富な臨床医によってACIPを強化するものです。」と付け加えました。ACIPは、米国の一般市民におけるワクチンで予防可能な疾患の管理のための予防接種の使用について、CDC長官およびHHS長官に勧告を提供します。<br><br>看護実務への示唆：予防接種政策の策定プロセスに、多様な臨床経験を持つ専門家が関与することは、現場のニーズや患者の視点を反映した、より実践的で信頼性の高いガイドラインにつながる可能性があります。看護師は、これらの専門家による勧告の実施者として、最新の科学的根拠に基づいた質の高いケアを提供するために、委員会の構成や議論の動向を注視することが重要です。</div>
+  <div class="source-box">
+    <strong>ソース・引用元</strong><br>
+    配信元：CDC (Centers for Disease Control and Prevention)<br>
+    原文URL：<a href="https://tools.cdc.gov/api/embed/downloader/download.asp?m=132608&amp;c=763817" target="_blank" rel="noopener">https://tools.cdc.gov/api/embed/downloader/download.asp?m=132608&amp;c=763817</a>
+  </div>
+</article>
+
+<article>
+  <p class="meta">ScienceDaily Health　Wed, 18 Mar 2026 08:15:21 Z</p>
+  <h2 class="article-title">肺なしで48時間生存、革新的治療で救命された男性</h2>
+  <div class="summary">重度のインフルエンザによる感染で肺が破壊され多臓器不全に陥った33歳の男性が、両肺を摘出し、人工肺システムを用いて48時間生存したという画期的な症例が報告されました。<br><br>この男性は、急性呼吸窮迫症候群（ARDS）を発症し、肺機能が著しく低下していました。感染拡大を防ぐために両肺の摘出が必要でしたが、移植手術に耐えられる状態ではなかったため、一時的に人工肺システムで生命維持を図ることになりました。<br><br>人工肺システムは、血液の酸素化、二酸化炭素の除去、循環のサポートを行い、患者の心臓や他の臓器が機能し続けることを可能にしました。これにより、患者の状態は安定し、2日後にドナー肺の提供を受けて無事、肺移植手術が成功しました。<br><br>現在、患者は健康な肺機能を取り戻し、通常の生活を送っています。この症例は、重症患者のドナー臓器移植待ち期間における新たな生命維持戦略の可能性を示唆しています。<br><br>看護実務への示唆：重症呼吸不全患者における一時的な生命維持装置（人工肺など）の管理と、移植待機中の患者の全身状態のモニタリングおよび管理の重要性が示唆されます。</div>
+  <div class="source-box">
+    <strong>ソース・引用元</strong><br>
+    配信元：ScienceDaily Health<br>
+    原文URL：<a href="https://www.sciencedaily.com/releases/2026/03/260317064507.htm" target="_blank" rel="noopener">https://www.sciencedaily.com/releases/2026/03/260317064507.htm</a>
+  </div>
+</article>
+
+<article>
+  <p class="meta">ScienceDaily Health　Thu, 19 Mar 2026 12:09:07 Z</p>
+  <h2 class="article-title">筋力トレーニング：最も効果的な計画はシンプルで継続可能なもの</h2>
+  <div class="summary">最新の研究に基づいたストレングストレーニングのガイドラインでは、どのようなレジスタンストレーニングでも行うことが最も重要であると強調されています。たとえシンプルなルーティンであっても、筋肉量、筋力、身体機能を向上させることが可能です。<br><br>このガイドラインは、17年ぶりの大きな改訂であり、137の系統的レビューと3万人以上の参加者を対象とした研究に基づいています。これにより、これまでで最も包括的でエビデンスに基づいたレジスタンストレーニングの推奨事項が示されました。<br><br>専門家は、「最も良いレジスタンストレーニングプログラムは、実際に継続できるものです。完璧な計画を追求するよりも、主要な筋肉群を週に少なくとも2回トレーニングすることがはるかに重要です。バーベル、バンド、自重トレーニングのいずれであっても、一貫性と努力が結果をもたらします」と述べています。<br><br>また、効果的なレジスタンストレーニングはジムに通う必要はなく、ゴムバンド、自重運動、自宅での簡単なルーティンでも筋力や筋肉量の増加、日常生活の機能改善が期待できることも示されています。個人の好みや楽しみ、長期的な継続可能性が最も重要であるというアプローチは、高齢になっても健康で活動的な状態を維持したい成人にとって特に重要です。<br><br>看護実務への示唆：患者の生活習慣や好みに合わせた、継続可能な運動プログラムの提案と、運動習慣の定着を支援するアプローチの重要性が示唆されます。</div>
+  <div class="source-box">
+    <strong>ソース・引用元</strong><br>
+    配信元：ScienceDaily Health<br>
+    原文URL：<a href="https://www.sciencedaily.com/releases/2026/03/260319074552.htm" target="_blank" rel="noopener">https://www.sciencedaily.com/releases/2026/03/260319074552.htm</a>
+  </div>
+</article>
+
+<article>
+  <p class="meta">ScienceDaily Health　Thu, 19 Mar 2026 11:19:27 Z</p>
+  <h2 class="article-title">マラリア原虫内部の微小な「ロケットエンジン」を発見、新薬開発やロボット技術への応用も期待</h2>
+  <div class="summary">マラリア原虫の細胞内に存在する微細な結晶が、過酸化水素を分解するロケットのような反応によって駆動されていることが新たな研究で明らかになりました。この発見は、原虫が有害な化学物質を解毒し、鉄分を効率的に管理するのに役立つ可能性があります。<br><br>これまで長年、科学者たちを悩ませてきたこの結晶の奇妙な動きは、過酸化水素の分解によって生じるエネルギーによって推進されていることが判明しました。この化学反応は、宇宙ロケットの推進にも利用されるものと同様の原理です。<br><br>研究チームは、原虫が生成する過酸化水素が結晶の動きを駆動するエネルギー源となっていることを突き止めました。低酸素条件下で原虫を培養すると、過酸化水素の生成が減少し、結晶の動きも遅くなることが確認されました。この発見は、マラリア治療の新薬開発につながる可能性を秘めています。<br><br>さらに、この微小な推進メカニズムは、ナノスケールのロボットシステム設計にも新たなインスピレーションを与える可能性があります。将来的には、この原理を利用した革新的な医療技術やロボット工学への応用が期待されます。<br><br>看護実務への示唆：感染症の原因となる病原体の微細なメカニズムの解明が、新たな治療法開発につながる可能性があり、感染症対策における基礎研究の重要性が示唆されます。</div>
+  <div class="source-box">
+    <strong>ソース・引用元</strong><br>
+    配信元：ScienceDaily Health<br>
+    原文URL：<a href="https://www.sciencedaily.com/releases/2026/03/260318033111.htm" target="_blank" rel="noopener">https://www.sciencedaily.com/releases/2026/03/260318033111.htm</a>
+  </div>
+</article>
+
+<article>
+  <p class="meta">ScienceDaily Health　Thu, 19 Mar 2026 10:57:52 Z</p>
+  <h2 class="article-title">甘い食品の摂取制限、欲求や健康改善に効果なし</h2>
+  <div class="summary">甘い食品の摂取量を減らしても、甘いものへの欲求が軽減されたり、健康指標が改善されたりするわけではないことが新たな研究で示唆されました。参加者が食事中の甘味を増やしても減らしても、嗜好、体重、疾患リスクに変化は見られませんでした。多くの参加者は、時間の経過とともに元の食習慣に戻りました。研究者らは、甘味の摂取を減らすことに焦点を当てるガイドラインを見直す時期かもしれないと述べています。<br><br>新たな臨床試験では、食事の甘味度を調整しても、甘い食品を楽しむ度合いには影響しないことが判明しました。参加者が甘い食品の摂取を増やしても減らしても、甘味に対する嗜好は変わらなかったのです。<br><br>また、心臓病や糖尿病に関連する指標にも意味のある違いは見られませんでした。6ヶ月間にわたり、甘い食品の摂取量を増やした参加者と減らした参加者では、すべての健康測定値で同様の結果が得られました。<br><br>これらの結果に基づき、研究者らは、肥満に対処するための甘い食品の摂取制限に焦点を当てた公衆衛生戦略を見直す必要がある可能性を示唆しています。研究者らは、「健康への懸念は砂糖の摂取量に関係している。一部のファストフードは甘くなくても高濃度の砂糖を含んでいる可能性がある。同様に、新鮮な果物や乳製品などの自然に甘い製品の多くは健康上の利点がある。したがって、公衆衛生上のアドバイスは、人々が摂取する砂糖とエネルギー密度の高い食品の量をどのように減らせるかに焦点を当てる必要がある」と結論付けています。<br><br>看護実務への示唆：患者への食事指導においては、単に「甘いものを減らす」という指示ではなく、砂糖やエネルギー密度の高い食品の摂取量削減に焦点を当て、個々の食品の栄養価や健康への影響を考慮した具体的なアドバイスを提供することが重要です。</div>
+  <div class="source-box">
+    <strong>ソース・引用元</strong><br>
+    配信元：ScienceDaily Health<br>
+    原文URL：<a href="https://www.sciencedaily.com/releases/2026/03/260318033107.htm" target="_blank" rel="noopener">https://www.sciencedaily.com/releases/2026/03/260318033107.htm</a>
+  </div>
+</article>
+
+<article>
+  <p class="meta">CDC (Centers for Disease Control and Prevention)　Wed, 11 Mar 2026 08:00:00 Z</p>
+  <h2 class="article-title">CDC、石炭採掘労働者向け無料健康診断を今年も実施</h2>
+  <div class="summary">米国疾病予防管理センター（CDC）傘下の国立労働安全衛生研究所（NIOSH）は、石炭採掘労働者を対象とした年次の移動式健康診断を開始しました。この連邦プログラムは21年目を迎え、黒肺病（石炭鉱山の粉塵吸引によって引き起こされる重篤だが予防可能な疾患）の早期発見を支援する、無料かつ機密性の高い検査を提供しています。<br><br>今年の検査は3月から5月にかけて、ウェストバージニア州、バージニア州、アラバマ州、ケンタッキー州、オハイオ州、インディアナ州の地域で実施されます。移動式検査ユニットで、仕事の経歴や呼吸器に関する問診、胸部X線検査、血圧測定、呼吸機能検査（スパイロメトリー）が行われます。現在および過去の石炭採掘労働者、坑内・露天掘り労働者、契約労働者など、すべての石炭採掘労働者の参加を歓迎します。<br><br>NIOSHのジョン・ハワード所長は、「アメリカの石炭採掘労働者は、我が国の運営を維持するために懸命に働き、犠牲を払っています。これらの機密性の高い無料検査は、彼らの健康を守り、肺疾患のリスクを軽減するための重要な方法です。黒肺病が早期に発見されれば、深刻な健康被害を防ぐことができます。そのため、最新鋭の移動ユニットを通じて、これらのサービスを必要としている地域に直接提供することが非常に重要です」と述べています。<br><br>検査は約30分で完了し、法律により機密が保持されます。参加を希望する方は、1-888-480-4042に電話するか、cwhsp@cdc.govにメールで予約できます。検査場所、日程、時間は、石炭労働者健康監視プログラムのウェブページ、Facebook、X/Twitterで公開されています。<br><br>看護実務への示唆：労働者の健康診断プログラムは、職業性疾患の早期発見と予防に不可欠です。看護師は、これらのプログラムへの参加を奨励し、検査結果に基づいたフォローアップや健康指導を提供することで、労働者の健康維持に貢献できます。</div>
+  <div class="source-box">
+    <strong>ソース・引用元</strong><br>
+    配信元：CDC (Centers for Disease Control and Prevention)<br>
+    原文URL：<a href="https://tools.cdc.gov/api/embed/downloader/download.asp?m=132608&amp;c=764138" target="_blank" rel="noopener">https://tools.cdc.gov/api/embed/downloader/download.asp?m=132608&amp;c=764138</a>
+  </div>
+</article>
+
+<article>
+  <p class="meta">CDC (Centers for Disease Control and Prevention)　Mon, 09 Mar 2026 08:00:00 Z</p>
+  <h2 class="article-title">CDC、州と連携し麻疹対策を強化</h2>
+  <div class="summary">米国疾病予防管理センター（CDC）は、サウスカロライナ州公衆衛生局、ノースカロライナ州保健福祉局と緊密に連携し、麻疹の発生を封じ込め、予防するための取り組みを再確認しました。サウスカロライナ州の要請に基づき、CDCのエピデミック知見サービス（EIS）の専門家が現地での対応活動を支援しています。また、州および地方当局と協力して、両州からのアウトブレイクデータを分析します。<br><br>疫学とアウトブレイク調査における専門知識は、感染経路の特定、封じ込め戦略の強化、そして地域社会を守るためのターゲットを絞ったワクチン接種と予防活動の指針策定に役立ちます。CDCは、地域ごとのニーズに合わせた包括的なリソースと技術支援を提供し続けています。<br><br>CDCのジェイ・バタチャリア代行所長は最近、全国の2,000人以上の公衆衛生パートナーとのウェビナーに参加し、麻疹の予防と封じ込めにおけるCDCの役割について議論し、州および地方のリーダーから直接話を聞きました。バタチャリア氏は、「信頼は公衆衛生の基盤であり、オープンさ、誠実さ、そして最良の利用可能な証拠によって築かれる。我々は、国中のパートナーと協力して麻疹を封じ込める中で、我々は耳を傾けており、ワクチン供給を含む幅広いツールを州および地方の公衆衛生パートナーに提供するためにここにいることを保証できる」と強調しました。<br><br>バタチャリア氏は最近、麻疹対策におけるCDCの包括的な対応を概説した公開ビデオメッセージを共有し、CDCのリソースの急増、州との緊密な連携、そして麻疹の予防と地域社会の保護に最も効果的なツールとしての麻疹・おたふく風邪・風疹（MMR）ワクチンの接種の継続的な重視を強調しました。<br><br>看護実務への示唆：麻疹のような感染症の発生時、看護師は公衆衛生当局との連携を強化し、ワクチン接種の重要性を啓発し、感染拡大防止策の実施を支援することが求められます。地域社会における公衆衛生への信頼を維持し、正確な情報を提供することが不可欠です。</div>
+  <div class="source-box">
+    <strong>ソース・引用元</strong><br>
+    配信元：CDC (Centers for Disease Control and Prevention)<br>
+    原文URL：<a href="https://tools.cdc.gov/api/embed/downloader/download.asp?m=132608&amp;c=764137" target="_blank" rel="noopener">https://tools.cdc.gov/api/embed/downloader/download.asp?m=132608&amp;c=764137</a>
+  </div>
+</article>
+
+<article>
+  <p class="meta">ScienceDaily Health　Wed, 18 Mar 2026 07:31:34 Z</p>
+  <h2 class="article-title">腸管手術後の肝臓保護と栄養吸収改善を目指す新薬候補</h2>
+  <div class="summary">腸管手術は、しばしば救命のために行われますが、その後に深刻な肝臓障害を引き起こすリスクがあります。現在、この合併症に対する有効な治療法は存在しません。しかし、この度、マウスを用いた研究で、腸管内で作用し肝臓を保護するとともに、栄養吸収を改善する可能性のある化合物が開発されました。<br><br>この化合物は、マウス実験において体重増加を促進し、肝臓の線維化を軽減する効果が示されました。さらに、化合物が腸管内に留まる性質を持つため、全身への副作用のリスクを回避できる可能性があります。この研究は、短腸症候群に苦しむ患者さんの予後改善に繋がる治療法の開発に向けた有望な一歩となることが期待されます。<br><br>短腸症候群は、腸管切除後に栄養吸収が困難になる状態であり、特に小児では長期的な中心静脈栄養が必要となる場合があります。この栄養法は肝臓に負担をかける可能性があり、肝臓病や肝移植のリスクを高めます。本研究で開発された化合物は、このような患者さんの肝臓保護と栄養状態の改善に貢献する可能性があります。<br><br>これまでの研究で、腸内細菌が産生する物質が肝臓に到達し損傷を引き起こすこと、そしてHDL（善玉コレステロール）がこれらの有害物質をブロックすることで肝臓を保護する可能性が示唆されていました。この新しい化合物は、HDL産生を促進する薬剤の一種であり、腸管に特異的に作用することで、全身への影響を最小限に抑えつつ肝臓を保護することを目指しています。<br><br>看護実務への示唆：腸管手術後の患者さんに対し、肝臓合併症のリスクと栄養吸収の重要性について理解を深め、新たな治療薬の開発動向に注意を払うことが求められます。また、患者さんの栄養状態や肝機能のモニタリングを継続し、合併症の早期発見・早期介入に努めることが重要です。</div>
+  <div class="source-box">
+    <strong>ソース・引用元</strong><br>
+    配信元：ScienceDaily Health<br>
+    原文URL：<a href="https://www.sciencedaily.com/releases/2026/03/260318033134.htm" target="_blank" rel="noopener">https://www.sciencedaily.com/releases/2026/03/260318033134.htm</a>
+  </div>
+</article>
+
+<article>
+  <p class="meta">ScienceDaily Health　Wed, 18 Mar 2026 02:08:54 Z</p>
+  <h2 class="article-title">幼少期のストレスが長期的な消化器系問題と関連する可能性</h2>
+  <div class="summary">幼少期のストレス体験が、腸と脳の連携を乱すことで、長期にわたる消化器系の問題を引き起こす可能性が新たな研究で示唆されています。マウスを用いた実験と、数千人の子供たちを対象とした研究の両方で、腹痛、便秘、過敏性腸症候群（IBS）などの症状との関連が発見されました。<br><br>この研究によると、幼少期のストレスは、脳の発達や自律神経系に影響を与え、それが消化器系の機能不全につながる可能性があります。特に、ストレスの種類や時期によって影響を受ける生物学的な経路が異なることが明らかになっており、将来的に症状に応じた個別化された治療法の開発が期待されます。<br><br>マウスを用いた実験では、幼少期にストレスを受けたマウスは、成長後も不安様行動や腹痛、腸の運動異常を示すことが確認されました。興味深いことに、腸の運動異常の種類は性別によって異なり、メスでは下痢、オスでは便秘が多く見られました。これは、ストレスが性ホルモンや神経伝達物質など、複数の要因に影響を与える可能性を示唆しています。<br><br>さらに、異なる生物学的経路が異なる症状を制御している可能性も示唆されました。例えば、交感神経系のシグナル伝達を抑制すると腸の運動異常は改善しましたが、痛みの軽減にはつながりませんでした。逆に、性ホルモンは痛みに影響を与えましたが、腸の運動には影響しませんでした。これは、消化器系の問題に対する治療法が、患者さんの症状に合わせて個別化される必要があることを示唆しています。<br><br>看護実務への示唆：患者さんやその家族に対し、幼少期のストレス体験が消化器系の健康に長期的な影響を与える可能性があることを伝え、心理的なサポートの重要性を認識することが求められます。また、消化器症状の訴えに対しては、身体的な要因だけでなく、心理社会的要因も考慮したアセスメントとケアを提供することが重要です。</div>
+  <div class="source-box">
+    <strong>ソース・引用元</strong><br>
+    配信元：ScienceDaily Health<br>
+    原文URL：<a href="https://www.sciencedaily.com/releases/2026/03/260317064444.htm" target="_blank" rel="noopener">https://www.sciencedaily.com/releases/2026/03/260317064444.htm</a>
+  </div>
+</article>
+
+<article>
+  <p class="meta">ScienceDaily Health　Tue, 17 Mar 2026 11:44:52 Z</p>
+  <h2 class="article-title">アルツハイマー病治療薬レカネマブの作用機序、免疫細胞の活性化が鍵と判明</h2>
+  <div class="summary">アルツハイマー病治療薬であるレカネマブ（製品名：レキュンビ）の正確な作用機序が、この度初めて詳細に解明されました。研究チームは、レカネマブが脳内の免疫細胞であるミクログリアを活性化させることで、病気の原因となるアミロイドプラークを除去する効果を発揮することを発見しました。この発見は、将来のアルツハイマー病治療薬の開発に大きな影響を与える可能性があります。<br><br>レカネマブは、アミロイドプラークに結合する抗体医薬ですが、その効果を発揮するためには、抗体の一部である「Fcフラグメント」が不可欠であることが明らかになりました。このFcフラグメントがミクログリアに対する「トリガー」として機能し、ミクログリアがアミロイドプラークを効率的に除去するように促します。このメカニズムの解明は、長年の疑問を解消し、より安全で効果的な治療法の開発指針となることが期待されます。<br><br>アルツハイマー病は、脳内にアミロイドプラークが蓄積することで神経細胞が損傷し、認知機能の低下を引き起こす疾患です。ミクログリアは、本来これらのプラークの周りに集まりますが、その除去能力は限定的です。レカネマブは、このミクログリアの機能を補強することで、病気の進行を遅らせることを目指しています。しかし、副作用も報告されており、その詳細な作用機序の解明が求められていました。<br><br>研究では、ヒトのミクログリア細胞を含む特殊なマウスモデルを使用し、レカネマブとミクログリアの相互作用を詳細に観察しました。その結果、Fcフラグメントが機能しない場合、レカネマブはアミロイドプラークの除去効果を示さないことが確認されました。これは、Fcフラグメントがミクログリアの活性化とプラーク除去に必須であることを強く示唆しています。<br><br>看護実務への示唆：レカネマブ治療を受けている患者さんに対し、薬剤の効果がミクログリアの活性化によるものであることを理解してもらうことが重要です。また、治療効果と副作用のバランスを考慮し、患者さんの状態を注意深くモニタリングするとともに、薬剤の作用機序に関する最新の研究動向を把握しておくことが求められます。</div>
+  <div class="source-box">
+    <strong>ソース・引用元</strong><br>
+    配信元：ScienceDaily Health<br>
+    原文URL：<a href="https://www.sciencedaily.com/releases/2026/03/260317064457.htm" target="_blank" rel="noopener">https://www.sciencedaily.com/releases/2026/03/260317064457.htm</a>
+  </div>
+</article>
+
+<article>
+  <p class="meta">ScienceDaily Health　Thu, 19 Mar 2026 06:32:09 Z</p>
+  <h2 class="article-title">減量なしでも前糖尿病は改善可能、脂肪の蓄積場所が鍵</h2>
+  <div class="summary">長年の定説に反し、前糖尿病の状態は減量なしでも改善し、血糖値が正常に戻る可能性があることが新たな研究で示されました。重要なのは体重ではなく、脂肪がどこに蓄積されているかです。腹部に蓄積された内臓脂肪は炎症を引き起こしインスリンの働きを妨げますが、皮下脂肪は健康的な代謝をサポートする可能性があります。<br><br>従来の糖尿病予防策は減量に重点が置かれてきましたが、今回の研究結果は、体重減少を伴わなくても前糖尿病が寛解し、将来の糖尿病発症リスクを減量による寛解と同程度に低減できる可能性を示唆しています。これは、過体重や肥満のリスクが高い人々への治療アプローチに変化をもたらすかもしれません。<br><br>研究者らは、内臓脂肪がインスリン抵抗性を引き起こすメカニズムと、皮下脂肪が代謝を改善するメカニズムを解明しました。体重が変わらなくても、脂肪が内臓から皮下へ移動することで、インスリンの感受性が改善されることが示唆されています。<br><br>この発見は、前糖尿病の管理において、体重減少のみに固執するのではなく、脂肪の分布や質に注目することの重要性を示唆しています。看護師は、患者に対し、食事や運動だけでなく、脂肪の蓄積場所を考慮した生活習慣の改善を指導することが求められます。</div>
+  <div class="source-box">
+    <strong>ソース・引用元</strong><br>
+    配信元：ScienceDaily Health<br>
+    原文URL：<a href="https://www.sciencedaily.com/releases/2026/03/260318033129.htm" target="_blank" rel="noopener">https://www.sciencedaily.com/releases/2026/03/260318033129.htm</a>
+  </div>
+</article>
+
+<article>
+  <p class="meta">ScienceDaily Health　Wed, 18 Mar 2026 23:12:17 Z</p>
+  <h2 class="article-title">猫の癌遺伝子解析でヒトとの共通性が判明、新たな治療法開発に期待</h2>
+  <div class="summary">初めて大規模に行われた猫の癌遺伝子解析により、ヒトの癌と多くの遺伝子変異が共通していることが明らかになりました。特に乳癌に関連する変異などが猫にも見られ、一部のヒト用癌治療薬が猫にも有効である可能性が示唆されています。ペットと人間が同じ環境を共有することを考えると、これらの類似性は癌の共通原因の解明につながるかもしれません。<br><br>この研究では、約500匹の飼い猫から採取された腫瘍サンプルが解析され、猫の癌を駆動する主要な遺伝子変化が特定されました。その結果、多くの変化がヒトの癌で見られるものと類似していることが判明しました。特に、猫の乳腺癌とヒトの乳癌の間には顕著な類似性が見られました。<br><br>この発見は、癌に関わる複数の遺伝子経路が、ゲノミクスや臨床研究を通じてさらに探求される可能性を示唆しています。将来的には、猫とヒトの両方の癌に対して、同じ変異を標的とする治療法の開発につながる可能性があります。<br><br>今回の研究結果は、猫の癌治療だけでなく、ヒトの癌治療法の開発にも貢献する可能性を秘めています。看護師は、動物由来感染症のリスク管理に加え、動物とヒトの健康の相互関連性についても理解を深め、多角的な視点でのケアを提供することが重要となります。</div>
+  <div class="source-box">
+    <strong>ソース・引用元</strong><br>
+    配信元：ScienceDaily Health<br>
+    原文URL：<a href="https://www.sciencedaily.com/releases/2026/03/260318033143.htm" target="_blank" rel="noopener">https://www.sciencedaily.com/releases/2026/03/260318033143.htm</a>
+  </div>
+</article>
+
+<article>
+  <p class="meta">ScienceDaily Health　Wed, 18 Mar 2026 10:47:36 Z</p>
+  <h2 class="article-title">毎日のコーヒー・紅茶摂取が脳の健康を保護する可能性、43年間の研究で示唆</h2>
+  <div class="summary">毎日のコーヒーや紅茶の摂取が、脳の健康維持に役立つ可能性が、43年間にわたる大規模研究で示されました。カフェイン入りのコーヒーを1日2～3杯、または紅茶を1～2杯摂取することで、認知症のリスクが18%低下し、認知機能の低下が緩やかになる傾向が見られました。この効果は、遺伝的に認知症のリスクが高い人にも見られました。<br><br>この研究では、13万人以上の参加者のデータを分析し、カフェイン入りコーヒーや紅茶の適度な摂取と、認知症リスクの低下、認知機能の低下抑制との関連性が明らかになりました。研究者らは、コーヒーや紅茶に含まれるポリフェノールやカフェインといった成分が、抗炎症作用や細胞損傷の抑制に寄与している可能性を指摘しています。<br><br>特に注目すべきは、カフェイン抜きのコーヒーでは同様の効果が見られなかった点です。これは、カフェインが脳保護効果に重要な役割を果たしている可能性を示唆しています。参加者の追跡期間が長かったため、長期的な飲料摂取パターンと脳の健康との関連性をより正確に評価することができました。<br><br>この研究結果は、認知症予防における食生活の重要性を示唆するものです。看護師は、患者に対し、バランスの取れた食事に加え、適度なカフェイン摂取が脳の健康維持に寄与する可能性について情報提供することが、認知症予防ケアの一環として役立つと考えられます。</div>
+  <div class="source-box">
+    <strong>ソース・引用元</strong><br>
+    配信元：ScienceDaily Health<br>
+    原文URL：<a href="https://www.sciencedaily.com/releases/2026/03/260318033138.htm" target="_blank" rel="noopener">https://www.sciencedaily.com/releases/2026/03/260318033138.htm</a>
+  </div>
+</article>
+
+<article>
+  <p class="meta">NIH (National Institutes of Health)　Thu, 19 Mar 2026 11:41:09 Z</p>
+  <h2 class="article-title">オハイオ州列車事故、健康影響調査のためNIHが研究事務所を開設</h2>
+  <div class="summary">2023年にオハイオ州イーストパレスチナで発生した列車脱線事故により、有害化学物質が地域に流出した問題に対し、米国国立衛生研究所（NIH）は、長期的な健康影響を評価・対処するための「イーストパレスチナ列車脱線事故健康研究プログラム事務所」を開設しました。<br><br>この事務所は、NIHが資金提供する5年間の1000万ドルの研究イニシアチブの中心となります。連邦の研究専門家が地域住民と直接連携し、研究を調整し、連邦政府支援の研究への参加を支援します。<br><br>この研究プログラムは、2023年の災害が公衆衛生に与える影響について、住民に明確で信頼できる情報を提供するとともに、大規模な環境健康災害への連邦政府の対応能力を強化することを目的としています。<br><br>看護実務への示唆：地域住民との直接的なコミュニケーションと信頼関係の構築が、健康影響調査の成功に不可欠であり、看護職は住民の懸念を理解し、研究への参加を促す上で重要な役割を担います。</div>
+  <div class="source-box">
+    <strong>ソース・引用元</strong><br>
+    配信元：NIH (National Institutes of Health)<br>
+    原文URL：<a href="https://www.nih.gov/news-events/news-releases/nih-opens-east-palestine-health-research-office-study-train-disaster" target="_blank" rel="noopener">https://www.nih.gov/news-events/news-releases/nih-opens-east-palestine-health-research-office-study-train-disaster</a>
+  </div>
+</article>
+
+<article>
+  <p class="meta">NIH (National Institutes of Health)　Thu, 19 Mar 2026 11:41:09 Z</p>
+  <h2 class="article-title">認知速度トレーニング、数週間で認知症診断を遅らせる可能性</h2>
+  <div class="summary">65歳以上の成人を20年間追跡したNIH（米国国立衛生研究所）資金提供の研究により、特定の認知トレーニングレジメンがアルツハイマー病および関連認知症（ADRD）の診断率低下と関連付けられました。3種類のトレーニングが評価されましたが、主に無意識の思考に働きかける迅速な物体検出タスクに挑戦したトレーニングのみが、メディケアの請求データによると認知症診断率の25%低下と関連していました。<br><br>この研究は、数週間の単純な脳トレーニングが、人々を長年にわたり精神的に健康に保つのに役立つ可能性を示唆しています。手頃な価格で実践的なツールが認知症の発症を遅らせ、高齢者の自立と生活の質を維持するのに役立つ可能性があるという考えは非常に強力です。<br><br>この研究では、参加者は5〜6週間にわたり週2回、60〜75分の認知トレーニングセッションにランダムに割り当てられました。その後、参加者の半数は11ヶ月後と35ヶ月後に別のトレーニングラウンドにランダムに割り当てられました。研究者たちは、2019年まで収集された2,021人の参加者のメディケアデータを分析して、各トレーニングレジメンの効果を評価しました。<br><br>看護実務への示唆：認知症の発症を遅らせる可能性のある介入策として、認知速度トレーニングが注目されます。看護職は、高齢者に対し、日常生活で取り入れやすい認知トレーニングの機会を提供し、その効果について情報提供を行うことが期待されます。</div>
+  <div class="source-box">
+    <strong>ソース・引用元</strong><br>
+    配信元：NIH (National Institutes of Health)<br>
+    原文URL：<a href="https://www.nih.gov/news-events/news-releases/cognitive-speed-training-over-weeks-may-delay-diagnosis-dementia-over-decades" target="_blank" rel="noopener">https://www.nih.gov/news-events/news-releases/cognitive-speed-training-over-weeks-may-delay-diagnosis-dementia-over-decades</a>
+  </div>
+</article>
+
+<article>
+  <p class="meta">NIH (National Institutes of Health)　Thu, 19 Mar 2026 11:41:09 Z</p>
+  <h2 class="article-title">眼細胞の「デジタルツイン」開発、加齢黄斑変性治療への道開く</h2>
+  <div class="summary">米国国立衛生研究所（NIH）の研究者たちは、重要な眼細胞のデジタルレプリカを開発し、健康な状態および疾患の影響下にある細胞がどのように自己組織化するかを研究するための新しいツールを提供しました。このプラットフォームは、50歳以上の視力低下の主な原因である加齢黄斑変性（AMD）のような失明疾患の治療法発見に新たな道を開きます。<br><br>この研究は、網膜色素上皮（RPE）細胞のサブセルラー解像度での初のデジタルツインであり、眼が生物医学研究全般に利用できる方法開発の理想的な場であることを示しています。RPE細胞は、網膜の光受容細胞に不可欠なリサイクルおよび支持的役割を果たしており、AMDなどの疾患ではRPE細胞が死滅し、最終的に視力低下につながります。<br><br>研究者たちは、誘導多能性幹細胞（iPS細胞）からNIHの国立眼研究所（NEI）で作成されたRPE細胞に基づき、高解像度の3Dデジタルツインを構築しました。自動共焦点顕微鏡を使用して、約4,000視野の細胞から採取された130万個のRPE細胞の3D画像データを収集しました。<br><br>このデジタルツインは、疾患が細胞およびサブセルラーレベルでRPEにどのように影響するかを研究するための参照として研究者に提供され、治療法発見に大きな変革をもたらす可能性があります。<br><br>看護実務への示唆：デジタルツイン技術は、疾患メカニズムの理解を深め、個別化された治療戦略の開発に貢献する可能性があります。看護職は、最新の医療技術に関する知識を深め、患者への説明やケア提供に活かすことが求められます。</div>
+  <div class="source-box">
+    <strong>ソース・引用元</strong><br>
+    配信元：NIH (National Institutes of Health)<br>
+    原文URL：<a href="https://www.nih.gov/news-events/news-releases/nih-scientists-develop-digital-twin-eye-cells-understand-treat-age-related-macular-degeneration" target="_blank" rel="noopener">https://www.nih.gov/news-events/news-releases/nih-scientists-develop-digital-twin-eye-cells-understand-treat-age-related-macular-degeneration</a>
+  </div>
+</article>
+
+<article>
+  <p class="meta">NIH (National Institutes of Health)　Thu, 19 Mar 2026 11:41:08 Z</p>
+  <h2 class="article-title">NIH、動物実験代替へヒト由来研究に1億5千万ドル投資</h2>
+  <div class="summary">米国国立衛生研究所（NIH）は、ヒトの生物学をより正確にシミュレートし、動物モデルへの依存を減らす研究手法の開発と普及のため、1億5千万ドル以上の資金提供を発表しました。これは、実験動物の使用を削減するという優先事項に沿ったものです。<br><br>この資金は、「Complement Animal Research in Experimentation (Complement-ARIE)」プログラムの下で初めて提供されるもので、新しいアプローチ手法（NAMs）として知られる、実験室やコンピューターベースの手法を開発、実施、標準化することを目的としています。米国の研究チームが、ヒトの疾患に対するより予測性の高いモデルを生成するためのプロジェクトを主導します。<br><br>このプログラムでは、技術開発センター（TDCs）を設立し、婦人科疾患、心疾患、神経疾患、希少疾患などの研究におけるNAMs開発を促進します。また、データ共有と標準化を促進するNAMsデータハブ・調整センター（NDHCC）や、信頼性の高い市場投入可能なNAMsの実施に必要な官民連携と規制専門知識を活用する検証・認定ネットワーク（VQN）も設置されます。<br><br>看護実務への示唆：新しい研究手法の導入は、疾患メカニズムの理解を深め、より個別化された治療法の開発につながる可能性があります。看護師は、これらの新しい知見を臨床現場に応用し、患者ケアの質の向上に貢献することが期待されます。</div>
+  <div class="source-box">
+    <strong>ソース・引用元</strong><br>
+    配信元：NIH (National Institutes of Health)<br>
+    原文URL：<a href="https://www.nih.gov/news-events/news-releases/nih-invests-150-million-human-based-research-reduce-use-animal-models" target="_blank" rel="noopener">https://www.nih.gov/news-events/news-releases/nih-invests-150-million-human-based-research-reduce-use-animal-models</a>
+  </div>
+</article>
+
+<article>
+  <p class="meta">ScienceDaily Health　Tue, 17 Mar 2026 05:59:33 Z</p>
+  <h2 class="article-title">DNAオリガミワクチン：mRNAを超える次世代技術の可能性</h2>
+  <div class="summary">新型コロナウイルス感染症（COVID-19）パンデミックでmRNAワクチンは大きな役割を果たしましたが、免疫持続期間の短さや製造の複雑さといった課題も浮き彫りになりました。これに対し、ハーバード大学などの研究チームは、DNAを折り畳んでナノ構造を作る「DNAオリガミ」技術を用いた新しいワクチンプラットフォーム「DoriVac」を開発しました。この技術は、免疫応答をより精密に制御することを目指しています。<br><br>DoriVacワクチンは、SARS-CoV-2、HIV、エボラウイルスなどのスパイクタンパク質に見られる特定のペプチド領域を標的として設計されました。マウスを用いた初期研究では、このワクチンが抗体産生（液性免疫）とT細胞の活性化（細胞性免疫）の両方において強力な免疫応答を誘導することが示されました。さらに、ヒトのリンパ節を模倣したマイクロ流体デバイスを用いた実験でも、ヒト細胞において抗原特異的な免疫応答が確認されています。<br><br>mRNAワクチンと比較して、DoriVacワクチンは同等の免疫活性を示しながらも、安定性が高く、保管や製造が容易であるという利点が示唆されています。これらの発見は、Nature Biomedical Engineering誌に掲載され、COVID-19だけでなく、HIVやエボラ出血熱といった他の感染症に対する、より安定し製造しやすいワクチンの開発につながる可能性が期待されています。<br><br>看護実務への示唆：DNAオリガミワクチンは、従来のワクチンに比べて安定性や製造の容易さといった利点を持つ可能性があります。将来的に実用化されれば、ワクチンの普及やアクセス改善に貢献し、感染症対策における看護師の役割にも影響を与えることが考えられます。</div>
+  <div class="source-box">
+    <strong>ソース・引用元</strong><br>
+    配信元：ScienceDaily Health<br>
+    原文URL：<a href="https://www.sciencedaily.com/releases/2026/03/260317015933.htm" target="_blank" rel="noopener">https://www.sciencedaily.com/releases/2026/03/260317015933.htm</a>
+  </div>
+</article>
+
+<article>
+  <p class="meta">ScienceDaily Health　Wed, 18 Mar 2026 22:01:48 Z</p>
+  <h2 class="article-title">高齢者の長寿と自立を支えるシンプルな習慣：自転車の効用</h2>
+  <div class="summary">日本の10年間にわたる研究により、高齢者が自転車に乗る習慣を持つことで、長期的なケアの必要性や死亡リスクが低下することが明らかになりました。特に、自動車を運転しない高齢者において、この効果は顕著でした。成人期後期に自転車に乗ることを開始した場合でも、あるいは継続した場合でも、健康維持に明らかな利点があることが示されています。<br><br>この研究結果は、自転車に乗ることが、高齢者の自立と健康維持のための驚くほど強力なツールとなり得ることを示唆しています。研究では、自転車に乗る頻度や距離に関わらず、健康へのポジティブな影響が観察されました。これは、特別な運動器具や施設を必要としない、手軽に取り入れられる健康増進法としての自転車の価値を強調するものです。<br><br>自転車に乗るというシンプルな習慣が、高齢者の身体的・精神的な健康を維持し、結果として生活の質（QOL）の向上に寄与する可能性が示唆されています。この習慣は、転倒リスクの低減や心血管系の健康維持にもつながる可能性があります。<br><br>看護実務への示唆：高齢者に対して、安全に配慮した上での自転車利用を推奨することは、身体機能の維持、転倒予防、そして精神的な健康の向上に寄与する可能性があります。看護師は、個々の高齢者の状態に合わせて、自転車利用のメリットと注意点を伝え、自立した生活を支援する一助とすることができます。</div>
+  <div class="source-box">
+    <strong>ソース・引用元</strong><br>
+    配信元：ScienceDaily Health<br>
+    原文URL：<a href="https://www.sciencedaily.com/releases/2026/03/260318033100.htm" target="_blank" rel="noopener">https://www.sciencedaily.com/releases/2026/03/260318033100.htm</a>
+  </div>
+</article>
+
+<article>
+  <p class="meta">NIH (National Institutes of Health)　Thu, 19 Mar 2026 10:02:06 Z</p>
+  <h2 class="article-title">脳卒中治療薬の臨床試験、一部中止へ</h2>
+  <div class="summary">米国国立衛生研究所（NIH）は、脳卒中治療薬候補の臨床試験「CAPTIVA」において、低用量リバーロキサバンを評価するアームを中止すると発表しました。<br><br>これは、独立した専門家グループであるデータ安全性モニタリング委員会（DSMB）による定期レビューの結果、安全性の懸念と治療効果の無効性が示唆されたためです。リバーロキサバンは、血栓の治療や予防に使用される抗凝固薬です。<br><br>CAPTIVA試験は、30歳以上の成人で、脳の主要な動脈が70～99％狭窄している脳卒中患者を対象とした大規模な臨床試験です。今回の結果は、低用量リバーロキサバンが標準治療と比較して安全ではなく、効果的でもない可能性を示唆しています。<br><br>この決定は、参加者の安全を最優先するというNIHの方針に基づくものです。試験中止に伴い、該当するアームに参加している患者には、薬剤の中止と今後の対応について指示が出されています。<br><br>今回の結果は、脳卒中治療における薬剤の安全性と有効性を慎重に評価することの重要性を示唆しています。看護師は、患者の安全を確保し、治療方針の変更について適切に情報提供を行う必要があります。</div>
+  <div class="source-box">
+    <strong>ソース・引用元</strong><br>
+    配信元：NIH (National Institutes of Health)<br>
+    原文URL：<a href="https://www.nih.gov/news-events/news-releases/nih-halts-arm-clinical-trial-evaluating-potential-stroke-treatment" target="_blank" rel="noopener">https://www.nih.gov/news-events/news-releases/nih-halts-arm-clinical-trial-evaluating-potential-stroke-treatment</a>
+  </div>
+</article>
+
+<article>
+  <p class="meta">NIH (National Institutes of Health)　Thu, 19 Mar 2026 10:02:06 Z</p>
+  <h2 class="article-title">妊婦のオピオイド使用障害治療、週1回製剤が有効か</h2>
+  <div class="summary">米国国立衛生研究所（NIH）が支援した臨床試験により、妊娠中のオピオイド使用障害（OUD）治療において、週1回投与の徐放性ブプレノルフィン製剤が、従来の舌下投与製剤よりも有効である可能性が示されました。<br><br>この試験では、週1回投与の徐放性ブプレノルフィン製剤を使用した群では、毎日舌下投与する製剤を使用した群と比較して、違法オピオイドの使用を中止できた割合が高く、重篤な有害事象の発生率も低いことが明らかになりました。<br><br>OUDの治療には舌下投与ブプレノルフィンが有効ですが、乱用のリスクやアドヒアランスの低下、血中濃度の変動による離脱症状や渇望のコントロール不足といった課題がありました。今回の週1回投与製剤は、これらの課題を克服する可能性を秘めています。<br><br>この結果は、妊娠中のOUD治療における新たな選択肢として、徐放性ブプレノルフィン製剤の使用を支持するものです。今後、より多くの妊婦が安全かつ効果的な治療を受けられるようになることが期待されます。<br><br>看護師は、OUDに苦しむ妊婦に対し、最新の治療法に関する情報を提供し、アドヒアランスを支援するとともに、母子双方の健康をサポートする役割が期待されます。</div>
+  <div class="source-box">
+    <strong>ソース・引用元</strong><br>
+    配信元：NIH (National Institutes of Health)<br>
+    原文URL：<a href="https://www.nih.gov/news-events/news-releases/clinical-trial-results-support-use-weekly-extended-release-buprenorphine-treatment-opioid-use-disorder-during-pregnancy" target="_blank" rel="noopener">https://www.nih.gov/news-events/news-releases/clinical-trial-results-support-use-weekly-extended-release-buprenorphine-treatment-opioid-use-disorder-during-pregnancy</a>
+  </div>
+</article>
+
+<article>
+  <p class="meta">NIH (National Institutes of Health)　Thu, 19 Mar 2026 10:02:06 Z</p>
+  <h2 class="article-title">遠隔地のHIV新規感染、70%減少させる介入研究</h2>
+  <div class="summary">米国国立衛生研究所（NIH）が支援した研究により、ケニアとウガンダの農村部において、テクノロジーを活用した介入によりHIV新規感染者数を70％削減できることが示されました。<br><br>この研究では、地域保健員や臨床医が提供する既存の医療インフラと、デジタルツールを組み合わせたアプローチが用いられました。これにより、HIV検査、予防、治療へのアクセスが向上し、感染拡大の抑制に繋がりました。<br><br>HIV予防・治療薬は既に存在しますが、医療システムがこれらのサービスを必要とする人々に十分にリーチできていないことが、感染拡大の要因の一つとなっています。この研究は、既存のインフラを活用し、テクノロジーでそのリーチを拡大するという、新たな解決策を提示しています。<br><br>この革新的な研究結果は、実世界の設定でHIV予防・治療戦略をテストする実装研究の重要性を強調しています。今後、このモデルが他の国々、特に医療資源が限られている地域でのHIV対策に応用されることが期待されます。<br><br>看護師は、テクノロジーを活用した地域密着型のヘルスケア提供において、重要な役割を担うことが期待されます。患者への教育、アドヒアランスの向上、そして地域社会全体の健康増進に貢献することが求められます。</div>
+  <div class="source-box">
+    <strong>ソース・引用元</strong><br>
+    配信元：NIH (National Institutes of Health)<br>
+    原文URL：<a href="https://www.nih.gov/news-events/news-releases/nih-supported-trial-reduces-hiv-incidence-70-rural-populations" target="_blank" rel="noopener">https://www.nih.gov/news-events/news-releases/nih-supported-trial-reduces-hiv-incidence-70-rural-populations</a>
+  </div>
+</article>
+
+<article>
+  <p class="meta">NIH (National Institutes of Health)　Thu, 19 Mar 2026 10:02:06 Z</p>
+  <h2 class="article-title">AIがパートナーからの暴力のリスクを予測するツールを開発</h2>
+  <div class="summary">米国立衛生研究所（NIH）の資金提供を受けた研究チームが、親密なパートナーからの暴力（IPV）のリスクがある患者を予測する人工知能（AI）ツールを開発しました。このツールは、医療機関で日常的に収集されるデータを使用して、機械学習モデルを訓練したものです。研究によると、このモデルはIPVのリスクを検出する上で高い精度を示しました。<br><br>IPVは、現在のまたは元交際相手からの虐待であり、生命を脅かす傷害、慢性的な痛み、精神的健康障害などを引き起こす可能性があります。米国では数百万人がこの問題の影響を受けていますが、安全への懸念やスティグマから、患者が虐待関係にあることを打ち明けることをためらうケースが多く、見過ごされがちです。<br><br>この研究では、ハーバード大学医学部の研究者らが主導し、医療現場でのIPV検出のために3つのAIモデルを比較検討しました。これらのモデルは、構造化された患者データや、放射線科レポートを含む医療記録の非構造化データから学習しています。特に、放射線科医は身体的外傷のパターン頻度など、IPVの兆候を認識する上で有利な立場にあることが示唆されています。<br><br>この臨床意思決定支援ツールは、IPVの予測と予防に大きな影響を与える可能性があります。多くのIPVケースが見過ごされることで、タイムリーな介入の機会が失われています。既存のスクリーニングツールでは捕捉しきれないケースも多く、臨床記録や画像データがIPVリスク検出に価値ある情報を提供することが期待されます。看護実務への示唆としては、AIツールを活用することで、潜在的なリスクを持つ患者を早期に特定し、より迅速かつ適切な介入につなげることが可能になるかもしれません。</div>
+  <div class="source-box">
+    <strong>ソース・引用元</strong><br>
+    配信元：NIH (National Institutes of Health)<br>
+    原文URL：<a href="https://www.nih.gov/news-events/news-releases/researchers-develop-ai-tool-predict-patients-risk-intimate-partner-violence" target="_blank" rel="noopener">https://www.nih.gov/news-events/news-releases/researchers-develop-ai-tool-predict-patients-risk-intimate-partner-violence</a>
+  </div>
+</article>
+
+<article>
+  <p class="meta">NIH (National Institutes of Health)　Thu, 19 Mar 2026 10:02:06 Z</p>
+  <h2 class="article-title">アルツハイマー病の新クラスのバイオマーカーを確立：タンパク質構造変化を測定</h2>
+  <div class="summary">米国立衛生研究所（NIH）の支援を受けた研究により、アルツハイマー病の新たな血液バイオマーカー検査法が特定されました。この検査法は、タンパク質の構造変化を測定することで、従来の血液検査よりも疾患の根本的な生物学的メカニズムに関する詳細な情報を提供します。この発見は、アルツハイマー病の生物学が男性と女性でどのように異なるかについての新たな洞察も提供します。<br><br>この研究は『Nature Aging』誌に掲載され、NIHの国立老化研究所（NIA）が資金提供しました。研究者らは、タンパク質の構造変化を調べることで、疾患のリスク因子や症状の背景にあるメカニズムについて、より深く理解できる可能性があると考えています。これは、早期診断や、より効果的な臨床試験の実施につながる可能性があります。<br><br>従来のアルツハイマー病の血液検査の多くは、疾患関連タンパク質の量を測定しますが、この研究では、タンパク質の構造変化に着目しました。アルツハイマー病では、細胞機能の調節不全がタンパク質の異常な折りたたみを引き起こすことが知られています。研究チームは、これらの構造変化が血液検査で検出可能であり、疾患検出に役立つのではないかと仮説を立てました。<br><br>さらに、アルツハイマー病患者の多くが神経精神症状を発症しますが、その頻度や重症度には男女差があることが示唆されています。この研究では、タンパク質の構造変化が、これらの性差の背景にある生物学的プロセスを理解するのに役立つ可能性も探求されました。看護実務への示唆としては、この新しいバイオマーカーは、患者の病状をより詳細に把握し、個別化されたケアプランの策定や、臨床試験への参加判断に役立つ可能性があります。</div>
+  <div class="source-box">
+    <strong>ソース・引用元</strong><br>
+    配信元：NIH (National Institutes of Health)<br>
+    原文URL：<a href="https://www.nih.gov/news-events/news-releases/study-measuring-changes-protein-structure-establishes-new-class-alzheimers-biomarkers" target="_blank" rel="noopener">https://www.nih.gov/news-events/news-releases/study-measuring-changes-protein-structure-establishes-new-class-alzheimers-biomarkers</a>
+  </div>
+</article>
+
+<article>
+  <p class="meta">NIH (National Institutes of Health)　Thu, 19 Mar 2026 10:02:06 Z</p>
+  <h2 class="article-title">CTスキャン自動解析で臨床評価を迅速化：AIツール「Merlin」が疾患の早期発見に貢献</h2>
+  <div class="summary">米国立衛生研究所（NIH）の資金提供を受けた研究チームが、医療画像診断を大きく前進させる可能性のある、汎用性の高い機械学習モデル「Merlin」を開発しました。このAIツールは、3次元腹部CTスキャンを解析し、解剖学的特徴の特定から、数年先の疾患発症予測まで、幅広いタスクを実行できます。Merlinは、特定のタスクのために開発された他の自動化ツールを上回る性能を示しました。<br><br>研究チームは、スタンフォード大学医学部から提供された、放射線科レポートや診断コードと紐づけられた、過去最大規模の腹部CTスキャンデータセットを用いてMerlinを訓練しました。NIH国立生物医学イメージング・バイオエンジニアリング研究所（NIBIB）のブルース・トロンバーグ博士は、このような質の高いデータセットがAIモデルの能力を押し上げるために不可欠であると述べています。<br><br>CT検査は初期の医療評価で一般的に用いられますが、診断には放射線科医の解剖が必要です。このプロセスは時間がかかり、医師不足が深刻化する中で、その負担は増大しています。Merlinのようなツールは、従来の放射線科のプロセスを超え、画像診断から直接、可能性のある診断へと進むことを可能にするかもしれません。<br><br>Merlinは、大規模でラベル付けされていないデータセットで訓練された「基盤モデル」と呼ばれる新しいクラスのモデルです。研究者たちは、Merlinを診断、予後予測、品質評価を含む750以上の個別のタスクにわたる6つの広範なカテゴリでテストしました。看護実務への示唆としては、CTスキャンの解析時間を短縮し、より迅速な診断と治療計画の開始を支援することで、患者のケアの質向上に貢献する可能性があります。</div>
+  <div class="source-box">
+    <strong>ソース・引用元</strong><br>
+    配信元：NIH (National Institutes of Health)<br>
+    原文URL：<a href="https://www.nih.gov/news-events/news-releases/automated-ct-scan-analysis-could-fast-track-clinical-assessments" target="_blank" rel="noopener">https://www.nih.gov/news-events/news-releases/automated-ct-scan-analysis-could-fast-track-clinical-assessments</a>
+  </div>
+</article>
+
+<article>
+            <p class="meta">WHO (World Health Organization)　Wed, 18 Mar 2026 00:01:15 Z</p>
+            <h2 class="article-title">Progress in reducing child deaths slows as 4.9 million children die before age five</h2>
+            <div class="summary">最新の推計によると、2024年には世界中で推定490万人の子どもが5歳になる前に命を落とし、そのうち230万人は新生児でした。これらの死亡のほとんどは、既に確立された費用対効果の高い介入と質の高い医療へのアクセスがあれば予防可能であるにもかかわらず、このような現状が続いています。<br><br>2000年以降、世界の5歳未満児死亡率は半分以下に減少しましたが、2015年以降、その改善ペースは60%以上も鈍化しています。今年の報告書では、初めて死因の推計が詳細に統合され、より明確な状況が示されました。<br><br>特に、重症急性栄養失調（SAM）による直接的な死亡が新たに推定され、2024年には1～59ヶ月の子ども10万人以上がSAMで命を落としました。栄養失調は子どもの免疫力を低下させ、一般的な小児疾患による死亡リスクを高めるため、間接的な影響を含めるとその負担はさらに大きいとされています。<br><br>新生児死亡は5歳未満児死亡全体のほぼ半分を占め、出生前後の死亡予防の進展が遅い現状を反映しています。新生児の主な死因は、早産による合併症、分娩中の合併症、感染症（新生児敗血症など）、先天性異常でした。生後1ヶ月以降では、マラリア、下痢、肺炎といった感染症が主な死因で、特にマラリアは年齢層で最大の死因（17%）を占め、その多くはサハラ以南アフリカの風土病地域で発生しています。<br><br>子どもの死亡は一部の地域に集中しており、2024年にはサハラ以南アフリカが世界の5歳未満児死亡全体の58%を占めました。この地域の5歳未満児死亡の半数以上は主要な感染症によるものです。南アジアでは全死亡の25%を占め、早産、出産時の仮死、新生児感染症など、生後1ヶ月目の合併症が主な要因でした。これらの地域間の大きな格差は、救命効果が実証されている介入へのアクセスが不平等であることを反映しています。紛争の影響を受けている国々では、子どもが5歳になる前に死亡する確率は、他の地域の約3倍にも上ります。<br><br>また、2024年には推定210万人の5歳から24歳の小児、青年、若者が死亡しました。低年齢では感染症や外傷が主な死因である一方、思春期になるとリスクは変化し、女子では自傷行為が、男子では交通事故が主要な死因となっています。<br><br>ユニセフやWHOなどの国際機関は、これらの死亡の多くが予防可能であると強調し、世界的な予算削減が進む中で子どもの生存に関する進展が鈍化している現状に懸念を表明しています。質の高い妊婦健診、熟練した医療従事者による分娩、病気の新生児ケア、予防接種、そして一次医療への持続的な投資と政治的意志が不可欠であると訴えています。子どもの健康への投資は、最も費用対効果の高い開発策の一つであり、社会経済的利益を生み出すことが証明されています。<br><br>日本の看護師の皆様にとって、このような国際的な状況は、私たちが日々提供しているケア、特に周産期ケア、感染症予防、栄養指導といった基本的な看護介入の重要性を改めて認識する機会となるでしょう。確立された解決策は存在し、私たち医療従事者がその知識と技術を共有し、国際的な協力の枠組みの中で貢献していくことの意義は大きいと言えます。全ての子どもが生き延び、成長する機会を得られるよう、行動が求められています。</div>
+            <div class="source-box">
+              <strong>ソース・引用元</strong><br>
+              配信元：WHO (World Health Organization)<br>
+              原文URL：<a href="https://www.who.int/news/item/18-03-2026-progress-in-reducing-child-deaths-slows-as-4.9-million-children-die-before-age-five" target="_blank" rel="noopener">https://www.who.int/news/item/18-03-2026-progress-in-reducing-child-deaths-slows-as-4.9-million-children-die-before-age-five</a>
+            </div>
+          </article>
+
+<article>
+            <p class="meta">WHO (World Health Organization)　Wed, 11 Mar 2026 14:18:29 Z</p>
+            <h2 class="article-title">Conflict deepens health crisis across Middle East, WHO says</h2>
+            <div class="summary">中東地域で紛争が激化し、医療システムが深刻な危機に直面しています。負傷者や避難民の数が急増し、医療機関への攻撃が続く中で、公衆衛生上のリスクも高まっています。イランでは千三百人以上の死者と九千人以上の負傷者、レバノンでは少なくとも五百七十人の死者と千四百人以上の負傷者が報告されています。イスラエルでも千五百人以上の死者と二千百人以上の負傷者が出ています。<br><br>紛争は、まさに命を救うべき医療サービスに直接的な影響を与えています。WHOの検証によると、二月末以降、イランでは十八件の医療機関への攻撃があり、八人の医療従事者が命を落としました。レバノンでも二十五件の攻撃があり、十六人の死者と二十九人の負傷者が出ています。これらの攻撃は、人命を奪うだけでなく、人々が最も医療を必要とする時に、地域社会からケアの機会を奪っています。医療従事者、患者、そして医療施設は、国際人道法の下で常に保護されなければなりません。<br><br>また、紛争は広範な公衆衛生上のリスクを生み出しています。イランでは十万人以上、レバノンでは最大七十万人が国内で避難を余儀なくされ、多くの人々が劣悪な公衆衛生状態の集団避難所で生活しています。安全な水や衛生設備へのアクセスが限られているため、呼吸器感染症や下痢性疾患などの感染症リスクが特に女性や子どもといった脆弱な人々で増大しています。さらに、イランでは石油火災や損傷したインフラからの煙が有毒汚染物質を放出し、呼吸器系の問題、目や皮膚の炎症、水や食料源の汚染を引き起こす環境上の懸念も高まっています。<br><br>医療サービスへのアクセスも複数の国でますます制限されています。レバノンでは、イスラエル軍の発した避難命令により、四十九のプライマリヘルスケアセンターと五つの病院が閉鎖され、医療ニーズが増大する中で不可欠なサービスの利用可能性が低下しています。占領下のパレスチナ地域では、移動制限や検問所の閉鎖により、西岸地区のいくつかの行政区で救急車や巡回診療のアクセスが遅れています。ガザでは、二月末から医療搬送が停止したままです。病院は医薬品、医療物資、燃料の不足に直面しながらも運営を続けており、燃料は緊急外傷ケア、母子新生児サービス、感染症管理といった不可欠な医療サービスを優先するために配給されています。<br><br>空域の一時的な制限は、WHOのドバイにある国際ロジスティクス拠点からの医療物資の移動を妨げており、百万五千人以上の人々を対象とした五十件以上の緊急物資要請に影響が出て、かなりのバックログが発生しています。中東地域は、もともと世界でも有数の人道支援ニーズが高い地域であり、十二億五千万人が人道支援を必要としているにもかかわらず、人道的な保健緊急アピールは七割も資金が不足している状況です。医療の保護、持続的な人道支援のアクセス、そして人道的な保健対応へのより強力な財政的・運営的支援がなければ、脆弱な人々やすでに脆弱な医療システムへの負担は増大し続けるでしょう。<br><br>WHOは、すべての関係者に対し、市民と医療の保護、妨げられない持続的な人道支援のアクセスの確保、そして紛争の鎮静化を求めています。これは、地域社会が回復を開始し、平和へと向かうために不可欠です。</div>
+            <div class="source-box">
+              <strong>ソース・引用元</strong><br>
+              配信元：WHO (World Health Organization)<br>
+              原文URL：<a href="https://www.who.int/news/item/11-03-2026-conflict-deepens-health-crisis-across-middle-east--who-says" target="_blank" rel="noopener">https://www.who.int/news/item/11-03-2026-conflict-deepens-health-crisis-across-middle-east--who-says</a>
+            </div>
+          </article>
+
+<article>
+            <p class="meta">WHO (World Health Organization)　Wed, 04 Feb 2026 14:20:30 Z</p>
+            <h2 class="article-title">Preventive cholera vaccination resumes as global supply reaches critical milestone</h2>
+            <div class="summary">【予防的コレラワクチン接種が再開：世界の供給量が大幅改善】<br><br>Gavi、UNICEF、世界保健機関（WHO）は、3年以上ぶりに生命を救う予防的コレラワクチンキャンペーンが再開可能になったと発表しました。これは、経口コレラワクチン（OCV）の世界的供給量が、十分な水準に達したためです。モザンビークが、2022年にコレラ症例が世界的に急増し需要が高まり、OCVの備蓄不足により停止されていた予防接種を再開する最初の国となります。<br><br>この再開は、コレラのアウトブレイクが進行中で、70万人以上が被災し、多くの人々が避難した洪水の影響が残るモザンビークで実施されます。洪水は保健システムを混乱させ、水道システムを損傷し、コレラのような水系感染症のリスクをさらに高めています。<br><br>WHO事務局長のテドロス・アダノム・ゲブレイェソス博士は、「世界的なワクチン不足により、私たちはコレラのアウトブレイクを予防するのではなく、それに対応するサイクルに陥っていました。今、そのサイクルを断ち切る強力な位置にいます。」と述べ、集団接種に必要な規模でコレラワクチンを生産している唯一のメーカーであるEUBiologicsに感謝の意を表し、他のメーカーにもこの重要な分野への参入を促しています。<br><br>最初の割り当てとして2000万回分のワクチンが予防キャンペーンに展開されます。このうち360万回分がモザンビークに、610万回分が大規模なアウトブレイクを経験しているコンゴ民主共和国に、そして1030万回分がバングラデシュに届けられる予定です。これらの費用はGaviが負担し、UNICEFが調達・配送します。コレラ制御のための国際タスクフォース（GTFCC）が設定した配分基準に基づき、予防キャンペーン用のワクチンが体系的、公平、透明性を持って分配されるよう、供給国が選ばれました。<br><br>世界的機関、メーカー、パートナーによる継続的な努力の結果、OCVの年間供給量は2022年の3500万回分から2025年には約7000万回分へと倍増しました。GaviのCEOであるサニア・ニシュター博士は、持続可能でアクセス可能なワクチン供給は世界の公共財であると強調し、パートナーやメーカー、特にEUBiologicsに感謝の意を表しています。<br><br>UNICEF事務局長のキャサリン・ラッセル氏は、「何年かぶりに、このワクチン増加により大規模なコレラ緊急事態をより良く予防できるようになります。予防的コレラワクチン接種の再開は子どもたちを保護し、この非常に伝染性の高い病気を食い止めるのに役立ちます。」と述べています。しかし、安全な水と基本的な衛生設備へのアクセス改善など、他の努力と併せて実施されるべきであると強調しています。<br><br>OCVは安全で効果的であり、1歳以上の個人に推奨されます。1回接種で少なくとも6ヶ月の短期的な防御効果があり、アウトブレイクの制御に役立ちます。一方、2回接種は3年間のより長期的な感染防御を提供します。世界的なワクチン供給は着実に改善していますが、アウトブレイク対応では当面の間、1回接種戦略が標準となり、2回接種の適用はケースバイケースで検討されます。<br><br>コレラは汚染された食物や水を介して広がり、重度の下痢と脱水を引き起こし、迅速に治療されなければ死に至る可能性があります。安全な水と衛生設備が不足している地域、特に紛争や貧困の影響を受ける地域で多く見られます。昨年、WHOには33カ国から60万件以上のコレラまたは急性水様性下痢症と約7600人の死亡が報告されましたが、コレラは過少報告される傾向にあるため、これらは過小評価された数値です。2021年以降、世界のコレラ症例は年々増加していましたが、2025年には減少が予測されています。しかし、コレラによる死亡者数は同時期に増加し続けています。<br><br>ワクチン接種はコレラの予防と対応の一側面に過ぎません。長期的な視点での安全な水、衛生、手洗いインフラへの投資、疾患監視、迅速な治療、そして地域社会との連携は、アウトブレイクの発生と拡大を防ぎ、長期的に死亡を減らすために不可欠な要素です。<br><br>Gaviは、世界の子供たちの半数以上を最も致命的な病気から守るための官民パートナーシップです。UNICEFは、世界中のすべての子供たちの権利を保護するために活動する国連機関です。WHOは、国際的な公衆衛生を統括・調整する機関です。</div>
+            <div class="source-box">
+              <strong>ソース・引用元</strong><br>
+              配信元：WHO (World Health Organization)<br>
+              原文URL：<a href="https://www.who.int/news/item/04-02-2026-preventive-cholera-vaccination-resumes-as-global-supply-reaches-critical-milestone" target="_blank" rel="noopener">https://www.who.int/news/item/04-02-2026-preventive-cholera-vaccination-resumes-as-global-supply-reaches-critical-milestone</a>
+            </div>
+          </article>
+
+<article>
+            <p class="meta">WHO (World Health Organization)　Tue, 03 Feb 2026 11:33:19 Z</p>
+            <h2 class="article-title">Four in ten cancer cases could be prevented globally</h2>
+            <div class="summary">【世界の癌予防の新たな可能性】<br><br>世界保健機関（WHO）と国際がん研究機関（IARC）による最新の国際分析によると、世界で発生する癌のうち、最大4割、具体的には2022年の新規癌症例の約37%（約710万件）が予防可能であると推定されました。この画期的な研究では、従来の喫煙、アルコール摂取、高いBMI（肥満度指数）、身体活動不足、大気汚染、紫外線といった要因に加え、初めて癌を引き起こす9種類の感染症を予防可能原因として分析対象に含めました。この知見は、世界的な癌負担を軽減する上で、予防が持つ計り知れない可能性を浮き彫りにしています。<br><br>【主要な予防可能要因と関連癌】<br><br>分析の結果、予防可能な癌の主要因はタバコであり、全世界の新規癌症例の15%に関与しています。次いで感染症が10%、アルコール摂取が3%を占めます。特に、肺癌、胃癌、子宮頸癌の3つの癌種が、予防可能な癌症例全体のほぼ半分を占めています。肺癌は主に喫煙と大気汚染に、胃癌はヘリコバクター・ピロリ菌感染に、そして子宮頸癌はヒトパピローマウイルス（HPV）感染に強く関連していることが示されました。WHOの癌対策チームリーダーであるアンドレ・イルバウィ医師は、この分析が「予防可能な原因からどれだけの癌リスクが生じるかを示した初のグローバル分析である」と述べています。<br><br>【性差と地域差に見る予防の多様性】<br><br>予防可能な癌の負担には性差が見られ、男性では新規癌症例の45%が、女性では30%が予防可能でした。男性では喫煙が23%と最も大きな要因であり、次いで感染症が9%、アルコールが4%でした。一方、女性では感染症が11%と最も多く、次いで喫煙が6%、高いBMIが3%を占めています。地域間でも予防可能な癌の割合は大きく異なり、男性では東アジアで57%と最も高く、女性ではサハラ以南アフリカで38%と最も高くなっています。これは、行動、環境、職業、感染症のリスク要因への曝露度、社会経済的発展度、国の予防政策、医療システム能力の違いを反映しています。<br><br>【看護師が実践できる予防戦略の提言】<br><br>今回の知見は、看護師が日々の業務において癌予防の重要性を患者さんやそのご家族に伝える上で極めて貴重な情報となります。喫煙対策の強化、アルコール摂取の適正化、HPVやB型肝炎ウイルスワクチン接種の推奨、健康的な食生活と身体活動の促進、大気汚染や職場環境のリスク軽減に向けた啓発活動などが挙げられます。これらの予防策は、癌の発生率を減少させるだけでなく、長期的な医療費の削減や国民全体の健康と幸福の向上にも繋がります。健康・教育・エネルギー・運輸・労働といった多岐にわたる分野との協調的な行動を通じて、多くの人々を癌の診断という負担から守ることができるでしょう。私たちは、それぞれの状況に応じた個別具体的な予防戦略を立案し、実践していく必要があります。</div>
+            <div class="source-box">
+              <strong>ソース・引用元</strong><br>
+              配信元：WHO (World Health Organization)<br>
+              原文URL：<a href="https://www.who.int/news/item/03-02-2026-four-in-ten-cancer-cases-could-be-prevented-globally" target="_blank" rel="noopener">https://www.who.int/news/item/03-02-2026-four-in-ten-cancer-cases-could-be-prevented-globally</a>
+            </div>
+          </article>
+
+<article>
+            <p class="meta">WHO (World Health Organization)　Tue, 03 Feb 2026 11:16:38 Z</p>
+            <h2 class="article-title">WHO launches 2026 appeal to help millions of people in health emergencies and crisis settings</h2>
+            <div class="summary">【世界の公衆衛生危機への対応 WHOが2026年の緊急支援を呼びかけ】<br><br>世界保健機関（WHO）は、人道危機や紛争地域に住む何百万もの人々が医療を受けられるよう、2026年のグローバルアピール（国際的な資金提供の呼びかけ）を開始しました。これは、緊急性の高い公衆衛生問題に直面する世界中の人々に、タイムリーで効果的な支援を届けることを目的としています。<br><br>2025年には、WHOとパートナー団体は年間緊急アピールを通じて調達された資金により、3000万人を支援しました。この支援は、530万人以上の子供たちへの命を守る予防接種、5300万回に及ぶ健康相談の実施、8000以上の医療施設のサポート、そして1370台の移動診療所の配備を可能にしました。これらの活動は、脆弱な状況にある人々の健康と命を守る上で極めて重要な役割を果たしています。<br><br>2026年のアピールでは、世界中で発生している36の緊急事態、特に組織的な対応が最高レベルで求められる14のグレード3緊急事態に対応するため、約10億ドル（約1500億円）の資金を目指しています。テドロスWHO事務局長は、このアピールは単なる慈善活動ではなく、「健康と安全への戦略的投資」であると強調しています。医療へのアクセスは、人々の尊厳を回復させ、コミュニティを安定させ、復興への道筋を提供するものです。<br><br>しかし、長引く紛争、気候変動の激化、感染症の再発など、複合的な世界的圧力により健康緊急事態への支援ニーズは増大し続けています。一方で、人道支援への国際的な資金提供は縮小傾向にあり、2025年には目標とした8100万人に対して、WHOとパートナーはわずか3分の1の人々にしか支援を届けられませんでした。この現状は、最も脆弱な状況にある人々を保護し支援するために、新たなコミットメントと連帯が緊急に必要であることを示しています。2026年のWHOの緊急対応の優先地域には、アフガニスタン、コンゴ民主共和国、ハイチ、ミャンマー、占領下のパレスチナ地域、ソマリア、南スーダン、スーダン、シリア、ウクライナ、イエメンなどが含まれるほか、コレラやエムポックスといった感染症のアウトブレイクへの対応も重要課題です。<br><br>WHOは、人道支援における保健対応の主導機関として、世界24の危機地域で1500を超えるパートナーと連携し、各国当局や現地のパートナーが緊急対応の中心となるよう調整しています。共同議長を務めたアイルランドとノルウェーの代表者も、「あらゆる人道危機は健康危機である」と述べ、WHOの役割の不可欠性を強調し、国際社会に対し、最前線で働く医療従事者への支援を含め、WHOへの強力な支援を呼びかけました。危機が発生した際に迅速に対応できるよう、早期かつ予測可能な投資を行うことは、死亡や疾病を減らし、アウトブレイクを封じ込め、健康リスクがより広範な人道・健康安全保障危機へとエスカレートするのを防ぐ上で不可欠です。</div>
+            <div class="source-box">
+              <strong>ソース・引用元</strong><br>
+              配信元：WHO (World Health Organization)<br>
+              原文URL：<a href="https://www.who.int/news/item/03-02-2026-who-launches-2026-appeal-to-help-millions-of-people-in-health-emergencies-and-crisis-settings" target="_blank" rel="noopener">https://www.who.int/news/item/03-02-2026-who-launches-2026-appeal-to-help-millions-of-people-in-health-emergencies-and-crisis-settings</a>
+            </div>
+          </article>
+
+<article>
+            <p class="meta">WHO (World Health Organization)　Mon, 02 Feb 2026 22:30:09 Z</p>
+            <h2 class="article-title">Six years after COVID-19’s global alarm: Is the world better prepared for the next pandemic?</h2>
+            <div class="summary">【COVID-19から6年：次のパンデミックに世界は備えられているか】<br><br>世界保健機関（WHO）が新しいコロナウイルス感染症（後にCOVID-19として知られる）を「国際的に懸念される公衆衛生上の緊急事態（PHEIC）」と宣言してから6年が経過しました。このPHEICは2023年5月に解除されたものの、COVID-19の記憶と影響は今も世界中で感じられています。WHOは、この6年の節目に、次のパンデミックへの世界の備えについて「イエス」と「ノー」の両方の側面があると述べています。<br><br>多くの点で「イエス」と言えるのは、パンデミックへの準備、予防、対応を強化するための具体的かつ意味のある措置が講じられてきたからです。WHOのテドロス事務局長は、「パンデミックは、地球規模の脅威には地球規模の対応が求められることを私たち全員に教えてくれた。連帯こそが最良の免疫である」と述べました。この教訓を活かし、WHOと加盟国、パートナーは協力して大きな進展を遂げています。例えば、かつてワクチンも迅速な診断もなく、壊滅的な被害をもたらしたエボラ出血熱が変革され、最近のコンゴ民主共和国におけるエボラや、ルワンダ、タンザニア、エチオピアにおけるマールブルグ病のアウトブレイクは、以前よりも短期間で封じ込められ、感染拡大と致死率が抑えられました。これは、各国の機関がWHOの支援を受けて対応を主導した結果です。<br><br>しかし、「ノー」と言えるのは、これまでの進展が脆弱で不均一であり、人類を安全に保つためにはさらなる取り組みが必要だからです。近年、世界の保健分野は大きな混乱に見舞われ、資金は保健分野から国防や国家安全保障へと移行する傾向にあります。これは近視眼的な見方であり、パンデミック自体が国家安全保障上の脅威であることを忘れてはなりません。WHOは、次のパンデミックが襲う前に、備えへの投資を継続することが重要であると強く訴えています。<br><br>WHOは、すべての政府、パートナー、関係者に対し、パンデミックへの準備と予防の手を緩めることなく、継続的な警戒を求めています。病原体は国境を尊重せず、いかなる国も単独でパンデミックを予防したり管理したりすることはできません。地球規模の保健安全保障には、セクターや政府、地域を超えた連携が不可欠です。WHOは、パンデミックからより安全な世界を築くための歴史的な「世界的な協定」を完成させる加盟国の努力を引き続き支援し、備えを強化し、革新を加速し、連帯を堅持していくと強調しています。準備は今、次のパンデミックが起こる前に行うべきことです。</div>
+            <div class="source-box">
+              <strong>ソース・引用元</strong><br>
+              配信元：WHO (World Health Organization)<br>
+              原文URL：<a href="https://www.who.int/news/item/02-02-2026-six-years-after-covid-19-s-global-alarm-is-the-world-better-prepared-for-the-next-pandemic" target="_blank" rel="noopener">https://www.who.int/news/item/02-02-2026-six-years-after-covid-19-s-global-alarm-is-the-world-better-prepared-for-the-next-pandemic</a>
+            </div>
+          </article>
+
+<article>
+            <p class="meta">WHO (World Health Organization)　Mon, 02 Feb 2026 17:02:47 Z</p>
+            <h2 class="article-title">Joint statement on the renewed Quadripartite Memorandum of Understanding  regarding cooperation on One Health until 2030</h2>
+            <div class="summary">【ワンヘルス推進に向けた国際協力体制の強化】<br>国連食糧農業機関（FAO）、国連環境計画（UNEP）、世界保健機関（WHO）、そして国際獣疫事務局（WOAH）という四つの国際機関が、ワンヘルス・アプローチの推進に関する覚書（MoU）を更新しました。この更新により、2030年までの国際的な協力体制がさらに強化されることになります。これは、人間、動物、植物、生態系、そして広範な環境の健康が本質的に相互に関連しているという認識に基づき、長年の協力と共同の成功を土台としたものです。<br><br>【ワンヘルス・アプローチの重要性】<br>ワンヘルスとは、人間、動物、環境の健康が密接に結びついているという考え方であり、これらの分野を統合的に捉えて健康課題に取り組むアプローチです。現在、そして将来的に発生する可能性のある健康上の課題に対処するためには、分野横断的で多角的な協力が不可欠であると、四者機関は改めて強調しています。パンデミック、薬剤耐性、食料安全保障、気候変動など、今日の複雑な健康問題は、どれか一つの分野だけで解決できるものではありません。このため、ワンヘルスはこれらの課題に対する最も効果的な戦略とされています。<br><br>【更新された覚書の目的と原則】<br>今回の覚書更新は、各機関のそれぞれの使命と得意分野を活かし、協力のための法的および運営上の枠組みを強化するものです。これにより、主要な優先分野における協力の可能性がさらに高まります。協力、共通の責任、包摂性、公平性、そしてジェンダー平等という原則に導かれ、四者機関は引き続き、エビデンスに基づいた政策を推進し、各国の政府やパートナー組織への協調的な支援を進めていく方針です。この継続的な取り組みを通じて、ワンヘルス・アプローチの実施を加速させることを目指しています。<br><br>【持続可能な健康成果への決意】<br>更新された覚書を通じて、FAO、UNEP、WHO、WOAHは、世界中で健康リスクを低減し、人間、動物、植物、生態系、そしてより広い環境における持続可能な健康成果を促進するという共通の決意を改めて表明しました。これは、地球全体の健康と福祉を守るための国際社会の強い意志を示すものです。<br><br>【看護師の皆様への示唆】<br>私たち看護師は、患者さんのケアや公衆衛生の現場で、まさに人間と環境の接点にいます。感染症の拡大防止、薬剤耐性菌への対応、環境変化が健康に与える影響への理解、そして地域社会全体の健康増進といった日々の業務において、ワンヘルスの視点を持つことは極めて重要です。この国際的な取り組みは、多様な専門家との連携を促進し、私たちの実践がより広範な健康課題解決に貢献できる可能性を示唆しています。人間だけでなく、動物や環境の健康にも配慮した包括的なアプローチを理解し、多職種連携の一員としてその実現に貢献していくことが、今後の看護実践に求められるでしょう。</div>
+            <div class="source-box">
+              <strong>ソース・引用元</strong><br>
+              配信元：WHO (World Health Organization)<br>
+              原文URL：<a href="https://www.who.int/news/item/03-02-2026-joint-statement-on-the-renewed-quadripartite-memorandum-of-understanding-regarding-cooperation-on-one-health-until-2030" target="_blank" rel="noopener">https://www.who.int/news/item/03-02-2026-joint-statement-on-the-renewed-quadripartite-memorandum-of-understanding-regarding-cooperation-on-one-health-until-2030</a>
+            </div>
+          </article>
+
+<article>
+            <p class="meta">WHO (World Health Organization)　Thu, 29 Jan 2026 19:06:53 Z</p>
+            <h2 class="article-title">Communities unite to address stigma and discrimination affecting people with neglected tropical diseases</h2>
+            <div class="summary">【NTD患者の「見えない苦しみ」：精神面とスティグマへの対応】<br>世界保健機関（WHO）は、世界NTD（顧みられない熱帯病）デーに際し、NTD患者が差別、社会的スティグマ、未治療の精神疾患により深刻な苦しみに直面している現状に警鐘を鳴らしています。世界で10億人以上がNTDに罹患し、同時に多くの人が精神疾患も抱えています。身体的な変形を伴うNTD患者は、感染症に対する誤解から生じるスティグマや差別の対象となりやすいです。これらの患者は、一般の人々に比べ、精神的な苦痛を抱えやすく、必要なケアを受けられていないことが大きな課題です。<br><br>WHOは、NTDとの戦いは病原体だけでなく、それに伴う羞恥心、孤立、絶望からも人々を解放することだと強調しています。この課題解決のため、WHOはNTD患者の精神衛生とスティグマに対応する「Essential care package (ECP)」に関する初のグローバルガイドを発表しました。看護師の皆さんには、患者さんの身体的ケアに加え、精神的な側面や社会的スティグマに目を向け、全人的なサポートの重要性を再認識していただきたいと思います。<br><br>【進歩と懸念される課題】<br>NTDは、世界保健において最も解決可能で、投資効果の高い分野の一つです。過去10年間で、NTD介入が必要な人の数は過去最低の14億人に減少し、死亡率や罹患率も大幅に低下しました。現在、58カ国が少なくとも一つのNTDを撲滅し、WHOの2030年までの目標達成に向けた道筋は確かなものです。<br><br>しかし、「Global Report on Neglected Tropical Diseases 2025」によると、NTDに対する政府開発援助（ODA）が2018年から2023年の間に41%も減少しており、これまでの成果が危ぶまれています。資金減少は、年間約330億ドルもの経済的損失をNTDの影響を受ける地域社会にもたらしかねません。<br><br>【看護師に求められる貢献】<br>今回の世界NTDデーは、これまでの進捗を維持し、新たな資金とリーダーシップを動員し、イノベーションを加速させ、精神医療を含む保健サービスをNTD対策に統合することを強く呼びかけています。看護師の皆さんには、NTD患者さんの身体的・心理的・社会的な苦しみを深く理解し、スティグマを軽減する支援、そして多職種連携の中で全人的なケアを提供することが期待されます。患者さんの尊厳を守り、孤立させない看護実践が、この課題解決に貢献する鍵となるでしょう。</div>
+            <div class="source-box">
+              <strong>ソース・引用元</strong><br>
+              配信元：WHO (World Health Organization)<br>
+              原文URL：<a href="https://www.who.int/news/item/30-01-2026-communities-unite-to-address-stigma-and-discrimination-affecting-people-with-neglected-tropical-diseases" target="_blank" rel="noopener">https://www.who.int/news/item/30-01-2026-communities-unite-to-address-stigma-and-discrimination-affecting-people-with-neglected-tropical-diseases</a>
+            </div>
+          </article>
+
+<article>
+            <p class="meta">WHO (World Health Organization)　Tue, 27 Jan 2026 15:26:20 Z</p>
+            <h2 class="article-title">WHO urges schools worldwide to promote healthy eating for children</h2>
+            <div class="summary">【WHO、世界中の学校に子供の健康的な食生活推進を強く要請】<br><br>世界保健機関（WHO）は、健康的な学校給食環境を創出するためのエビデンスに基づいた政策と介入に関する新たな国際ガイドラインを発表しました。WHOは今回初めて、学校で提供される食品や飲料、そしてより広範な学校の食環境全体が健康的で栄養価の高いものであることを保証する「学校全体のアプローチ」を各国に推奨しています。<br><br>子供の過体重や肥満は世界的に増加傾向にあり、同時に低栄養も依然として根強い課題です。学校は、この栄養の二重負荷の最前線に位置しています。2025年には、世界中で学齢期の子供と青年のおよそ10人に1人にあたる1億8800万人が肥満と診断され、低体重の子供の数を初めて上回ると予測されています。<br><br>WHO事務局長のテドロス・アダノム・ゲブレイェソス博士は、「子供たちが学校で食べるもの、そして彼らの食生活を形成する環境は、学習に深い影響を与え、彼らの健康と幸福に生涯にわたる結果をもたらす可能性があります。学校で適切な栄養を提供することは、将来の病気を予防し、より健康な成人を育む上で極めて重要です」と述べています。<br><br>健康的な食習慣は幼少期から始まります。子供たちは一日の大部分を学校で過ごすため、学校は生涯にわたる食習慣を形成し、健康と栄養の不平等を減らすための重要な場となります。現在、世界中で推定4億6600万人の子供たちが学校給食を利用していますが、提供される食品の栄養品質に関する情報はまだ限られています。<br><br>このガイドラインでは、学校が健康的な食事をサポートする食品や飲料の消費を促進するために、学校での食品提供を改善することを推奨しています。特に、政策だけでなく、ガイドラインが効果的かつ一貫して学校で実施されることを確実にするための監視および施行メカニズムが不可欠であると強調されています。<br><br>WHOの食品と栄養行動の実施に関するグローバルデータベース（GIFNA）によると、2025年10月時点で、104の加盟国が学校給食に関する健全な政策を有しており、そのほぼ4分の3が学校給食の組成を導く強制的な基準を含んでいます。しかし、砂糖、塩、または不健康な脂肪を多く含む食品のマーケティングを制限する政策を持つ国は、わずか48カ国に過ぎません。<br><br>WHOは、厳格で透明性のあるエビデンスに基づいたプロセスを通じてこのガイドラインを策定するために、多様な分野の国際専門家グループを招集しました。この取り組みは、健全な食環境を創出するというWHOの広範な使命の礎をなすものであり、肥満を阻止するためのWHO加速計画や栄養に配慮した学校イニシアチブなどの国際的な取り組みの一環として実施されています。<br><br>このガイドラインは、地方自治体や都市当局が学校給食イニシアチブを推進し、実施する上で重要な役割を果たすことを認識し、地域レベルと国レベルの両方での行動を支援するように設計されています。WHOは技術支援、知識共有、協力関係を通じて、加盟国がガイドラインを適用し、実施することを支援する予定です。<br><br>看護師の皆さまにとっても、子供たちの健康増進と疾病予防における食育の重要性は計り知れません。学校での健全な食環境の整備は、将来の生活習慣病予防や健康寿命の延伸に直結するだけでなく、健康格差の是正にも貢献します。このWHOの提言は、病院や地域社会における健康指導や啓発活動においても、小児期からの介入の重要性を再認識するきっかけとなるでしょう。</div>
+            <div class="source-box">
+              <strong>ソース・引用元</strong><br>
+              配信元：WHO (World Health Organization)<br>
+              原文URL：<a href="https://www.who.int/news/item/27-01-2026-who-urges-schools-worldwide-to-promote-healthy-eating-for-children" target="_blank" rel="noopener">https://www.who.int/news/item/27-01-2026-who-urges-schools-worldwide-to-promote-healthy-eating-for-children</a>
+            </div>
+          </article>
+
+<article>
+            <p class="meta">WHO (World Health Organization)　Sat, 24 Jan 2026 20:09:49 Z</p>
+            <h2 class="article-title">WHO statement on notification of withdrawal of the United States</h2>
+            <div class="summary">【米国、WHOからの脱退を通知】<br>米国は、世界保健機関（WHO）からの脱退を通知しました。WHOはこの決定に深い遺憾の意を表明し、この脱退が米国と世界の双方の安全を損なうものだと考えています。脱退の通知は、2月のWHO執行理事会と2026年5月の世界保健総会で検討される予定です。米国はWHOの創設メンバーであり、天然痘の根絶をはじめとする多くの公衆衛生上の偉業に大きく貢献してきました。WHOは、これらの貢献に感謝しつつも、今回の決定に懸念を示しています。<br><br>【米国の批判に対するWHOの反論】<br>米国政府は、WHOが「評判を傷つけ、独立性を侵害した」「COVID-19パンデミック対応で失敗し、情報を隠蔽した」と主張しています。しかしWHOは、全ての加盟国と同様に、常に誠実な姿勢で米国と関わり、その主権を完全に尊重してきたと反論しています。COVID-19パンデミックにおいては、いかなる組織や政府も全てを完璧にこなせたわけではないとしつつも、WHOは自身の対応について確信を持っています。パンデミックを通じて、WHOは迅速に行動し、得られた全ての情報を速やかに、そして透明性を持って世界に共有しました。最良のエビデンスに基づいて加盟国に助言を行い、マスク着用、ワクチン接種、身体的距離の確保を推奨しましたが、これらを義務化するよう勧告したことは一度もありません。各国の主権を尊重し、国民の最善の利益となると判断する決定は各国自身が行うべきであるという立場を一貫してとっていました。<br><br>【パンデミック初期対応の経緯】<br>2019年12月31日に中国・武漢で「原因不明の肺炎」の集団発生が初めて報告されると、WHOは直ちに中国に追加情報を求め、緊急事態管理システムを起動しました。最初の死亡が報告された2020年1月11日までに、WHOは既に公式チャンネル、声明、ソーシャルメディアを通じて世界に警鐘を鳴らし、世界中の専門家を招集し、各国が住民と医療システムを保護するための包括的なガイダンスを公開していました。さらに、2020年1月30日には、国際保健規則に基づき、COVID-19を「国際的に懸念される公衆衛生上の緊急事態（PHEIC）」と宣言しました。これは国際保健法における最高レベルの警告であり、当時中国国外での報告症例は100件未満で、死亡報告はありませんでした。パンデミックの初期段階において、WHO事務局長は各国に「好機は閉じつつある」「これは演習ではない」「COVID-19は最大の公衆の敵」と繰り返し警告し、住民を保護するための即時行動を強く促しました。<br><br>【政治的偏向批判への反論と未来への取り組み】<br>米国はまた、WHOが「アメリカの利益に敵対的な国々によって動かされる、政治的で官僚的なアジェンダを追求した」と批判しています。しかし、WHOは194の加盟国によって統治される国連の専門機関であり、常に公平であり、いかなる偏見も持たず、全ての国に奉仕するために存在すると強調しています。パンデミック対応の複数のレビューを受け、WHOは自身の業務を強化し、各国のパンデミック準備と対応能力を向上させるための支援を行ってきました。昨年、加盟国は将来のパンデミックから世界をより安全に保つ画期的な国際法となる「WHOパンデミック合意」を採択しました。現在、パンデミック合意の付属書として、病原体の迅速な検出と共有、そしてワクチン、治療薬、診断薬への公平かつタイムリーなアクセスを促進する「病原体アクセス・利益共有システム」の交渉が進められています。<br><br>【今後の展望】<br>WHOは、将来的に米国がWHOに積極的に参加することを希望しつつ、その核となる使命である「全ての人々が達成可能な最高の健康水準を基本的な権利として享受する」という憲章上の義務を追求するため、全ての国と協力し続けることを固く誓っています。</div>
+            <div class="source-box">
+              <strong>ソース・引用元</strong><br>
+              配信元：WHO (World Health Organization)<br>
+              原文URL：<a href="https://www.who.int/news/item/24-01-2026-who-statement-on-notification-of-withdrawal-of-the-united-states" target="_blank" rel="noopener">https://www.who.int/news/item/24-01-2026-who-statement-on-notification-of-withdrawal-of-the-united-states</a>
+            </div>
+          </article>
+
+<article>
+            <p class="meta">WHO (World Health Organization)　Fri, 23 Jan 2026 16:24:59 Z</p>
+            <h2 class="article-title">Countries progress negotiations in support of WHO Pandemic Agreement</h2>
+            <div class="summary">【世界的なパンデミック協定の進展】<br>世界の保健機関（WHO）の加盟国は、今週、WHOパンデミック協定に関する政府間交渉会議（IGWG）の再開されたセッションで、「病原体アクセスと利益配分（PABS）システム」についての交渉を進めました。このPABSシステムは、2025年5月に世界保健総会（WHA）で採択される予定の協定の中核をなす重要な要素です。<br><br>【病原体の共有と公平な利益配分】<br>1月20日から22日にかけて開催されたこのセッションでは、加盟国は草案に残された未解決の課題についてテキストベースの交渉を続け、意見の相違を縮め、共通認識を見出すことを目指して意見を交換しました。ブラジルのIGWG共同議長は「いくつかの分野で進展が見られ、PABSシステムの一部で合意形成の兆しがあることに勇気づけられています」と述べ、今後の会合では残された複雑な課題に焦点を当てると説明しました。<br><br>【パンデミックへの備えを強化】<br>世界保健総会によって設立されたIGWGは、優先事項としてPABSシステムの起草と交渉を担当しています。このシステムは、パンデミックを引き起こす可能性のある病原体とその遺伝子配列情報を安全、透明性、そして説明責任をもって共有することを可能にすることを目指しています。同時に、病原体の利用から生じるワクチン、治療薬、診断薬などの利益を公平かつ公正に配分することも目的としています。これは、世界中の人々がパンデミック発生時に必要な医療資源にアクセスできるよう、国際社会が協力する上で極めて重要です。<br><br>【看護師の視点から見た意義】<br>私たち看護師は、パンデミック発生時に最前線で患者ケアに当たります。病原体が迅速かつオープンに共有されることで、ワクチンの開発が加速し、適切な治療薬や診断薬が世界中に供給されることは、感染拡大の抑制と重症化予防に直結します。また、これらの医療資源がどの国の人々にも公平に行き渡ることは、医療格差を縮め、より多くの命を救うために不可欠です。この国際的な協定は、将来の公衆衛生危機に対する備えを強化し、私たち医療従事者がより効果的に対応できる環境を整える土台となります。<br><br>【今後の展望と国際協力の重要性】<br>英国のIGWG共同議長は「加盟国は今週、建設的な議論を行いました。5月の期限に向けて進展する中で、効果的なPABSシステムを実現するために協力し、意見の相違を乗り越えようとする彼らの意欲に励まされています」と述べました。WHO事務局長のテドロス・アダノム・ゲブレイェスス博士は、「強力なPABSシステムは、より安全で公平な世界の礎となるでしょう」と強調し、多国間での解決策への各国のコミットメントに感謝を表明しました。IGWGの交渉結果は、2026年5月に開催される第79回世界保健総会に提出され、検討される予定です。この取り組みは、私たち一人ひとりの健康、そしてグローバルヘルスを守るための重要な一歩と言えるでしょう。</div>
+            <div class="source-box">
+              <strong>ソース・引用元</strong><br>
+              配信元：WHO (World Health Organization)<br>
+              原文URL：<a href="https://www.who.int/news/item/23-01-2026-countries-progress-negotiations-in-support-of-who-pandemic-agreement" target="_blank" rel="noopener">https://www.who.int/news/item/23-01-2026-countries-progress-negotiations-in-support-of-who-pandemic-agreement</a>
+            </div>
+          </article>
+
+<article>
+            <p class="meta">WHO (World Health Organization)　Wed, 21 Jan 2026 17:14:46 Z</p>
+            <h2 class="article-title">WHO renews commitment to a leprosy-free world, spotlighting partnership and progress ahead of World Leprosy Day</h2>
+            <div class="summary">【ハンセン病制圧への新たなコミットメント】<br>世界保健機関（WHO）は、1月25日の「世界ハンセン病デー」に先立ち、ハンセン病のない世界の実現に向けた決意を改めて表明しました。ハンセン病は、らい菌（Mycobacterium leprae）による感染症で、主に皮膚と末梢神経に影響を及ぼします。適切な治療を受けずに放置すると、進行性の永続的な身体障害や、社会的な偏見（スティグマ）、孤立を招く可能性があります。しかし、多剤併用療法（MDT）によって完治可能な病気です。<br><br>世界中でハンセン病の新規症例数は減少傾向にありますが、2024年には依然として172,717件もの新規症例が報告されており、治療へのアクセスがまだ不十分な地域があることを示唆しています。<br><br>【WHOとノバルティスの四半世紀にわたるパートナーシップ】<br>ハンセン病制圧に向けた取り組みを強力に支えてきたのが、製薬企業ノバルティスとのパートナーシップです。WHOは2000年からノバルティスと協力し、世界中のハンセン病患者に対してMDTとクロファジミンを無償で提供してきました。この貢献は、グローバルヘルスにおける最も持続的な医薬品寄付プログラムの一つです。<br><br>この度、25周年の節目を迎え、WHOとノバルティスはパートナーシップ協定（MoU）をさらに5年間、2030年まで延長しました。この延長により、MDTとクロファジミンの継続的な供給が確保されるだけでなく、接触者への曝露後予防（PEP）として使用されるリファンピシン単回投与（SDR）の調達と配布のための資金も含まれることになりました。この無償提供は、何百万もの患者の人生を変え、障害の予防、スティグマの軽減に大きく貢献してきました。<br><br>【治療を超えた課題：スティグマとの闘い】<br>今年の「世界ハンセン病デー」のテーマは「ハンセン病は治せる、真の課題はスティグマ」です。WHOハンセン病制圧大使である笹川陽平氏は、「私が旅をする中で最も根深い課題の一つは、ハンセン病に付随する社会的スティグマであり、これは病気そのものよりも厄介な問題となり得ます。治療が終了した後も残り続けることがあります」と述べています。特に、病気の結果として後遺症が残った人々は、強制的な離婚、教育機会の喪失、不当な解雇といった様々な形の差別や、治癒後も終わりのない社会的排除の苦痛に直面することがあります。<br><br>【日本の看護師へ：今後の戦略と私たちの役割】<br>ハンセン病は、顧みられない熱帯病（NTDs）の一つとして位置づけられています。「グローバルハンセン病戦略2021-2030」では、公衆衛生上の問題としての制圧に留まらず、感染伝播の遮断と疾病そのものの制圧を目指しています。この戦略の主要な柱は、早期発見・早期治療に加え、接触者スクリーニング、予防的化学療法の拡大、そしてスティグマと差別の軽減です。<br><br>私たち看護師は、患者さんの早期発見と適切な治療への支援だけでなく、ハンセン病に対する誤解や偏見を解消し、患者さんが社会的に孤立しないよう支援する重要な役割を担っています。病気の知識を深め、患者さん一人ひとりが尊厳を持って生活できるよう、医療専門職としてこの世界的な取り組みに貢献していきましょう。</div>
+            <div class="source-box">
+              <strong>ソース・引用元</strong><br>
+              配信元：WHO (World Health Organization)<br>
+              原文URL：<a href="https://www.who.int/news/item/21-01-2026-who-renews-commitment-to-a-leprosy-free-world--spotlighting-partnership-and-progress-ahead-of-world-leprosy-day" target="_blank" rel="noopener">https://www.who.int/news/item/21-01-2026-who-renews-commitment-to-a-leprosy-free-world--spotlighting-partnership-and-progress-ahead-of-world-leprosy-day</a>
+            </div>
+          </article>
+<!-- ARTICLES_END -->
+  </div>
+</body>
+</html>
