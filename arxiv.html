@@ -102,6 +102,84 @@
     <p class="page-desc">arXiv の最新AI論文をAIで日本語要約し、定期更新しています。</p>
 <!-- ARTICLES_START -->
 <article>
+  <p class="meta">arXiv cs.AI　Thu, 19 Mar 2026 17:59:51 Z</p>
+  <h2 class="article-title">具現化ナビゲーションにおける信頼性ベンチマーク「NavTrust」</h2>
+  <div class="summary">本論文は、具現化ナビゲーション（ロボットなどが現実世界で指示に従って移動する技術）における信頼性を評価するための新しいベンチマーク「NavTrust」を提案します。<br><br>従来の評価は、理想的な条件下での性能に焦点を当てていましたが、現実世界で発生しうるセンサー（RGB、深度）や指示のノイズ・破損に対する耐性は十分に評価されていませんでした。NavTrustは、これらの現実的な問題を統一的なフレームワークでシミュレートし、ナビゲーション性能への影響を体系的に評価します。<br><br>7つの最先端モデルの評価により、現実的なノイズ下での性能低下が明らかになり、より信頼性の高い具現化ナビゲーションシステム開発への道筋を示します。さらに、4つの異なる緩和戦略を評価し、実機ロボットでの実験でノイズに対する頑健性の向上が確認されました。</div>
+  <div class="source-box">
+    <strong>ソース・引用元</strong><br>
+    配信元：arXiv cs.AI<br>
+    著者：Huaide Jiang, Yash Chaudhary, Yuping Wang, Zehao Wang, Raghav Sharma, Manan Mehta, Yang Zhou, Lichao Sun<br>
+    分類：cs.RO, cs.AI, cs.CV, cs.LG, eess.SY<br>
+    原文URL：<a href="https://arxiv.org/abs/2603.19229v1" target="_blank" rel="noopener">https://arxiv.org/abs/2603.19229v1</a>
+  </div>
+</article>
+
+<article>
+  <p class="meta">arXiv cs.AI　Thu, 19 Mar 2026 17:58:52 Z</p>
+  <h2 class="article-title">Nemotron-Cascade 2: Cascade RLとマルチドメイン蒸留によるLLMの後段学習</h2>
+  <div class="summary">本論文では、オープンソースの大規模言語モデル（LLM）「Nemotron-Cascade 2」を紹介します。これは300億パラメータを持ちながら、アクティブなパラメータは30億に抑えられたモデルです。<br><br>このモデルは、特に推論能力とエージェントとしての能力において、最先端のオープンモデルに匹敵する性能を示します。数学やコーディングの推論能力は、はるかに大規模なモデルに匹敵し、国際数学オリンピックや情報オリンピック、競技プログラミングの世界大会で金メダルレベルの成績を収めています。これは、少ないパラメータ数で高い知能密度を実現していることを示しています。<br><br>Nemotron-Cascade 1からの主な技術的進歩は、Cascade RL（強化学習）の適用範囲を推論とエージェント領域に大幅に拡大したこと、および各ドメインの強力な教師モデルからのマルチドメインオンポリシー蒸留を導入したことです。これにより、性能の低下を防ぎつつ、効率的に性能向上を達成しました。モデルチェックポイントと学習データが公開されます。</div>
+  <div class="source-box">
+    <strong>ソース・引用元</strong><br>
+    配信元：arXiv cs.AI<br>
+    著者：Zhuolin Yang, Zihan Liu, Yang Chen, Wenliang Dai, Boxin Wang, Sheng-Chieh Lin, Chankyu Lee, Yangyi Chen<br>
+    分類：cs.CL, cs.AI, cs.LG<br>
+    原文URL：<a href="https://arxiv.org/abs/2603.19220v1" target="_blank" rel="noopener">https://arxiv.org/abs/2603.19220v1</a>
+  </div>
+</article>
+
+<article>
+  <p class="meta">arXiv cs.AI　Thu, 19 Mar 2026 17:30:02 Z</p>
+  <h2 class="article-title">GPUカーネル最適化のための「SOL-ExecBench」：ハードウェア限界に挑む</h2>
+  <div class="summary">本論文は、AIシステムにおけるGPUカーネル（GPUで実行される計算処理）の最適化を評価するための新しいベンチマーク「SOL-ExecBench」を提案します。これは、単に既存のソフトウェア実装を上回る速度を目指すのではなく、ハードウェアの理論的な限界（Speed-of-Light: SOL）にどれだけ近づけるかを測ることを目的としています。<br><br>SOL-ExecBenchは、言語、拡散モデル、画像、音声など、様々なAIモデルから抽出された235個のCUDAカーネル最適化問題で構成されており、NVIDIA Blackwell GPUをターゲットとしています。本ベンチマークでは、SOLARというパイプラインを用いてハードウェアに根差したSOL限界を計算し、それを固定目標として最適化の進捗を測る「SOLスコア」を導入しています。<br><br>さらに、評価の信頼性を高めるために、GPUクロックの固定、キャッシュのクリア、独立したプロセス実行などの機能を備えたサンドボックス化された実行環境を提供しています。これにより、従来のソフトウェアベースのベンチマークから、ハードウェアの物理的限界に迫る最適化を目指すという、GPUカーネルベンチマークの新たな方向性を示しています。</div>
+  <div class="source-box">
+    <strong>ソース・引用元</strong><br>
+    配信元：arXiv cs.AI<br>
+    著者：Edward Lin, Sahil Modi, Siva Kumar Sastry Hari, Qijing Huang, Zhifan Ye, Nestor Qin, Fengzhe Zhou, Yuan Zhang<br>
+    分類：cs.LG, cs.AI<br>
+    原文URL：<a href="https://arxiv.org/abs/2603.19173v1" target="_blank" rel="noopener">https://arxiv.org/abs/2603.19173v1</a>
+  </div>
+</article>
+
+<article>
+  <p class="meta">arXiv cs.CL　Thu, 19 Mar 2026 17:10:29 Z</p>
+  <h2 class="article-title">低リソース言語向け可変エントロピー方策最適化モデルVEPO</h2>
+  <div class="summary">本論文は、低リソース言語における大規模言語モデルの性能低下問題に対処するため、VEPO（Variable Entropy Policy Optimization）を提案します。<br><br>VEPOは、決定論的な構造制約を方策アライメントプロセスに組み込むために、検証可能な報酬を持つ強化学習を活用します。これにより、訓練中に指定されたシーケンス長、形式の一貫性、言語的な正しさが保証されます。特に、エントロピーの可変メカニズムにより、モデルは文字通りの忠実性と意味的な自然さの間の均衡を動的に調整します。<br><br>エントロピー緩和型アドバンテージ推定と非対称クリッピングを統合することで、VEPOは方策の崩壊を軽減しつつ、堅牢な探索を維持します。90のFLORES-200、COMET-22、chrF方向での実証評価により、VEPOはトークン化効率と翻訳品質の両方で大幅な改善をもたらし、表現の少ない言語の性能ギャップを埋めることが示されました。</div>
+  <div class="source-box">
+    <strong>ソース・引用元</strong><br>
+    配信元：arXiv cs.CL<br>
+    著者：Chonghan Liu, Yimin Du, Qi An, Xin He, Cunqi Zhai, Fei Tan, Weijia Lin, Xiaochun Gong<br>
+    分類：cs.CL, cs.AI<br>
+    原文URL：<a href="https://arxiv.org/abs/2603.19152v1" target="_blank" rel="noopener">https://arxiv.org/abs/2603.19152v1</a>
+  </div>
+</article>
+
+<article>
+  <p class="meta">arXiv stat.ML　Thu, 19 Mar 2026 17:16:28 Z</p>
+  <h2 class="article-title">PPIは差分推定量：予測駆動推論の調査サンプリングのルーツを認識する</h2>
+  <div class="summary">本論文は、予測駆動推論（PPI）の主要な推定量が、1970年代に遡る調査サンプリングの確立された推定量と同等であることを論じます。<br><br>具体的には、母集団平均のPPI推定量は、Casselら（1976）の差分推定量と代数的に等価であり、PPIプラスはSarndalら（2003）の一般化回帰（GREG）推定量に対応します。この等価性を認識することで、PPIのどの部分が長年の統計学の文献から受け継がれ、何が真に新しいのか、そして推論の主張にはどのような注意が必要かを考察します。<br><br>PPIとモデル支援推定との違い、推論のモード、ラベルなしデータプール、サブグループ推定値への予測誤差の影響などを分析します。PPI研究者は、キャリブレーション、最適配分、デザインベース診断に関する調査サンプリング文献の理論を活用でき、調査サンプリング研究者は、非標準的な推定対象への拡張や、アクセスしやすいソフトウェアエコシステムから恩恵を受けることができます。</div>
+  <div class="source-box">
+    <strong>ソース・引用元</strong><br>
+    配信元：arXiv stat.ML<br>
+    著者：Reagan Mozer<br>
+    分類：stat.ME, stat.ML<br>
+    原文URL：<a href="https://arxiv.org/abs/2603.19160v1" target="_blank" rel="noopener">https://arxiv.org/abs/2603.19160v1</a>
+  </div>
+</article>
+
+<article>
+  <p class="meta">arXiv cs.AI　Thu, 19 Mar 2026 17:59:21 Z</p>
+  <h2 class="article-title">F2LLM-v2：多言語世界のための包括的で高性能かつ効率的な埋め込み</h2>
+  <div class="summary">本論文では、8つの異なるサイズ（80Mから14B）を持つ新しい汎用多言語埋め込みモデルファミリー、F2LLM-v2を発表します。<br><br>新たにキュレーションされた6000万件の高品質な公開データサンプルからなる複合データセットで訓練されたF2LLM-v2は、200以上の言語をサポートし、特にこれまで十分に扱われてこなかった中・低リソース言語に重点を置いています。2段階のLLMベース埋め込み訓練パイプラインに、マトゥリョーシュカ学習、モデルプルーニング、知識蒸留技術を統合することで、以前のLLMベース埋め込みモデルよりもはるかに効率的でありながら、競争力のある性能を維持するモデルを実現しました。<br><br>広範な評価により、F2LLM-v2-14Bが11のMTEBベンチマークで1位を獲得することが確認されました。また、このファミリーの小規模モデルも、リソース制約のあるアプリケーションにおいて新たな最先端技術を確立しています。オープンソースの埋め込みモデル研究を促進するため、全てのモデル、データ、コード、中間チェックポイントを公開します。</div>
+  <div class="source-box">
+    <strong>ソース・引用元</strong><br>
+    配信元：arXiv cs.AI<br>
+    著者：Ziyin Zhang, Zihan Liao, Hang Yu, Peng Di, Rui Wang<br>
+    分類：cs.CL, cs.AI<br>
+    原文URL：<a href="https://arxiv.org/abs/2603.19223v1" target="_blank" rel="noopener">https://arxiv.org/abs/2603.19223v1</a>
+  </div>
+</article>
+
+<article>
   <p class="meta">arXiv cs.AI　Thu, 19 Mar 2026 17:41:18 Z</p>
   <h2 class="article-title">Box Maze: LLMの信頼性の高い推論のためのプロセス制御アーキテクチャ</h2>
   <div class="summary">本論文は、AI分野における大規模言語モデル（LLM）の信頼性向上に関する研究です。<br><br>LLMは強力な生成能力を持つ一方で、幻覚や敵対的なプロンプトに対する不確かな推論が課題となっています。既存の安全対策は行動レベルに留まり、推論プロセスの整合性を保証するアーキテクチャ上のメカニズムが不足していました。本研究では、LLMの推論を記憶の接地、構造化推論、境界強制の3層に分解する「Box Maze」フレームワークを提案します。<br><br>シミュレーションベースの評価では、複数のLLMシステムに対し、境界侵食シナリオを用いて検証が行われました。その結果、明示的な認知制御層が境界維持の一貫性を向上させ、アーキテクチャ上の制約により、敵対的条件下での境界失敗率が約40%から1%未満に低減することが示唆されました。<br><br>現在の検証はシミュレーションに基づいた予備的なものですが、プロセスレベルの制御がLLMの推論信頼性向上に有望な方向性を示す可能性が示唆されています。</div>
