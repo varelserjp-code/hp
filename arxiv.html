@@ -102,6 +102,84 @@
     <p class="page-desc">arXiv の最新AI論文をAIで日本語要約し、定期更新しています。</p>
 <!-- ARTICLES_START -->
 <article>
+  <p class="meta">arXiv cs.AI　Thu, 19 Mar 2026 17:41:18 Z</p>
+  <h2 class="article-title">Box Maze: LLMの信頼性の高い推論のためのプロセス制御アーキテクチャ</h2>
+  <div class="summary">本論文は、AI分野における大規模言語モデル（LLM）の信頼性向上に関する研究です。<br><br>LLMは強力な生成能力を持つ一方で、幻覚や敵対的なプロンプトに対する不確かな推論が課題となっています。既存の安全対策は行動レベルに留まり、推論プロセスの整合性を保証するアーキテクチャ上のメカニズムが不足していました。本研究では、LLMの推論を記憶の接地、構造化推論、境界強制の3層に分解する「Box Maze」フレームワークを提案します。<br><br>シミュレーションベースの評価では、複数のLLMシステムに対し、境界侵食シナリオを用いて検証が行われました。その結果、明示的な認知制御層が境界維持の一貫性を向上させ、アーキテクチャ上の制約により、敵対的条件下での境界失敗率が約40%から1%未満に低減することが示唆されました。<br><br>現在の検証はシミュレーションに基づいた予備的なものですが、プロセスレベルの制御がLLMの推論信頼性向上に有望な方向性を示す可能性が示唆されています。</div>
+  <div class="source-box">
+    <strong>ソース・引用元</strong><br>
+    配信元：arXiv cs.AI<br>
+    著者：Zou Qiang<br>
+    分類：cs.AI, cs.CL<br>
+    原文URL：<a href="https://arxiv.org/abs/2603.19182v1" target="_blank" rel="noopener">https://arxiv.org/abs/2603.19182v1</a>
+  </div>
+</article>
+
+<article>
+  <p class="meta">arXiv cs.AI　Thu, 19 Mar 2026 17:59:41 Z</p>
+  <h2 class="article-title">FinTradeBench: LLMのための金融推論ベンチマーク</h2>
+  <div class="summary">本論文は、AI分野における金融タスクに特化した大規模言語モデル（LLM）の評価ベンチマークに関する研究です。<br><br>現実世界の金融意思決定は、企業財務情報と市場の取引シグナルといった異種信号を横断した推論を必要とします。近年LLMが金融分野で活用され始めていますが、既存のベンチマークは主に財務諸表データに焦点を当てており、市場での取引やファンダメンタルズとの相互作用に関する推論を評価するものが少ないという課題がありました。<br><br>この課題に対応するため、本研究では企業ファンダメンタルズと取引シグナルを統合した金融推論ベンチマーク「FinTradeBench」を提案します。このベンチマークは、NASDAQ-100企業を対象とした10年間のデータに基づき、1,400の質問を含みます。質問は、ファンダメンタルズ中心、取引シグナル中心、および両者を横断するハイブリッド推論の3カテゴリに分類されます。<br><br>14のLLMをゼロショットおよび検索拡張設定で評価した結果、明確な性能差が確認されました。検索拡張はテキストベースのファンダメンタルズ推論を大幅に改善しましたが、取引シグナル推論への効果は限定的でした。これらの結果は、現在のLLMにおける数値的・時系列推論の根本的な課題を浮き彫りにし、将来の金融知能研究の方向性を示唆しています。</div>
+  <div class="source-box">
+    <strong>ソース・引用元</strong><br>
+    配信元：arXiv cs.AI<br>
+    著者：Yogesh Agrawal, Aniruddha Dutta, Md Mahadi Hasan, Santu Karmaker, Aritra Dutta<br>
+    分類：cs.CE, cs.AI, cs.CL, cs.IR, q-fin.CP<br>
+    原文URL：<a href="https://arxiv.org/abs/2603.19225v1" target="_blank" rel="noopener">https://arxiv.org/abs/2603.19225v1</a>
+  </div>
+</article>
+
+<article>
+  <p class="meta">arXiv cs.AI　Thu, 19 Mar 2026 17:20:56 Z</p>
+  <h2 class="article-title">意味と測定：Vision-Language Navigationのためのマルチエージェント確率的接地</h2>
+  <div class="summary">本論文は、AI分野におけるロボットのナビゲーション能力向上に関する研究です。<br><br>人間と協働するロボットは、自然言語の指示を物理的に実現可能な行動に変換する必要があります。例えば、「冷蔵庫の右に2メートル進む」といった指示は、意味的な参照、空間関係、および距離の制約を3D空間内で理解する必要があります。近年のVision-Languageモデル（VLM）は意味的な理解に優れていますが、物理的な空間における距離制約を明示的に推論するようには設計されていません。<br><br>この限界に対処するため、本研究では「MAPG（Multi-Agent Probabilistic Grounding）」というエージェントフレームワークを提案します。MAPGは、言語指示を構造化されたサブコンポーネントに分解し、VLMに各コンポーネントの接地を問い合わせます。その後、これらの接地された出力を確率的に合成することで、3D空間内で距離的に整合性の取れた、実行可能な決定を生成します。<br><br>HM-EQAベンチマークでの評価により、既存の強力なベースラインと比較して一貫した性能向上が示されました。さらに、距離と意味の言語接地を評価するための新しいベンチマーク「MAPG-Bench」が導入されました。また、シミュレーションを超えて実世界ロボットでの実証も行われ、構造化されたシーン表現が利用可能な場合にMAPGが転移可能であることが示されています。</div>
+  <div class="source-box">
+    <strong>ソース・引用元</strong><br>
+    配信元：arXiv cs.AI<br>
+    著者：Swagat Padhan, Lakshya Jain, Bhavya Minesh Shah, Omkar Patil, Thao Nguyen, Nakul Gopalan<br>
+    分類：cs.RO, cs.AI, cs.CL, cs.CV, cs.LG<br>
+    原文URL：<a href="https://arxiv.org/abs/2603.19166v1" target="_blank" rel="noopener">https://arxiv.org/abs/2603.19166v1</a>
+  </div>
+</article>
+
+<article>
+  <p class="meta">arXiv cs.CL　Thu, 19 Mar 2026 17:50:07 Z</p>
+  <h2 class="article-title">LLMの聴覚知識がオーディオ言語モデルに与える影響：包括的評価</h2>
+  <div class="summary">本論文は、大規模言語モデル（LLM）が大規模オーディオ言語モデル（LALM）の知識基盤として広く利用されている現状に着目し、テキストのみの事前学習を通じてLLMがどの程度の聴覚知識をエンコードしているか、そしてそれが下流タスクのパフォーマンスにどう影響するかを明らかにすることを目的としています。<br><br>研究では、テキストのみの2つの設定と、オーディオを考慮した1つの設定で異なるLLMを比較評価しました。具体的には、聴覚知識の広さと深さをテストするベンチマーク「AKB-2000」での直接的なプロービング、オーディオキャプショナーからのテキスト記述に対するLLMの推論能力の評価、そしてオーディオエンコーダーと共にLLMをファインチューニングしたLALMでのオーディオベースの評価を実施しました。<br><br>その結果、LLMファミリー間で聴覚知識のエンコード量に大きなばらつきがあること、そしてテキストのみでの評価結果がオーディオベースのパフォーマンスと強く相関することが明らかになりました。本研究は、オーディオ分野におけるLLMの理解を深めるための経験的な基盤を提供するものです。</div>
+  <div class="source-box">
+    <strong>ソース・引用元</strong><br>
+    配信元：arXiv cs.CL<br>
+    著者：Ke-Han Lu, Szu-Wei Fu, Chao-Han Huck Yang, Zhehuai Chen, Sung-Feng Huang, Chih-Kai Yang, Yi-Cheng Lin, Chi-Yuan Hsiao<br>
+    分類：eess.AS, cs.CL, cs.SD<br>
+    原文URL：<a href="https://arxiv.org/abs/2603.19195v1" target="_blank" rel="noopener">https://arxiv.org/abs/2603.19195v1</a>
+  </div>
+</article>
+
+<article>
+  <p class="meta">arXiv cs.CL　Thu, 19 Mar 2026 17:23:20 Z</p>
+  <h2 class="article-title">大規模言語モデルにおける対事実的戦略的推論の評価</h2>
+  <div class="summary">本論文は、大規模言語モデル（LLM）が、戦略的なパフォーマンスにおいて真の推論能力を反映しているのか、それとも記憶されたパターンに依存しているのかを評価することを目的としています。この評価のために、LLMを繰り返しゲーム理論的な設定で検証しました。<br><br>研究では、囚人のジレンマ（PD）とじゃんけん（RPS）という2つの代表的なゲームを取り上げ、これらのゲームに payoff 構造や行動ラベルを変更する対事実的なバリエーションを導入しました。これにより、慣れ親しんだ対称性や優位関係が破られる状況を作り出しました。<br><br>評価フレームワークでは、デフォルト設定と対事実的な設定でのパフォーマンスを複数の指標で比較しました。その結果、LLMは対事実的な環境において、インセンティブへの感度、構造的汎化、戦略的推論において限界を示すことが示されました。</div>
+  <div class="source-box">
+    <strong>ソース・引用元</strong><br>
+    配信元：arXiv cs.CL<br>
+    著者：Dimitrios Georgousis, Maria Lymperaiou, Angeliki Dimitriou, Giorgos Filandrianos, Giorgos Stamou<br>
+    分類：cs.CL<br>
+    原文URL：<a href="https://arxiv.org/abs/2603.19167v1" target="_blank" rel="noopener">https://arxiv.org/abs/2603.19167v1</a>
+  </div>
+</article>
+
+<article>
+  <p class="meta">arXiv cs.CL　Thu, 19 Mar 2026 16:59:37 Z</p>
+  <h2 class="article-title">UGID：大規模言語モデルのバイアス除去のための統一グラフ同型性</h2>
+  <div class="summary">本論文は、大規模言語モデル（LLM）に顕著に見られる社会的バイアスに着目し、そのバイアスを内部表現レベルで除去するための新しいフレームワーク「UGID」を提案します。従来の出力レベルやデータ最適化に基づく手法ではバイアスを完全に解決できないという課題に対し、UGIDはTransformerを構造化された計算グラフとしてモデル化し、注意機構（attention mechanism）がグラフのルーティングエッジを、隠れ状態がグラフノードを定義すると考えます。<br><br>UGIDでは、バイアス除去を、対事実的な入力間でグラフ構造の不変性を強制する問題として定式化します。これにより、バイアスのある属性のみの違いを許容します。このフレームワークは、バイアスに敏感な領域における注意ルーティングと隠れ表現を同時に制約し、バイアスがアーキテクチャのコンポーネント間で移行するのを効果的に防ぎます。<br><br>さらに、モデルの汎用的な能力を低下させることなく、効果的な行動アライメントを実現するために、感度ロジットに対する対数空間制約と、定義的意味論を保持するための選択的アンカーベースの目的関数を導入しています。大規模言語モデルを用いた広範な実験により、UGIDは分布内および分布外の両方の設定でバイアスを効果的に低減し、内部構造の不一致を大幅に削減し、モデルの安全性と有用性を維持することが実証されました。</div>
+  <div class="source-box">
+    <strong>ソース・引用元</strong><br>
+    配信元：arXiv cs.CL<br>
+    著者：Zikang Ding, Junchi Yao, Junhao Li, Yi Zhang, Wenbo Jiang, Hongbo Liu, Lijie Hu<br>
+    分類：cs.CL, cs.AI<br>
+    原文URL：<a href="https://arxiv.org/abs/2603.19144v1" target="_blank" rel="noopener">https://arxiv.org/abs/2603.19144v1</a>
+  </div>
+</article>
+
+<article>
   <p class="meta">arXiv cs.AI　Wed, 18 Mar 2026 17:59:10 Z</p>
   <h2 class="article-title">Loc3R-VLM: 視覚言語モデルによる言語ベースの3D位置特定と推論</h2>
   <div class="summary">本論文は、2次元の視覚言語モデル（VLM）に単眼ビデオ入力から高度な3D理解能力を付与するフレームワーク「Loc3R-VLM」を提案します。<br><br>人間の空間認知に着想を得て、シーン構造の全体的な表現を構築するためのグローバルレイアウト再構築と、自己中心的視点を固定するための明示的な状況モデリングという2つの共同目標に依存します。これらの目標は、知覚と言語の両方を3Dコンテキストに結びつける直接的な空間的監督を提供します。<br><br>幾何学的整合性とメトリック尺度アライメントを確保するため、事前学習済みの3D基盤モデルから抽出された軽量なカメラポーズ事前情報を活用します。Loc3R-VLMは、言語ベースの位置特定において最先端の性能を達成し、状況依存および一般的な3D質問応答ベンチマークにおいて、既存の2Dおよびビデオベースのアプローチを上回ります。これは、提案する空間監督フレームワークが強力な3D理解を可能にすることを示しています。</div>
