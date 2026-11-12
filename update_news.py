@@ -348,7 +348,8 @@ def main():
 
     final_html = build_final_html(all_articles)
 
-    backup_file_if_exists(EXISTING_FILE)
+    # 2026-11-12: .bak backups disabled (past versions are kept in git history).
+    log("[INFO] backup skipped (disabled)")
 
     with open(EXISTING_FILE, "w", encoding="utf-8") as f:
         f.write(final_html)
